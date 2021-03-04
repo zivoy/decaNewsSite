@@ -4,7 +4,13 @@
     ".write": false,
     "leaks": {
       ".read": true,
-      ".indexOn": ["time", "reporter_uid"]
+      ".indexOn": [
+        "time",
+        "reporter_uid"
+      ]
+    },
+    "users": {
+      ".indexOn": ".value"
     }
   }
 }

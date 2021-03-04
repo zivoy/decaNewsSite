@@ -43,7 +43,8 @@ func initializeRoutes() {
 	}
 
 	admin := router.Group("/admin")
+	admin.Use(minAuthLevel(2))
 	{
-		admin.GET("/dashboard", minAuthLevel(2), adminBoard)
+		admin.GET("/dashboard", adminBoard)
 	}
 }

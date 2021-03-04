@@ -19,12 +19,13 @@ import (
 
 var router *gin.Engine
 
-var discordRedirect string
 var discordProvider *discord.Provider
 var debug bool
 var store *sessions.CookieStore
 
 var dataBase *db.Client
+
+var domainBase *url.URL
 
 var authorities = map[int]string{
 	0: "Browser",
@@ -46,19 +47,24 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	discordRedirect := os.Getenv("REDIRECT")
+	domainBase, err = url.Parse(discordRedirect)
+	if err != nil {
+		panic(err)
+	}
+
 	key := os.Getenv("STORE_SECRET") // Replace with your SESSION_SECRET or similar
 	maxAge := 86400 * 30             // 30 days
 
 	store = sessions.NewCookieStore([]byte(key))
 	store.MaxAge(maxAge)
 	store.Options.Path = "/"
-	//store.Options.Domain = ""
+	store.Options.Domain = domainBase.Host
 	store.Options.HttpOnly = true // HttpOnly should always be enabled
 	store.Options.Secure = !debug
 
 	gothic.Store = store
 
-	discordRedirect = os.Getenv("REDIRECT")
 	discordProvider = discord.New(os.Getenv("DISCORD_KEY"), os.Getenv("DISCORD_SECRET"), discordRedirect+"/u/login/callback", discord.ScopeIdentify)
 	goth.UseProviders(discordProvider)
 
@@ -110,6 +116,8 @@ func authorityLevel(auth int) string {
 func render(c *gin.Context, data gin.H, title string, description string, image string, url *url.URL, templateName string, status ...int) {
 	data["title"] = title
 	data["description"] = description
+	url.Host = domainBase.Host
+	url.Scheme = domainBase.Scheme
 	data["url"] = url.String()
 	data["image"] = image
 	loggedInInterface, _ := c.Get("is_logged_in")

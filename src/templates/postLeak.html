@@ -4,7 +4,7 @@
 {{if .publishSuccess}}
 <div class="notification is-success">
     <p class="title">Success</p>
-    <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakUrl}}</a></p>
+    <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakId}}</a></p>
 </div>
 {{end}}
 {{if .errorPublishing}}

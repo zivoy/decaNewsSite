@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"net/url"
 	"sort"
 	"strconv"
 )
@@ -128,10 +129,15 @@ func createArticle(c *gin.Context) {
 
 	if a, err := createNewLeak(description, time, imageUrl, discordUrl, reporterUid); err == nil {
 		// success
+		leakLocation := url.URL{
+			Scheme: domainBase.Scheme,
+			Host:   domainBase.Host,
+			Path:   fmt.Sprintf("/leaks/leak/%s", a.ID),
+		}
 		render(c, gin.H{"status": "success",
 			"payload": map[string]interface{}{
 				"leakId":  a.ID,
-				"leakUrl": fmt.Sprintf("/leaks/leak/%s", a.ID), //c.Request.URL.Scheme, c.Request.URL.Host,
+				"leakUrl": leakLocation.String(), //c.Request.URL.Scheme, c.Request.URL.Host,
 				"leak":    a,
 			}, "publishSuccess": true},
 			"Create new",
