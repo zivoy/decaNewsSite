@@ -1,0 +1,55 @@
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+<section class="section">
+    <div class="columns">
+        <div class="column is-offset-1-desktop is-5-fullhd is-8">
+            <div class="media">
+                <div class="media-left">
+                    <figure class="image is-128x128">
+                        <img class="is-rounded" src="{{ .payload.user.AvatarUrl }}?size=128">
+                    </figure>
+                </div>
+                <div class="media-content">
+                    <div class="content">
+                        <p class="is-size-4 is-size-6-mobile">
+                            <strong>{{.payload.user.Username}}</strong><small>#{{.payload.user.UserDiscriminator}}</small>
+                            <br>
+                            <i>{{.payload.user.UID}}</i>
+                            <br>
+                            authorization level {{authLevelName .payload.user.AuthLevel}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="columns {{/* is-vcentered */ -}} is-multiline is-centered">
+        {{range .payload.leaksMade}}
+        <div class="column">
+            <div class="box">
+                <article class="media">
+                    {{ if .ImageUrl}}
+                    <figure class="media-left">
+                        <a class="image is-64x64" href="/leaks/leak/{{.ID}}">
+                            <img src="{{.ImageUrl}}">
+                        </a>
+                    </figure>
+                    {{end}}
+                    <div class="media-content">
+                        <div class="content">
+                            <a href="/leaks/leak/{{.ID}}">{{.Summary}}</a>
+                        </div>
+                    </div>
+                    <figure class="media-left is-hidden-touch">
+                        <time datetime="{{.LeakTime}}"></time>
+                    </figure>
+                </article>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</section>
+<script src="/static/convertTime.js"></script>
+
+{{ template "footer.html" .}}

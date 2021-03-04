@@ -1,0 +1,46 @@
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+<section class="section is-2">
+    <div class="columns is-centered">
+        <div class="column is-half">
+            <a class="button is-primary mb-2" href="/leaks"> <!-- todo make this go back to you previous location -->
+                <span class="icon-text">
+                    <span class="icon">
+                        <ion-icon class="ion-ionic" name="arrow-back-outline"></ion-icon>
+                    </span>
+                    <span>Go back</span>
+                </span>
+            </a>
+            <div class="card">
+                <div class="card-content">
+                    <div class="content">
+                        <p>
+                            {{.payload.Description}}
+                        </p>
+                        <time datetime="{{.payload.LeakTime}}"></time>
+                        <span> - </span>
+                        <strong><a href="/u/profile/{{ .payload.ReporterUid }}">
+                            {{- $user := getUser .payload.ReporterUid -}}
+                            {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
+                        <span> - </span>
+                        <a id="source" target="_blank" href="{{.payload.DiscordLink}}">Source</a>
+                    </div>
+                </div>
+                {{ if .payload.ImageUrl}}
+                <div class="card-image">
+                    <figure class="image">
+                        <img id="previewImage"
+                             src="{{.payload.ImageUrl}}"
+                             alt="Leak Image">
+                    </figure>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</section>
+<script src="/static/convertTime.js"></script>
+
+<!--Embed the footer.html template at this location-->
+{{ template "footer.html" .}}

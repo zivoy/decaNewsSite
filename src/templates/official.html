@@ -1,0 +1,58 @@
+{{ template "header.html" .}}
+
+<p class="title">Official news</p>
+
+<style>
+    .limitHeight {
+        height: 60vh;
+        overflow: auto
+    }
+</style>
+
+<div class="columns">
+    <div class="column is-half">
+        <div class="box">
+        <span class="icon-text">
+          <span class="icon has-text-info">
+            <ion-icon class="ion-ionic" name="logo-twitter"></ion-icon>
+          </span>
+          <span>Twitter</span>
+        </span>
+            <div class="limitHeight">
+                <a class="twitter-timeline" href="https://twitter.com/DecaGear?ref_src=twsrc%5Etfw">Tweets by
+                    DecaGear</a>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="box">
+            <p>DecaNews</p>
+            <div class="limitHeight">
+                <a class="deca-news" href="https://www.deca.net/news/">Official DecaNews page</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script async>
+    let iframe = $('<iframe>', {
+        src: "https://www.deca.net/news/",
+        class: "deca-news is-hidden",
+        style: "position: static; visibility: visible; display: inline-block; width: 100%; padding: 0px; " +
+            "border: none; max-width: 100%; min-width: 180px; margin-top: 0px; margin-bottom: 0px; min-height: 200px;",
+        height: "4000px",
+        scrolling: "no",
+        frameborder: "0",
+        load: function () {
+            let $this = $(this)
+            $this.removeClass("is-hidden")
+            placeholder.remove()
+            // this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
+        }
+    });
+    let placeholder = $("a.deca-news")
+    let frameLocation = placeholder.parent()
+    frameLocation.append(iframe)
+</script>
+
+{{ template "footer.html" .}}

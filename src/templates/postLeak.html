@@ -1,0 +1,277 @@
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+{{if .publishSuccess}}
+<div class="notification is-success">
+    <p class="title">Success</p>
+    <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakUrl}}</a></p>
+</div>
+{{end}}
+{{if .errorPublishing}}
+<div class="notification is-warning">
+    <p class="title">Error!</p>
+    <p>something went wrong :/</p>
+    {{/* maybe bring back values */}}
+</div>
+{{end}}
+
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box is-info has-text-centered">
+            <fieldset>
+                <div class="field">
+                    <label class="label">Leak Description</label>
+                    <div class="control">
+                        <textarea id="leak" name="leak" class="textarea"
+                                  placeholder="Description of leak, be as descriptive as you want" required></textarea>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Discord Link</label>
+                    <div class="control">
+                        <input id="link" name="link" class="input" type="url" placeholder="Link to the leak in the chat"
+                               required>
+                    </div>
+                    <p class="help" id="linkInfo"></p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Image</label>
+                    <div class="control">
+                        <input class="input" type="url" id="image" name="image" placeholder="Optional link to image">
+                    </div>
+                    <p class="help">Can be a screenshot of a discussion or a relevant image to the leak</p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Time</label>
+                    <div class="control">
+                        <input class="input" type="datetime-local" id="leakTime" name="leakTime" required>
+                    </div>
+                </div>
+
+                <div class="field is-grouped is-grouped-right">
+                    <div class="control">
+                        <button id="submit" class="button is-link" onclick="post()" disabled>Submit</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="preview" class="column is-invisible is-hidden-touch">
+        <div class="card">
+            <div class="card-content">
+                <div class="content">
+                    <p id="leakPreview">
+                    </p>
+                    <time id="timeToSet" datetime=""></time>
+                    <span> - </span>
+                    <strong>{{.user.Username}}#{{ .user.UserDiscriminator }}</strong>
+                    <span> - </span>
+                    <a id="source" target="_blank" class="has-text-danger">Source</a>
+                </div>
+            </div>
+
+            <div class="card-image is-hidden">
+                <figure class="image">
+                    <img id="previewImage"
+                         src=""
+                         alt="Leak Image">
+                </figure>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    let LeakTime = new Date();
+    const User = "{{.user.UID}}";
+    let Link = "";
+    let Leak = "";
+    let Image = "";
+
+    const postError = "true" === "{{.errorPublishing}}"
+    const postSuccess = "true" === "{{.publishSuccess}}"
+
+    const inputTime = $("input#leakTime");
+    const inputLink = $("input#link");
+    const linkInfo = $("p#linkInfo");
+    const submitButton = $("button#submit");
+    const inputLeak = $("textarea#leak");
+    const inputImage = $("input#image");
+    const preview = $("div#preview");
+
+    LeakTime.setSeconds(0);
+    LeakTime.setMilliseconds(0);
+    $("time#timeToSet").attr("datetime", LeakTime.toISOString());
+
+    setTimeVal(LeakTime)
+
+    function setTimeVal(date) {
+        let now = new Date(date);
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        inputTime.val(now.toISOString().slice(0, 16));
+        inputTime.attr("max", now.toISOString().slice(0, 16));
+    }
+
+    inputTime.change(timeChange)
+
+    function timeChange() {
+        preview.removeClass("is-invisible")
+        inputTime.removeClass("is-danger")
+        try {
+            LeakTime = new Date(inputTime.val());
+            $("time#timeToSet").attr("datetime", LeakTime.toISOString());
+            fixTime()
+        } catch (err) {
+            inputTime.addClass("is-danger")
+            LeakTime = null
+            $("time#timeToSet").text("invalid date")
+        }
+        formReady()
+    }
+
+    inputLink.on("input", linkChange)
+
+    function linkChange() {
+        preview.removeClass("is-invisible")
+        inputLink.removeClass("is-danger is-success")
+        linkInfo.removeClass("is-danger is-success")
+        let source = $("a#source")
+        source.addClass("has-text-danger")
+        linkInfo.text("")
+        Link = ""
+        let val = inputLink.val();
+        if (val === "") {
+            inputLink.addClass("is-danger")
+        }
+        if (val.match(/https:\/\/discord\.com\/channels\/765917490734694412\/\d+\/\d+/)) {
+            inputLink.addClass("is-success")
+            Link = val
+            source.removeClass("has-text-danger")
+            source.attr("href", val)
+        } else {
+            linkInfo.text("This does not seem to be a valid Discord post link in the DecaGear server")
+            linkInfo.addClass("is-danger")
+            inputLink.addClass("is-danger")
+        }
+        formReady()
+    }
+
+    inputLeak.on("input", leakChange)
+
+    function leakChange() {
+        preview.removeClass("is-invisible")
+        inputLeak.removeClass("is-danger")
+        let val = inputLeak.val();
+        Leak = val
+        if (val === "") {
+            inputLeak.addClass("is-danger")
+        }
+        $("p#leakPreview").text(val)
+        formReady()
+    }
+
+    inputImage.on("input", imageChange)
+
+    function imageChange() {
+        preview.removeClass("is-invisible");
+        inputImage.removeClass("is-danger")
+        let previewImage = $("img#previewImage");
+        let container = previewImage.parent().parent();
+        let val = inputImage.val();
+        Image = val
+
+        function isValidImageUrl(url, callback) {
+            $('<img>', {
+                src: url,
+                load: function () {
+                    callback(true);
+                },
+                error: function () {
+                    callback(false);
+                }
+            });
+        }
+
+        if (val != "") {
+            isValidImageUrl(val, function (result) {
+                if (result) {
+                    previewImage.attr("src", val)
+                    container.removeClass("is-hidden")
+                } else {
+                    previewImage.attr("src", "")
+                    container.addClass("is-hidden")
+                    inputImage.addClass("is-danger")
+                    Image = ""
+                }
+            });
+        }
+        formReady()
+    }
+
+
+    function formReady() {
+        submitButton.prop("disabled", true);
+        if (Leak && LeakTime && User && Link) {
+            submitButton.prop("disabled", false);
+        }
+    }
+
+    function post() {
+        var form = $('<form></form>');
+
+        form.attr("method", "post");
+        form.addClass("is-hidden");
+        form.attr("action", "/leaks/create");
+
+        $.each({
+            description: Leak,
+            time: LeakTime.getTime(),
+            image_url: Image,
+            discord_url: Link,
+            reporter_uid: User
+        }, function (key, value) {
+            let field = $('<input></input>');
+            field.attr("type", "hidden");
+            field.attr("name", key);
+            field.attr("value", value);
+
+            form.append(field);
+        });
+
+        $(document.body).append(form);
+        form.submit();
+    }
+
+    if (postError) {
+        Leak = "{{.payload.description}}"
+        LeakTime = new Date(parseInt("{{.payload.time}}"))
+        Image = "{{.payload.image_url}}"
+        Link = "{{.payload.discord_url}}"
+        if (isNaN(LeakTime.getTime())) {
+            LeakTime = new Date()
+        }
+        setTimeVal(LeakTime);
+        inputLink.val(Link);
+        inputLeak.val(Leak);
+        inputImage.val(Image);
+
+        timeChange();
+        linkChange();
+        leakChange();
+        imageChange();
+        formReady();
+    }
+
+</script>
+<script src="/static/convertTime.js"></script>
+
+
+<!--Embed the footer.html template at this location-->
+{{ template "footer.html" .}}

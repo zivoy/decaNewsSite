@@ -1,0 +1,64 @@
+{{ template "header.html" .}}
+
+<section class="section">
+    <a class="button is-info mb-2" href="/leaks/create">
+        New Leak
+    </a>
+    <div class="columns {{/* is-vcentered */ -}} is-multiline is-centered">
+        {{range .payload}}
+        <div class="column">
+            <div class="box">
+                <article class="media">
+                    {{ if .ImageUrl}}
+                    <figure class="media-left">
+                        <a class="image is-128x128" href="/leaks/leak/{{.ID}}">
+                            <img src="{{.ImageUrl}}">
+                        </a>
+                    </figure>
+                    {{end}}
+                    <div class="media-content">
+                        <div class="content">
+                            <a href="/leaks/leak/{{.ID}}">{{.Summary}}</a>
+                        </div>
+                    </div>
+                    <figure class="media-left is-hidden-touch">
+                        <a href="/u/profile/{{.ReporterUid}}">
+                        <p class="level is-size-6">
+                            {{- $user := getUser .ReporterUid -}}
+                            <span class="level-left">
+                        <span class="image is-32x32">
+                            <img class="level-item" src="{{$user.AvatarUrl}}">
+                        </span>
+                        </span>
+                            <span class="level-right">
+                                <span class="level-item">{{$user.Username}}#{{$user.UserDiscriminator}}</span>
+                            </span>
+                        </p>
+                        </a>
+                        <time datetime="{{.LeakTime}}"></time>
+                    </figure>
+                </article>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{/*<!-- todo make page things-->
+    <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+        <a class="pagination-previous">Previous</a>
+        <a class="pagination-next">Next page</a>
+        <ul class="pagination-list">
+            <li><a class="pagination-link" aria-label="Goto page 1">1</a></li>
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
+            <li><a class="pagination-link" aria-label="Goto page 45">45</a></li>
+            <li><a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a></li>
+            <li><a class="pagination-link" aria-label="Goto page 47">47</a></li>
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
+            <li><a class="pagination-link" aria-label="Goto page 86">86</a></li>
+        </ul>
+    </nav>
+    */}}
+
+</section>
+<script src="/static/convertTime.js"></script>
+
+{{ template "footer.html" .}}
