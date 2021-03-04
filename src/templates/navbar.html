@@ -29,8 +29,15 @@
             {{ if .is_logged_in }}
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link" href="/u/profile/{{.user.UID}}">
-                    <span class="level">
-                        <span class="icon level-item {{- /* is-medium its stretched :/ */}}">
+                    <span class="is-hidden-desktop">
+                        <span class="icon is-medium">
+                            <img class="is-rounded" src="{{ .user.AvatarUrl }}?size=64" width="64" height="64">
+                          </span>
+                        <span>{{.user.Username}}</span>
+                    </span>
+
+                    <span class="level is-hidden-touch">
+                        <span class="icon level-item">
                             <img class="is-rounded" src="{{ .user.AvatarUrl }}?size=64" width="64" height="64">
                           </span>
                         <span class="level-item">{{.user.Username}}</span>

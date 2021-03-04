@@ -45,6 +45,16 @@ func initializeRoutes() {
 	admin := router.Group("/admin")
 	admin.Use(minAuthLevel(2))
 	{
+		admin.GET("/", func(c *gin.Context) {
+			c.Redirect(http.StatusPermanentRedirect, "/admin/dashboard")
+		})
 		admin.GET("/dashboard", adminBoard)
+
+		adminApi := admin.Group("/api")
+		{
+			adminApi.POST("clearCache/user/:uid", clearUserCache)
+			adminApi.POST("togglePosting/:uid", togglePostingPerms)
+			adminApi.POST("updateRank/:uid", UpdateUserRank)
+		}
 	}
 }

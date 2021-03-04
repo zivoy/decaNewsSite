@@ -2,7 +2,6 @@ package main
 
 import (
 	"firebase.google.com/go/db"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
@@ -71,8 +70,9 @@ func main() {
 	router = gin.Default()
 
 	router.SetFuncMap(template.FuncMap{
-		"authLevelName": authorityLevel,
-		"getUser":       getUser,
+		"authLevelName":  authorityLevel,
+		"getUser":        getUser,
+		"makeButtonList": generateAuthButtons,
 	}) //todo create a function for name colours
 
 	router.LoadHTMLGlob("templates/*")
@@ -107,7 +107,12 @@ func authorityLevel(auth int) string {
 	//	valid = append(valid, v)
 	//}
 	//return strings.Join(valid[:], ", ")
-	return fmt.Sprintf("%d: %s", auth, authorities[auth])
+	authLevel, ok := authorities[auth]
+	if !ok {
+		authLevel = "Invalid"
+	}
+	return authLevel
+	//fmt.Sprintf("%d: %s", auth, authorities[auth])
 }
 
 // Render one of HTML, JSON or CSV based on the 'Accept' header of the request

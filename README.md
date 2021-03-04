@@ -8,7 +8,8 @@ website for making and sharing news and leaks about the [decagear](https://deca.
 docker build --build-arg "DB_CREDS={{Firebase auth creds json contents with \" s escaped}}" \
  --build-arg D_KEY={{discord client id}} --build-arg D_SECRET={{discord app secret}} \
   --build-arg HOST_PATH={{https://decafans.com || or path to your url}} \
-  --build-arg RANDOM_SECRET={{idk make something up for this its for the local cookie store}} -t decafans .
+  --build-arg RANDOM_SECRET={{idk make something up for this its for the local cookie store}} \
+  --build-arg DEBUG_MODE={{true || [false] -- optinal}} -t decafans .
 ```
 then
 ```shell
@@ -16,5 +17,5 @@ docker run -d --restart unless-stopped -p 5000:5000 decafans
 ```
 or in testing use
 ```shell
-docker run -p 5000:5000 -v src/templates:templates decafans
+docker run -p 5000:5000 -it -v $(pwd)/src/templates:/app/decafans-server/templates decafans  
 ```

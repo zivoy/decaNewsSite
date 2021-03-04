@@ -9,6 +9,7 @@ COPY go.mod .
 COPY go.sum .
 
 RUN go mod download
+RUN go mod verify
 
 COPY src src
 COPY src/templates templates
