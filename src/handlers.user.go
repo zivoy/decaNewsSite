@@ -50,7 +50,9 @@ func logout(c *gin.Context) {
 
 func userProfile(c *gin.Context) {
 	uid := c.Param("profile_id")
-	if user := getUser(uid); user.UID != "" {
+
+	if userExists(uid) {
+		user := getUser(uid)
 		// Call the HTML method of the Context to render a template
 		userLeaks, err := getAllUsersArticles(uid)
 		if err != nil {
