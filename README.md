@@ -14,3 +14,7 @@ then
 ```shell
 docker run -d --restart unless-stopped -p 5000:5000 decafans
 ```
+or in testing use
+```shell
+docker run -p 5000:5000 -v src/templates:templates decafans
+```
