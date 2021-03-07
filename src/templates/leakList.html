@@ -16,28 +16,36 @@
                         </a>
                     </figure>
                     {{end}}
-                    <div class="media-content">
+                    <div class="media-content" style="min-width: 150px;">
                         <div class="content">
                             <a href="/leaks/leak/{{.ID}}">{{.Summary}}</a>
                         </div>
                     </div>
-                    <figure class="media-left is-hidden-touch">
-                        <a href="/u/profile/{{.ReporterUid}}">
-                        <p class="level is-size-6">
-                            {{- $user := getUser .ReporterUid -}}
-                            <span class="level-left">
+                </article>
+                <div class="level is-size-7">
+                    <div class="level-right">
+                    </div>
+                    <div class="level-right">
+                        <figure class="level-item is-hidden-mobile">
+                            <div>
+                                <a href="/u/profile/{{.ReporterUid}}">
+                                    <p class="level is-size-6">
+                                        {{- $user := getUser .ReporterUid -}}
+                                        <span class="level-left">
                         <span class="image is-32x32">
                             <img class="level-item" src="{{$user.AvatarUrl}}">
                         </span>
                         </span>
-                            <span class="level-right">
+                                        <span class="level-right">
                                 <span class="level-item">{{$user.Username}}#{{$user.UserDiscriminator}}</span>
                             </span>
-                        </p>
-                        </a>
-                        <time datetime="{{.LeakTime}}"></time>
-                    </figure>
-                </article>
+                                    </p>
+                                </a>
+                                <time datetime="{{.LeakTime}}"></time>
+                            </div>
+                        </figure>
+                    </div>
+                </div>
             </div>
         </div>
         {{end}}
