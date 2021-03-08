@@ -67,7 +67,9 @@ func getArticle(c *gin.Context) {
 }
 
 func showArticleCreationPage(c *gin.Context) {
-	render(c, gin.H{},
+	render(c, gin.H{"payload": map[string][]string{
+		"allowed_links": getAllowedLink(),
+	}},
 		"Create new",
 		"Share a new DecaLeak",
 		" ",

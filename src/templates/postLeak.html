@@ -83,7 +83,6 @@
         </div>
     </div>
 </div>
-
 <script>
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
@@ -150,7 +149,14 @@
         if (val === "") {
             inputLink.addClass("is-danger")
         }
-        if (val.match(/https:\/\/discord\.com\/channels\/765917490734694412\/\d+\/\d+/)) {
+
+        let vals = [
+        {{range $r:= .payload.allowed_links}}
+        val.match(new RegExp("{{$r}}")),
+        {{end}}
+        ]
+
+        if (vals.some(x => x)) {
             inputLink.addClass("is-success")
             Link = val
             source.removeClass("has-text-danger")
@@ -199,7 +205,7 @@
             });
         }
 
-        if (val != "") {
+        if (val !== "") {
             isValidImageUrl(val, function (result) {
                 if (result) {
                     previewImage.attr("src", val)

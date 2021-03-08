@@ -96,6 +96,16 @@ func articleExists(id string) bool {
 	return exists
 }
 
+func getAllowedLink() []string {
+	ref := dataBase.NewRef("admin/allowed_links")
+	var data []string
+	if err := ref.Get(ctx, &data); err != nil && debug {
+		fmt.Println(err)
+		return nil
+	}
+	return data
+}
+
 func createNewLeak(description string, rawTime string, imageUrl string, discordUrl string, reporterUid string) (article, error) {
 	time, err := strconv.Atoi(rawTime)
 	if err != nil {
@@ -136,9 +146,10 @@ func createArticle(c *gin.Context) {
 		}
 		render(c, gin.H{"status": "success",
 			"payload": map[string]interface{}{
-				"leakId":  a.ID,
-				"leakUrl": leakLocation.String(), //c.Request.URL.Scheme, c.Request.URL.Host,
-				"leak":    a,
+				"leakId":        a.ID,
+				"leakUrl":       leakLocation.String(), //c.Request.URL.Scheme, c.Request.URL.Host,
+				"leak":          a,
+				"allowed_links": getAllowedLink(),
 			}, "publishSuccess": true},
 			"Create new",
 			"Share a new DecaLeak",
@@ -148,12 +159,13 @@ func createArticle(c *gin.Context) {
 	} else {
 		// error
 		render(c, gin.H{"status": "error",
-			"payload": map[string]string{
-				"description":  description,
-				"time":         time,
-				"image_url":    imageUrl,
-				"discord_url":  discordUrl,
-				"reporter_uid": reporterUid,
+			"payload": map[string]interface{}{
+				"description":   description,
+				"time":          time,
+				"image_url":     imageUrl,
+				"discord_url":   discordUrl,
+				"reporter_uid":  reporterUid,
+				"allowed_links": getAllowedLink(),
 			}, "errorPublishing": true},
 			"Create new",
 			"Share a new DecaLeak",
