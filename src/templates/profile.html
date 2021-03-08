@@ -90,15 +90,22 @@
                         </a>
                     </figure>
                     {{end}}
-                    <div class="media-content">
+                    <div class="media-content" style="min-width: 150px;">
                         <div class="content">
                             <a href="/leaks/leak/{{.ID}}">{{.Summary}}</a>
                         </div>
                     </div>
-                    <figure class="media-left is-hidden-touch">
-                        <time datetime="{{.LeakTime}}"></time>
-                    </figure>
+
                 </article>
+                <div class="level is-size-7">
+                    <div class="level-left">
+                    </div>
+                    <div class="level-right">
+                        <figure class="is-hidden-touch">
+                            <time datetime="{{.LeakTime}}"></time>
+                        </figure>
+                    </div>
+                </div>
             </div>
         </div>
         {{end}}
