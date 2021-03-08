@@ -26,6 +26,14 @@
             <a class="navbar-item" href="/about">
                 About
             </a>
+            <a class="navbar-item is-success" href="https://discord.gg/d7YG7qD" target="_blank">
+                <span class="icon-text">
+                    <span>Join Discord</span>
+                    <span class="icon has-text-dark">
+                        <ion-icon class="ion-ionic" name="logo-discord"></ion-icon>
+                    </span>
+                </span>
+            </a>
         </div>
 
         <div class="navbar-end">
@@ -34,13 +42,14 @@
                 <a class="navbar-link" href="/u/profile/{{.user.UID}}">
                     <span class="is-hidden-desktop">
                         <span class="icon is-medium">
-                            <img class="is-rounded" src="{{ .user.AvatarUrl }}?size=64" width="64" height="64">
+                            <img class="is-rounded userImage" src="{{ .user.AvatarUrl }}?size=64" width="64"
+                                 height="64">
                           </span>
                         <span>{{.user.Username}}</span>
                     </span>
 
                     <span class="level is-hidden-touch">
-                        <span class="icon level-item">
+                        <span class="icon level-item userImage">
                             <img class="is-rounded" src="{{ .user.AvatarUrl }}?size=64" width="64" height="64">
                           </span>
                         <span class="level-item">{{.user.Username}}</span>
