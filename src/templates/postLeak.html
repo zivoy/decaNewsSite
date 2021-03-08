@@ -179,7 +179,7 @@
         if (val === "") {
             inputLeak.addClass("is-danger")
         }
-        $("p#leakPreview").text(val)
+        $("p#leakPreview").html(val.replaceAll("\n","<br>"))
         formReady()
     }
 

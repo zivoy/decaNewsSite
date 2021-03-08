@@ -2,12 +2,12 @@ package main
 
 import (
 	"firebase.google.com/go/db"
+	"github.com/Masterminds/sprig"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/discord"
-	"html/template"
 	"net/http"
 	"net/url"
 	"os"
@@ -69,11 +69,13 @@ func main() {
 
 	router = gin.Default()
 
-	router.SetFuncMap(template.FuncMap{
-		"authLevelName":  authorityLevel,
-		"getUser":        getUser,
-		"makeButtonList": generateAuthButtons,
-	}) //todo create a function for name colours
+	functions := sprig.GenericFuncMap()
+	functions["authLevelName"] = authorityLevel
+	functions["getUser"] = getUser
+	functions["makeButtonList"] = generateAuthButtons
+	functions["unescape"] = unescape
+
+	router.SetFuncMap(functions) //todo create a function for name colours
 
 	router.LoadHTMLGlob("templates/*")
 
