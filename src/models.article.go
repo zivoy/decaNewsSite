@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/frustra/bbcode"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -20,8 +19,6 @@ type article struct {
 	DiscordLink string `json:"source_url"`
 	ReporterUid string `json:"reporter_uid"`
 }
-
-var BBCompiler = bbcode.NewCompiler(true, true)
 
 func articlePathString(uid string) string {
 	return fmt.Sprintf("leaks/%s", uid)

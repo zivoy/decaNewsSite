@@ -3,6 +3,7 @@ package main
 import (
 	"firebase.google.com/go/db"
 	"github.com/Masterminds/sprig"
+	"github.com/frustra/bbcode"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
@@ -12,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 //todo make tests
@@ -25,6 +27,7 @@ var store *sessions.CookieStore
 var dataBase *db.Client
 
 var domainBase *url.URL
+var BBCompiler bbcode.Compiler
 
 var authorities = map[int]string{
 	0: "Browser",
@@ -94,6 +97,24 @@ func main() {
 	initializeRoutes()
 
 	initCacheClearing()
+
+	BBCompiler = bbcode.NewCompiler(true, true)
+	BBCompiler.SetTag("url", func(node *bbcode.BBCodeNode) (*bbcode.HTMLTag, bool) {
+		out := bbcode.NewHTMLTag("")
+		out.Name = "a"
+		value := node.GetOpeningTag().Value
+		if value == "" {
+			text := bbcode.CompileText(node)
+			if len(text) > 0 {
+				text = strings.ReplaceAll(text, "javascript:", "")
+				out.Attrs["href"] = bbcode.ValidURL(text)
+			}
+		} else {
+			value = strings.ReplaceAll(value, "javascript:", "")
+			out.Attrs["href"] = bbcode.ValidURL(value)
+		}
+		return out, true
+	})
 
 	err = router.Run(":5000")
 	if err != nil {
