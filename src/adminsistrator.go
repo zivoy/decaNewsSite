@@ -21,10 +21,10 @@ func adminBoard(c *gin.Context) {
 
 }
 
-// takes `requester` in post request
 func clearUserCache(c *gin.Context) {
 	uid := c.Param("uid")
-	requester := c.PostForm("requester")
+	requester, _ := c.Get("user")
+	requester = requester.(user).UID
 
 	if requester == "" {
 		c.JSON(http.StatusOK, map[string]interface{}{"success": false, "message": "need `requester` id"})
@@ -35,10 +35,10 @@ func clearUserCache(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{"success": true})
 }
 
-// takes `requester` in post request
 func togglePostingPerms(c *gin.Context) {
 	uid := c.Param("uid")
-	requester := c.PostForm("requester")
+	requester, _ := c.Get("user")
+	requester = requester.(user).UID
 
 	if requester == "" {
 		c.JSON(http.StatusOK, map[string]interface{}{"success": false, "message": "need `requester` id"})
@@ -73,10 +73,11 @@ func generateAuthButtons(viewerAuth int, viewedAuth int) template.HTML {
 	return unescape(returnString)
 }
 
-// takes `rank` and `requester` in post request
+// takes `rank` in post request
 func UpdateUserRank(c *gin.Context) {
 	uid := c.Param("uid")
-	requester := c.PostForm("requester")
+	requester, _ := c.Get("user")
+	requester = requester.(user).UID
 	rawRank := c.PostForm("rank")
 
 	if requester == "" {

@@ -16,7 +16,6 @@ var clearingCache bool
 
 const expireTime = 60 * 2 // 2 minute cache
 
-// todo admin commands
 func initCacheClearing() {
 	ticker := time.NewTicker(2 * time.Hour)
 	autoClearCache = make(chan struct{})

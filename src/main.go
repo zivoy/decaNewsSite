@@ -79,7 +79,7 @@ func main() {
 	functions["unescape"] = unescape
 	functions["compileBB"] = compileBBCode
 
-	router.SetFuncMap(functions) //todo create a function for name colours
+	router.SetFuncMap(functions)
 
 	router.LoadHTMLGlob("templates/*")
 
