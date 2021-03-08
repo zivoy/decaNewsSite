@@ -16,7 +16,7 @@ type article struct {
 	Summary     string `json:"summary"`
 	LeakTime    int64  `json:"time"`
 	ImageUrl    string `json:"image_url"`
-	DiscordLink string `json:"discord_url"`
+	DiscordLink string `json:"source_url"`
 	ReporterUid string `json:"reporter_uid"`
 }
 
@@ -79,7 +79,7 @@ func getArticleByID(id string) (article, error) {
 				Summary:     articleData["summary"].(string),
 				LeakTime:    int64(articleData["time"].(float64)),
 				ImageUrl:    articleData["image_url"].(string),
-				DiscordLink: articleData["discord_url"].(string),
+				DiscordLink: articleData["source_url"].(string),
 				ReporterUid: articleData["reporter_uid"].(string),
 			}
 		})
