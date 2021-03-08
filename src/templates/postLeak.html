@@ -175,7 +175,7 @@
     function leakChange() {
         preview.removeClass("is-invisible")
         inputLeak.removeClass("is-danger")
-        let val = inputLeak.val();
+        let val = inputLeak.val().trim();
         Leak = val
         if (val === "") {
             inputLeak.addClass("is-danger")
@@ -238,10 +238,10 @@
         form.attr("action", "/leaks/create");
 
         $.each({
-            description: Leak,
+            description: Leak.replaceAll("\r\n","\n"),
             time: LeakTime.getTime(),
             image_url: Image,
-            discord_url: Link,
+            source_url: Link,
             reporter_uid: User
         }, function (key, value) {
             let field = $('<input></input>');
