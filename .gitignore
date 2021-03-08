@@ -1,4 +1,4 @@
 vendor/
-pdk/
+pkg/
 .idea/
 src/conf/
