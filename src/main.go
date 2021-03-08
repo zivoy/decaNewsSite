@@ -74,6 +74,7 @@ func main() {
 	functions["getUser"] = getUser
 	functions["makeButtonList"] = generateAuthButtons
 	functions["unescape"] = unescape
+	functions["compileBB"] = compileBBCode
 
 	router.SetFuncMap(functions) //todo create a function for name colours
 

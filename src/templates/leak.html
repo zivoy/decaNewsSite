@@ -16,7 +16,7 @@
                 <div class="card-content">
                     <div class="content">
                         <p>
-                            {{.payload.Description | replace "\n" "<br>" | unescape}}
+                            {{.payload.Description | compileBB | replace "\n" "<br>" | unescape}}
                         </p>
                         <time datetime="{{.payload.LeakTime}}"></time>
                         <span> - </span>
