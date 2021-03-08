@@ -18,7 +18,22 @@ func initializeRoutes() {
 	router.StaticFile("/favicon.png", "./resources/cropped-deca_transparent_logo_clean_square-32x32.png")
 	router.StaticFile("/favicon.ico", "./resources/DecaFans-favicon.ico")
 
-	router.GET("/official", officialIndex)
+	router.GET("/official", func(c *gin.Context) {
+		render(c, gin.H{},
+			"Official news page",
+			"Official news from deca.",
+			" ",
+			c.Request.URL,
+			"official.html")
+	})
+	router.GET("/about", func(c *gin.Context) {
+		render(c, gin.H{},
+			"About DecaFans",
+			"DecaFans is a site for fans of the DecaGear headset to share the latest news.",
+			" ",
+			c.Request.URL,
+			"about.html")
+	})
 
 	userRoutes := router.Group("/u")
 	{

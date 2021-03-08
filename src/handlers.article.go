@@ -43,14 +43,6 @@ func showIndex(c *gin.Context) {
 		"index.html")
 
 }
-func officialIndex(c *gin.Context) {
-	render(c, gin.H{},
-		"Official news page",
-		"Official news from deca.",
-		" ",
-		c.Request.URL,
-		"official.html")
-}
 
 func getArticle(c *gin.Context) {
 	// Check if the article ID is valid
