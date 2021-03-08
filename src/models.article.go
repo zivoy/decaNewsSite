@@ -116,9 +116,13 @@ func createNewLeak(description string, rawTime string, imageUrl string, discordU
 		return article{}, errors.New("invalid time")
 	}
 
+	summery := BBCompiler.Compile(description)
+	summery = stripHtmlRegex(summery)
+	summery = clip(summery, 200)
+
 	leak := article{
 		Description: description,
-		Summary:     clip(description, 200),
+		Summary:     summery,
 		LeakTime:    int64(time),
 		ImageUrl:    imageUrl,
 		DiscordLink: discordUrl,
