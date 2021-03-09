@@ -84,7 +84,7 @@ func canPost() gin.HandlerFunc {
 			},
 				"Cannot Post",
 				"No posting privilege.",
-				" ",
+				pageLogo(c),
 				c.Request.URL,
 				"error.html", http.StatusOK)
 			c.Abort()
@@ -101,14 +101,14 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 	switch code {
 	case http.StatusNotFound:
 		render(c, gin.H{
-			"payload":       map[string]string{"error": "Page not found!", "url": formatUrl(c.Request.URL)},
+			"payload":       map[string]string{"error": "Page not found!", "url": c.Request.URL.String()},
 			"errorTitle":    "404!",
 			"errorSubtitle": "Page not found",
 			"explanation":   unescape(fmt.Sprintf("no such page <code>%s</code> was found", c.Request.URL)),
 		},
 			"404 - page not found",
 			"Page not found.",
-			" ",
+			pageLogo(c),
 			c.Request.URL,
 			"error.html", code)
 	case http.StatusUnauthorized:
@@ -123,7 +123,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 		},
 			"401 - unauthorised access",
 			"You are not signed in.",
-			" ",
+			pageLogo(c),
 			c.Request.URL,
 			"error.html", code)
 	case http.StatusForbidden:
@@ -135,7 +135,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 		},
 			"403 - insufficient privileges",
 			"Insufficient privileges to access page.",
-			" ",
+			pageLogo(c),
 			c.Request.URL,
 			"error.html", code)
 	case http.StatusBadRequest:
@@ -147,7 +147,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 		},
 			"400 - bad request",
 			"Url is invalid.",
-			" ",
+			pageLogo(c),
 			c.Request.URL,
 			"error.html", code)
 	default:

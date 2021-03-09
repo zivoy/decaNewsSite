@@ -3,10 +3,25 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"net/url"
 )
+
+func formatUrl() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Request.URL.Host = domainBase.Host
+		c.Request.URL.Scheme = domainBase.Scheme
+	}
+}
+
+func pageLogo(c *gin.Context) string {
+	logo, _ := url.Parse(c.Request.URL.String())
+	logo.Path = "/static/DecaFans-big.png"
+	return logo.String()
+}
 
 func initializeRoutes() {
 	router.Use(setUserStatus())
+	router.Use(formatUrl())
 
 	router.NoRoute(func(c *gin.Context) {
 		abortWithMessage(c, http.StatusNotFound)
@@ -15,14 +30,14 @@ func initializeRoutes() {
 	router.GET("/", showIndex)
 
 	router.Static("/static", "./resources")
-	router.StaticFile("/favicon.png", "./resources/cropped-deca_transparent_logo_clean_square-32x32.png")
+	router.StaticFile("/favicon.png", "./resources/decafansLogoSmall.png")
 	router.StaticFile("/favicon.ico", "./resources/DecaFans-favicon.ico")
 
 	router.GET("/official", func(c *gin.Context) {
 		render(c, gin.H{},
 			"Official news page",
 			"Official news from deca.",
-			" ",
+			pageLogo(c),
 			c.Request.URL,
 			"official.html")
 	})
@@ -30,7 +45,7 @@ func initializeRoutes() {
 		render(c, gin.H{},
 			"About DecaFans",
 			"DecaFans is a site for fans of the DecaGear headset to share the latest news.",
-			" ",
+			pageLogo(c),
 			c.Request.URL,
 			"about.html")
 	})

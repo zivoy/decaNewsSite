@@ -123,19 +123,13 @@ func authorityLevel(auth int) string {
 	//fmt.Sprintf("%d: %s", auth, authorities[auth])
 }
 
-func formatUrl(url *url.URL) string {
-	url.Host = domainBase.Host
-	url.Scheme = domainBase.Scheme
-	return url.String()
-}
-
 // Render one of HTML, JSON or CSV based on the 'Accept' header of the request
 // If the header doesn't specify this, HTML is rendered, provided that
 // the template name is present
 func render(c *gin.Context, data gin.H, title string, description string, image string, url *url.URL, templateName string, status ...int) {
 	data["title"] = title
 	data["description"] = description
-	data["url"] = formatUrl(url)
+	data["url"] = url.String()
 	data["image"] = image
 	loggedInInterface, _ := c.Get("is_logged_in")
 	data["is_logged_in"] = loggedInInterface.(bool)
