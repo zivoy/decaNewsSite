@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"math"
 	"net/http"
@@ -67,4 +68,31 @@ func showArticleCreationPage(c *gin.Context) {
 		" ",
 		c.Request.URL,
 		"postLeak.html")
+}
+
+func archiveLeak(c *gin.Context) {
+	uid := c.Param("uid")
+	requesterUser, _ := c.Get("user")
+	requester := requesterUser.(user).UID
+
+	if !articleExists(uid) {
+		abortWithMessage(c, http.StatusBadRequest)
+		return
+	}
+
+	leak, err := getArticleByID(uid)
+	if err != nil && debug {
+		fmt.Println(err)
+	}
+	err = setEntry(dataBase, fmt.Sprintf("leaks/%s", uid), nil)
+	if err != nil && debug {
+		fmt.Println(err)
+	}
+	err = setEntry(dataBase, fmt.Sprintf("admin/archived_leaks/%s", uid), leak)
+	if err != nil && debug {
+		fmt.Println(err)
+	}
+
+	addLog(1, requester, "Archiving Leak", map[string]interface{}{"leak_id": uid})
+
 }

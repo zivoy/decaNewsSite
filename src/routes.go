@@ -72,4 +72,18 @@ func initializeRoutes() {
 			adminApi.POST("updateRank/:uid", UpdateUserRank)
 		}
 	}
+
+	apiRoot := router.Group("/api")
+	{
+		apiRoot.GET("/", func(c *gin.Context) {
+			c.Redirect(http.StatusTemporaryRedirect, "/api/v1")
+		})
+		apiV1 := apiRoot.Group("/v1")
+		{
+			apiV1.GET("/", func(c *gin.Context) {
+				c.JSON(http.StatusOK, map[string]string{"hello": "world"})
+			})
+			apiV1.POST("/archive/:uid", ensureLoggedIn(), archiveLeak)
+		}
+	}
 }

@@ -1,17 +1,43 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
-{{/*<!--todo make editing-->*/}}
+<!--todo make editing-->
+<script>
+    function archivePost() {
+        $("button#archive").addClass("is-loading")
+        $.post("/api/v1/archive/{{.payload.ID}}", function () {
+            // maybe add a message ¯\_(ツ)_/¯
+            window.location.href = "/leaks";
+        }).fail(function() {
+            $("button#archive").removeClass("is-loading")
+            alert( "Error archiving leak" );
+        });
+    }
+</script>
 <section class="section is-2">
     <div class="columns is-centered">
         <div class="column is-half">
-            <a class="button is-primary mb-2" href="/leaks"> <!-- todo make this go back to you previous location -->
-                <span class="icon-text">
-                    <span class="icon">
-                        <ion-icon class="ion-ionic" name="arrow-back-outline"></ion-icon>
-                    </span>
-                    <span>Go back</span>
-                </span>
-            </a>
+            <div class="level mb-2">
+                <div class="level-left">
+                    <a class="button is-primary level-item" href="/leaks"> <!-- todo make this go back to you previous location -->
+                        <span class="icon-text">
+                            <span class="icon">
+                                <ion-icon class="ion-ionic" name="arrow-back-outline"></ion-icon>
+                            </span>
+                            <span>Go back</span>
+                        </span>
+                    </a>
+                </div>
+                <div class="level-right">
+                    {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 1)}}
+                    <div class="buttons level-item">
+                        {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 2)}}
+                        <button class="button is-danger" id="archive" onclick="archivePost()">Archive</button>
+                        {{end}}
+                        <button class="button is-warning" id="edit" disabled>Edit</button>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
             <div class="card">
                 <div class="card-content">
                     <div class="content">
