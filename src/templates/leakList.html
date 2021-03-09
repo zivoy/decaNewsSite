@@ -6,7 +6,7 @@
         New Leak
     </a>
     {{end}}
-    <div class="columns {{/* is-vcentered */ -}} is-multiline is-centered">
+    <div class="columns is-vcentered is-multiline is-centered">
         {{range .payload}}
         <div class="column">
             <div class="box">
@@ -18,7 +18,7 @@
                         </a>
                     </figure>
                     {{end}}
-                    <div class="media-content" style="min-width: 150px;">
+                    <div class="media-content" style="min-width: 170px;">
                         <div class="content">
                             <a href="/leaks/leak/{{.ID}}">{{.Summary | replace "\n" "<br>" | unescape}}</a>
                         </div>
