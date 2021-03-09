@@ -1,13 +1,40 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 )
 
-//todo add admin logs
+type adminLog struct {
+	Time        int64                  `json:"time"`
+	Uid         string                 `json:"uid"`
+	LogLevel    int                    `json:"log_level"`
+	Description string                 `json:"description"`
+	Information map[string]interface{} `json:"information,omitempty"`
+}
+
+func addLog(actionLevel int, actee string, description string, additionalInformation ...map[string]interface{}) {
+	location := dataBase.NewRef("admin/logs")
+	currTime := time.Now().Unix()
+	var details map[string]interface{}
+	if len(additionalInformation) > 0 {
+		details = additionalInformation[0]
+	}
+	_, err := location.Push(ctx, &adminLog{
+		Time:        currTime,
+		Uid:         actee,
+		LogLevel:    actionLevel,
+		Description: description,
+		Information: details,
+	})
+	if err != nil && debug {
+		fmt.Println(fmt.Errorf("log error: %w", err))
+	}
+}
 
 func adminBoard(c *gin.Context) {
 	render(c, gin.H{
@@ -23,13 +50,15 @@ func adminBoard(c *gin.Context) {
 
 func clearUserCache(c *gin.Context) {
 	uid := c.Param("uid")
-	requester, _ := c.Get("user")
-	requester = requester.(user).UID
+	requesterUser, _ := c.Get("user")
+	requester := requesterUser.(user).UID
 
 	if requester == "" {
 		c.JSON(http.StatusOK, map[string]interface{}{"success": false, "message": "need `requester` id"})
 		return
 	}
+
+	addLog(0, requester, "Refresh Cache", map[string]interface{}{"user_affected": uid})
 
 	deleteCache(userCache, uid)
 	c.JSON(http.StatusOK, map[string]interface{}{"success": true})
@@ -37,8 +66,8 @@ func clearUserCache(c *gin.Context) {
 
 func togglePostingPerms(c *gin.Context) {
 	uid := c.Param("uid")
-	requester, _ := c.Get("user")
-	requester = requester.(user).UID
+	requesterUser, _ := c.Get("user")
+	requester := requesterUser.(user).UID
 
 	if requester == "" {
 		c.JSON(http.StatusOK, map[string]interface{}{"success": false, "message": "need `requester` id"})
@@ -50,6 +79,10 @@ func togglePostingPerms(c *gin.Context) {
 		user.PostingPrivilege = !user.PostingPrivilege
 		addUser(uid, user)
 		c.JSON(http.StatusOK, map[string]interface{}{"success": true, "perms": user.PostingPrivilege})
+		addLog(1, requester, "Toggle Posting Privilege", map[string]interface{}{
+			"user_affected": uid,
+			"value_set":     user.PostingPrivilege,
+		})
 		return
 	}
 	c.JSON(http.StatusNotFound, map[string]interface{}{"success": false, "message": "user not found"})
@@ -76,8 +109,8 @@ func generateAuthButtons(viewerAuth int, viewedAuth int) template.HTML {
 // takes `rank` in post request
 func UpdateUserRank(c *gin.Context) {
 	uid := c.Param("uid")
-	requester, _ := c.Get("user")
-	requester = requester.(user).UID
+	requesterUser, _ := c.Get("user")
+	requester := requesterUser.(user).UID
 	rawRank := c.PostForm("rank")
 
 	if requester == "" {
@@ -96,6 +129,10 @@ func UpdateUserRank(c *gin.Context) {
 		user.AuthLevel = rank
 		addUser(uid, user)
 		c.JSON(http.StatusOK, map[string]interface{}{"success": true, "auth_level": user.AuthLevel})
+		addLog(1, requester, "Update User Authorization", map[string]interface{}{
+			"user_affected": uid,
+			"value_set":     user.AuthLevel,
+		})
 		return
 	}
 	c.JSON(http.StatusNotFound, map[string]interface{}{"success": false, "message": "user not found"})
