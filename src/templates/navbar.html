@@ -58,9 +58,11 @@
                     <a class="navbar-item" href="/u/profile/{{.user.UID}}">
                         {{.user.Username}}#{{ .user.UserDiscriminator }}
                     </a>
+                    {{ if .user.PostingPrivilege}}
                     <a class="navbar-item" href="/leaks/create">
                         Create Leak
                     </a>
+                    {{end}}
                     {{ if (ge .user.AuthLevel 2)}}
                     <a class="navbar-item" href="/admin/dashboard">
                         Administrate

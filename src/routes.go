@@ -53,8 +53,8 @@ func initializeRoutes() {
 		leaksRoutes.GET("/", leakListFirst)
 		leaksRoutes.GET("/list/:page", leakList)
 
-		leaksRoutes.GET("/create", ensureLoggedIn(), showArticleCreationPage)
-		leaksRoutes.POST("/create", ensureLoggedIn(), createArticle)
+		leaksRoutes.GET("/create", ensureLoggedIn(), canPost(), showArticleCreationPage)
+		leaksRoutes.POST("/create", ensureLoggedIn(), canPost(), createArticle)
 	}
 
 	admin := router.Group("/admin")

@@ -1,9 +1,11 @@
 {{ template "header.html" .}}
 
 <section class="section">
+    {{ if .user.PostingPrivilege}}
     <a class="button is-info mb-2" href="/leaks/create">
         New Leak
     </a>
+    {{end}}
     <div class="columns {{/* is-vcentered */ -}} is-multiline is-centered">
         {{range .payload}}
         <div class="column">

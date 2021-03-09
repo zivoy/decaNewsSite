@@ -72,6 +72,26 @@ func minAuthLevel(level int) gin.HandlerFunc {
 	}
 }
 
+func canPost() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		usera, _ := c.Get("user")
+		if !usera.(user).PostingPrivilege {
+			render(c, gin.H{
+				"payload":       map[string]string{"error": "no posting privilege!"},
+				"errorTitle":    "Invalid Permission",
+				"errorSubtitle": "You do not have posting permission",
+				"explanation":   "You can ask an admin to grant you posting privileges",
+			},
+				"Cannot Post",
+				"No posting privilege.",
+				" ",
+				c.Request.URL,
+				"error.html", http.StatusOK)
+			c.Abort()
+		}
+	}
+}
+
 func abortWithMessage(c *gin.Context, code int, erre ...error) {
 	var err error
 	err = nil
@@ -81,7 +101,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 	switch code {
 	case http.StatusNotFound:
 		render(c, gin.H{
-			"payload":       map[string]string{"error": "Page not found!", "url": fmt.Sprint(c.Request.URL)},
+			"payload":       map[string]string{"error": "Page not found!", "url": formatUrl(c.Request.URL)},
 			"errorTitle":    "404!",
 			"errorSubtitle": "Page not found",
 			"explanation":   unescape(fmt.Sprintf("no such page <code>%s</code> was found", c.Request.URL)),
