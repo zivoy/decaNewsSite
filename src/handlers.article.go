@@ -51,7 +51,11 @@ func getArticle(c *gin.Context) {
 	// Check if the article exists
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
-		render(c, gin.H{"payload": article}, "DecaLeak", article.Summary, article.ImageUrl, c.Request.URL,
+		image := article.ImageUrl
+		if image == "" {
+			image = pageLogo(c)
+		}
+		render(c, gin.H{"payload": article}, "DecaLeak", article.Summary, image, c.Request.URL,
 			"leak.html")
 	} else {
 		// If the article is not found, abort with an error
