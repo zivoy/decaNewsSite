@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type article struct {
@@ -136,6 +137,17 @@ func createNewLeak(description string, rawTime string, imageUrl string, sourceUr
 		addLog(2, reporter.UID, "Unauthorised to Skip Source Link", map[string]interface{}{"leak_metadata": leak})
 		return article{}, errors.New("missing source url")
 	}
+
+	if _, err := url.ParseRequestURI(sourceUrl); err != nil {
+		addLog(2, reporter.UID, "Tried to Post an Invalid Link", map[string]interface{}{"leak_metadata": leak})
+		return article{}, errors.New("invalid url")
+	}
+
+	if description == "" {
+		addLog(2, reporter.UID, "No leak Body", map[string]interface{}{"leak_metadata": leak})
+		return article{}, errors.New("missing body")
+	}
+
 	key, err := pushEntry(dataBase, "leaks", leak)
 	if err != nil {
 		addLog(2, reporter.UID, "Failed to Create Leak", map[string]interface{}{"article": key,
@@ -153,7 +165,7 @@ func createArticle(c *gin.Context) {
 	description := c.PostForm("description")
 	time := c.PostForm("time")
 	imageUrl := c.PostForm("image_url")
-	sourceUrl := c.PostForm("source_url")
+	sourceUrl := strings.ReplaceAll(c.PostForm("source_url"), "javascript:", "")
 	//reporter := getUser(c.PostForm("reporter_uid"))
 	reporterUser, _ := c.Get("user")
 	reporter := reporterUser.(user)
