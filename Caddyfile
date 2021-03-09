@@ -1,0 +1,8 @@
+decafans.com {
+  reverse_proxy localhost:5000
+  encode zstd gzip
+}
+
+www.decafans.com {
+  redir https://decafans.com{uri}
+}
