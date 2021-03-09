@@ -61,7 +61,7 @@ func getArticle(c *gin.Context) {
 func showArticleCreationPage(c *gin.Context) {
 	render(c, gin.H{"payload": map[string][]string{
 		"allowed_links": getAllowedLink(),
-	}},
+	}, "linkLessAuthLevel": linkLessAuthLevel},
 		"Create new",
 		"Share a new DecaLeak",
 		" ",

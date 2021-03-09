@@ -138,7 +138,7 @@ func createNewLeak(description string, rawTime string, imageUrl string, sourceUr
 		return article{}, errors.New("missing source url")
 	}
 
-	if _, err := url.ParseRequestURI(sourceUrl); err != nil {
+	if _, err := url.ParseRequestURI(sourceUrl); err != nil && reporter.AuthLevel < linkLessAuthLevel {
 		addLog(2, reporter.UID, "Tried to Post an Invalid Link", map[string]interface{}{"leak_metadata": leak})
 		return article{}, errors.New("invalid url")
 	}
@@ -191,6 +191,9 @@ func createArticle(c *gin.Context) {
 			"postLeak.html", http.StatusCreated)
 	} else {
 		// error
+		if debug {
+			fmt.Println(err)
+		}
 		render(c, gin.H{"status": "error",
 			"payload": map[string]interface{}{
 				"description":   description,
@@ -199,6 +202,7 @@ func createArticle(c *gin.Context) {
 				"source_url":    sourceUrl,
 				"reporter_uid":  reporter.UID,
 				"allowed_links": getAllowedLink(),
+				"error":         err,
 			}, "errorPublishing": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",
 			"Share a new DecaLeak",
