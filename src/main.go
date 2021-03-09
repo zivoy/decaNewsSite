@@ -13,7 +13,6 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"strings"
 )
 
 //todo make tests
@@ -99,22 +98,7 @@ func main() {
 	initCacheClearing()
 
 	BBCompiler = bbcode.NewCompiler(true, true)
-	BBCompiler.SetTag("url", func(node *bbcode.BBCodeNode) (*bbcode.HTMLTag, bool) {
-		out := bbcode.NewHTMLTag("")
-		out.Name = "a"
-		value := node.GetOpeningTag().Value
-		if value == "" {
-			text := bbcode.CompileText(node)
-			if len(text) > 0 {
-				text = strings.ReplaceAll(text, "javascript:", "")
-				out.Attrs["href"] = bbcode.ValidURL(text)
-			}
-		} else {
-			value = strings.ReplaceAll(value, "javascript:", "")
-			out.Attrs["href"] = bbcode.ValidURL(value)
-		}
-		return out, true
-	})
+	initBBCode(&BBCompiler)
 
 	err = router.Run(":5000")
 	if err != nil {
