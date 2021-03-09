@@ -69,10 +69,12 @@ func initBBCode(compiler *bbcode.Compiler) {
 		iframe.Attrs["src"] = fmt.Sprintf("https://www.youtube.com/embed/%s", text)
 		iframe.Attrs["allowfullscreen"] = ""
 		iframe.AppendChild(nil)
+		// todo this needs improving :/
 		iframe.Attrs["style"] = "height:max(225px,100%); width:min(100%,400px);"
 
 		out := bbcode.NewHTMLTag("")
 		out.Name = "figure"
+		// here too
 		out.Attrs["class"] = "image is-disable-16by9"
 		out.AppendChild(iframe)
 

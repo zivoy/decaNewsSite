@@ -1,6 +1,8 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
 
+{{$linkLess := .linkLessAuthLevel }}
+
 {{if .publishSuccess}}
 <div class="notification is-success">
     <p class="title">Success</p>
@@ -29,10 +31,13 @@
                 </div>
 
                 <div class="field">
-                    <label class="label">Discord Link</label>
+                    <label class="label">Source Link</label>
                     <div class="control">
                         <input id="link" name="link" class="input" type="url" placeholder="Link to the leak in the chat"
                                required>
+                        {{ if ge .user.AuthLevel $linkLess }}
+                        <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure you add one somewhere</p>
+                        {{end}}
                     </div>
                     <p class="help" id="linkInfo"></p>
                 </div>
@@ -147,16 +152,21 @@
         source.addClass("has-text-danger")
         linkInfo.text("")
         Link = ""
-        let val = inputLink.val();
+        let val = inputLink.val().trim();
         if (val === "") {
             inputLink.addClass("is-danger")
         }
 
+        {{ if ge .user.AuthLevel $linkLess }}
+        let vals = [
+            val.match(/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/)]
+        {{else}}
         let vals = [
         {{range $r:= .payload.allowed_links}}
         val.match(new RegExp("{{$r}}")),
         {{end}}
         ]
+        {{end}}
 
         if (vals.some(x => x)) {
             inputLink.addClass("is-success")
@@ -164,7 +174,7 @@
             source.removeClass("has-text-danger")
             source.attr("href", val)
         } else {
-            linkInfo.text("This does not seem to be a valid Discord post link in the DecaGear server")
+            linkInfo.text("This does not seem to be a authorised source link")
             linkInfo.addClass("is-danger")
             inputLink.addClass("is-danger")
         }
@@ -226,7 +236,12 @@
 
     function formReady() {
         submitButton.prop("disabled", true);
-        if (Leak && LeakTime && User && Link) {
+        {{ if ge .user.AuthLevel $linkLess }}
+        let linkValid = true
+        {{else}}
+        let linkValid = Link
+        {{end}}
+        if (Leak && LeakTime && User && linkValid) {
             submitButton.prop("disabled", false);
         }
     }
@@ -242,8 +257,7 @@
             description: Leak.replaceAll("\r\n","\n"),
             time: LeakTime.getTime(),
             image_url: Image,
-            source_url: Link,
-            reporter_uid: User
+            source_url: Link
         }, function (key, value) {
             let field = $('<input></input>');
             field.attr("type", "hidden");
@@ -261,7 +275,7 @@
         Leak = "{{.payload.description}}"
         LeakTime = new Date(parseInt("{{.payload.time}}"))
         Image = "{{.payload.image_url}}"
-        Link = "{{.payload.discord_url}}"
+        Link = "{{.payload.source_url}}"
         if (isNaN(LeakTime.getTime())) {
             LeakTime = new Date()
         }

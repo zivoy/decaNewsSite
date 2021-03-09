@@ -16,13 +16,16 @@ type article struct {
 	Summary     string `json:"summary"`
 	LeakTime    int64  `json:"time"`
 	ImageUrl    string `json:"image_url"`
-	DiscordLink string `json:"source_url"`
+	SourceLink  string `json:"source_url"`
 	ReporterUid string `json:"reporter_uid"`
 }
 
 func articlePathString(uid string) string {
 	return fmt.Sprintf("leaks/%s", uid)
 }
+
+// you need this auth level to post with no link
+const linkLessAuthLevel = 1
 
 // this function is really bad todo make this be done on the front end
 // todo implement splitting of pages
@@ -79,7 +82,7 @@ func getArticleByID(id string) (article, error) {
 				Summary:     articleData["summary"].(string),
 				LeakTime:    int64(articleData["time"].(float64)),
 				ImageUrl:    articleData["image_url"].(string),
-				DiscordLink: articleData["source_url"].(string),
+				SourceLink:  articleData["source_url"].(string),
 				ReporterUid: articleData["reporter_uid"].(string),
 			}
 		})
@@ -110,7 +113,7 @@ func getAllowedLink() []string {
 	return data
 }
 
-func createNewLeak(description string, rawTime string, imageUrl string, discordUrl string, reporterUid string) (article, error) {
+func createNewLeak(description string, rawTime string, imageUrl string, sourceUrl string, reporter user) (article, error) {
 	time, err := strconv.Atoi(rawTime)
 	if err != nil {
 		return article{}, errors.New("invalid time")
@@ -125,14 +128,22 @@ func createNewLeak(description string, rawTime string, imageUrl string, discordU
 		Summary:     summery,
 		LeakTime:    int64(time),
 		ImageUrl:    imageUrl,
-		DiscordLink: discordUrl,
-		ReporterUid: reporterUid,
+		SourceLink:  sourceUrl,
+		ReporterUid: reporter.UID,
 	}
 
+	if reporter.AuthLevel < linkLessAuthLevel && sourceUrl == "" {
+		addLog(2, reporter.UID, "Unauthorised to Skip Source Link", map[string]interface{}{"leak_metadata": leak})
+		return article{}, errors.New("missing source url")
+	}
 	key, err := pushEntry(dataBase, "leaks", leak)
 	if err != nil {
+		addLog(2, reporter.UID, "Failed to Create Leak", map[string]interface{}{"article": key,
+			"leak_metadata": leak})
 		return article{}, err
 	}
+
+	addLog(2, reporter.UID, "Created Leak", map[string]interface{}{"article": key})
 
 	leak.ID = key
 	return leak, nil
@@ -142,10 +153,12 @@ func createArticle(c *gin.Context) {
 	description := c.PostForm("description")
 	time := c.PostForm("time")
 	imageUrl := c.PostForm("image_url")
-	discordUrl := c.PostForm("discord_url")
-	reporterUid := c.PostForm("reporter_uid")
+	sourceUrl := c.PostForm("source_url")
+	//reporter := getUser(c.PostForm("reporter_uid"))
+	reporterUser, _ := c.Get("user")
+	reporter := reporterUser.(user)
 
-	if a, err := createNewLeak(description, time, imageUrl, discordUrl, reporterUid); err == nil {
+	if a, err := createNewLeak(description, time, imageUrl, sourceUrl, reporter); err == nil {
 		// success
 		leakLocation := url.URL{
 			Scheme: domainBase.Scheme,
@@ -158,7 +171,7 @@ func createArticle(c *gin.Context) {
 				"leakUrl":       leakLocation.String(), //c.Request.URL.Scheme, c.Request.URL.Host,
 				"leak":          a,
 				"allowed_links": getAllowedLink(),
-			}, "publishSuccess": true},
+			}, "publishSuccess": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",
 			"Share a new DecaLeak",
 			" ",
@@ -171,10 +184,10 @@ func createArticle(c *gin.Context) {
 				"description":   description,
 				"time":          time,
 				"image_url":     imageUrl,
-				"discord_url":   discordUrl,
-				"reporter_uid":  reporterUid,
+				"source_url":    sourceUrl,
+				"reporter_uid":  reporter.UID,
 				"allowed_links": getAllowedLink(),
-			}, "errorPublishing": true},
+			}, "errorPublishing": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",
 			"Share a new DecaLeak",
 			" ",

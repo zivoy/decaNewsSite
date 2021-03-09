@@ -24,15 +24,17 @@
                             {{- $user := getUser .payload.ReporterUid -}}
                             {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
                         <span> - </span>
-                        <a id="source" target="_blank" href="{{.payload.DiscordLink}}">Source</a>
+                        {{if .payload.SourceLink}}
+                        <a target="_blank" href="{{.payload.SourceLink}}">Source</a>
+                        {{else}}
+                        <span class="has-text-danger">Source</span>
+                        {{end}}
                     </div>
                 </div>
                 {{ if .payload.ImageUrl}}
                 <div class="card-image">
                     <figure class="image">
-                        <img id="previewImage"
-                             src="{{.payload.ImageUrl}}"
-                             alt="Leak Image">
+                        <img src="{{.payload.ImageUrl}}" alt="Leak Image">
                     </figure>
                 </div>
                 {{end}}
