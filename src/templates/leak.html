@@ -2,6 +2,12 @@
 {{ template "header.html" .}}
 <!--todo make editing-->
 <script>
+    function openModal(){
+        $("#archive-modal").addClass("is-active");
+    }
+    function closeModal(){
+        $("#archive-modal").removeClass("is-active");
+    }
     function archivePost() {
         $("button#archive").addClass("is-loading")
         $.post("/api/v1/archive/{{.payload.ID}}", function () {
@@ -13,6 +19,24 @@
         });
     }
 </script>
+<div class="modal" id="archive-modal">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Archive Post</p>
+            <button class="delete" aria-label="close" onclick="closeModal()"></button>
+        </header>
+        <section class="modal-card-body">
+           <p class="title">
+               Do you confirm you wish to archive this post?
+           </p>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-danger" onclick="archivePost()">Save changes</button>
+            <button class="button" onclick="closeModal()">Cancel</button>
+        </footer>
+    </div>
+</div>
 <section class="section is-2">
     <div class="columns is-centered">
         <div class="column is-half">
@@ -31,7 +55,7 @@
                     {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 1)}}
                     <div class="buttons level-item">
                         {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 2)}}
-                        <button class="button is-danger" id="archive" onclick="archivePost()">Archive</button>
+                        <button class="button is-danger" id="archive" onclick="openModal()">Archive</button>
                         {{end}}
                         <button class="button is-warning" id="edit" disabled>Edit</button>
                     </div>
