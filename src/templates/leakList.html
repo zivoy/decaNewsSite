@@ -1,10 +1,9 @@
 {{ template "header.html" .}}
 
 <section class="section">
-    {{ if .user}}
-    {{$privlage:=.user.PostingPrivilege}}
-    {{else}}
     {{$privlage:=false}}
+    {{ if .user}}
+    {{$privlage=.user.PostingPrivilege}}
     {{end}}
     {{ if coalesce $privlage true }}
     <a class="button is-info mb-2" href="/leaks/create">
