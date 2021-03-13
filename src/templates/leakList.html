@@ -1,7 +1,7 @@
 {{ template "header.html" .}}
 
 <section class="section">
-    {{ if (default true .user.PostingPrivilege)}}
+    {{ if (empty .user | ternary .user.PostingPrivilege true)}}
     <a class="button is-info mb-2" href="/leaks/create">
         New Leak
     </a>
