@@ -1,7 +1,10 @@
 {{ template "header.html" .}}
 
 <section class="section">
-    {{ if (empty .user | ternary true .user.PostingPrivilege)}}
+    {{ if .user}}
+    {{$privlage:=.user.PostingPrivilege}}
+    {{end}}
+    {{ if coalesce $privlage true }}
     <a class="button is-info mb-2" href="/leaks/create">
         New Leak
     </a>
