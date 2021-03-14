@@ -186,7 +186,7 @@ func createArticle(c *gin.Context) {
 			}, "publishSuccess": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",
 			"Share a new DecaLeak",
-			pageLogo(c),
+			"",
 			c.Request.URL,
 			"postLeak.html", http.StatusCreated)
 	} else {
@@ -206,7 +206,7 @@ func createArticle(c *gin.Context) {
 			}, "errorPublishing": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",
 			"Share a new DecaLeak",
-			pageLogo(c),
+			"",
 			c.Request.URL,
 			"postLeak.html")
 	}

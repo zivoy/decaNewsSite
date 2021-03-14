@@ -37,7 +37,7 @@ func initializeRoutes() {
 		render(c, gin.H{},
 			"Official news page",
 			"Official news from deca.",
-			pageLogo(c),
+			"",
 			c.Request.URL,
 			"official.html")
 	})
@@ -45,7 +45,7 @@ func initializeRoutes() {
 		render(c, gin.H{},
 			"About DecaFans",
 			"DecaFans is a site for fans of the DecaGear headset to share the latest news.",
-			pageLogo(c),
+			"",
 			c.Request.URL,
 			"about.html")
 	})

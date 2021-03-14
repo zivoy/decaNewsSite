@@ -42,7 +42,7 @@ func adminBoard(c *gin.Context) {
 	},
 		"Administrator Dashboard",
 		"place to administrate all the things.",
-		pageLogo(c),
+		"",
 		c.Request.URL,
 		"adminDashboard.html")
 

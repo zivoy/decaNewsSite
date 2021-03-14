@@ -16,11 +16,14 @@
 
     <meta property="og:site_name" content="Deca news leaks site">
     <meta name="theme-color" content="#414a48">
-    <meta property="og:image" content="{{ .image }}"/>
+    <meta property="og:image" content="{{coalesce .image .logo}}"/>
 
     <meta property="og:title" content="{{ .title }}">
     <meta property="og:description" content="{{ .description }}">
     <meta property="og:url" content="{{ .url }}">
+    {{if .image}}
+    <meta name="twitter:card" content="summary_large_image">
+    {{end}}
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" type="text/css"

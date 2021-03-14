@@ -25,7 +25,7 @@ func leakList(c *gin.Context) {
 	render(c, gin.H{"payload": articles},
 		"DecaLeak list",
 		"List of the latest DecaLeaks.",
-		pageLogo(c),
+		"",
 		c.Request.URL,
 		"leakList.html")
 
@@ -39,7 +39,7 @@ func showIndex(c *gin.Context) {
 	render(c, gin.H{},
 		"DecaFans Home Page",
 		"DecaFans is a news page for getting all the latest information on the DecaGear headset.",
-		pageLogo(c),
+		"",
 		c.Request.URL,
 		"index.html")
 
@@ -51,11 +51,7 @@ func getArticle(c *gin.Context) {
 	// Check if the article exists
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
-		image := article.ImageUrl
-		if image == "" {
-			image = pageLogo(c)
-		}
-		render(c, gin.H{"payload": article}, "DecaLeak", article.Summary, image, c.Request.URL,
+		render(c, gin.H{"payload": article}, "DecaLeak", article.Summary, article.ImageUrl, c.Request.URL,
 			"leak.html")
 	} else {
 		// If the article is not found, abort with an error
@@ -69,7 +65,7 @@ func showArticleCreationPage(c *gin.Context) {
 	}, "linkLessAuthLevel": linkLessAuthLevel},
 		"Create new",
 		"Share a new DecaLeak",
-		pageLogo(c),
+		"",
 		c.Request.URL,
 		"postLeak.html")
 }

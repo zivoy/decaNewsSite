@@ -136,6 +136,8 @@ func render(c *gin.Context, data gin.H, title string, description string, image 
 	userVals, _ := c.Get("user")
 	data["user"] = userVals
 
+	data["logo"] = pageLogo(c)
+
 	stat := http.StatusOK
 	if len(status) > 0 {
 		stat = status[0]
