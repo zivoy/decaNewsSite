@@ -14,16 +14,24 @@
     <link rel="apple-touch-icon" sizes="120x120" href="/static/DecaFans-smaller.png" />
     <link rel="apple-touch-icon" sizes="152x152" href="/static/DecaFans-big.png" />
 
-    <meta property="og:site_name" content="Deca news leaks site">
-    <meta name="theme-color" content="#414a48">
-    <meta property="og:image" content="{{coalesce .image .logo}}"/>
+    {{$image:=coalesce .image .logo}}
+    <meta property="og:site_name" content="DecaFans">
+    <meta name="theme-color" content="#dcfbc9">
+    <meta property="og:image" content="{{$image}}"/>
 
     <meta property="og:title" content="{{ .title }}">
     <meta property="og:description" content="{{ .description }}">
     <meta property="og:url" content="{{ .url }}">
+
     {{if .image}}
     <meta name="twitter:card" content="summary_large_image">
+    {{else}}
+    <meta name="twitter:card" content="summary">
     {{end}}
+    <meta property="twitter:title" content="{{ .title }}">
+    <meta property="twitter:description" content="{{ .description }}">
+    <meta property="twitter:image" content="{{$image}}">
+    <meta property="twitter:url" content="{{ .url }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" type="text/css"

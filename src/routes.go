@@ -32,19 +32,20 @@ func initializeRoutes() {
 	router.Static("/static", "./resources")
 	router.StaticFile("/favicon.png", "./resources/decafansLogoSmall.png")
 	router.StaticFile("/favicon.ico", "./resources/DecaFans-favicon.ico")
+	router.StaticFile("/robots.txt", "./resources/robots.txt")
 
 	router.GET("/official", func(c *gin.Context) {
 		render(c, gin.H{},
-			"Official news page",
-			"Official news from deca.",
+			"Official DecaGear1 news page",
+			"Official news from Megadodo about the DecaGear1 headset.",
 			"",
 			c.Request.URL,
 			"official.html")
 	})
 	router.GET("/about", func(c *gin.Context) {
 		render(c, gin.H{},
-			"About DecaFans",
-			"DecaFans is a site for fans of the DecaGear headset to share the latest news.",
+			"About",
+			"DecaFans is a site maintained and run by fans of the DecaGear1 headset to share the latest news and leaks.",
 			"",
 			c.Request.URL,
 			"about.html")

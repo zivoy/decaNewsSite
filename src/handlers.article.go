@@ -23,7 +23,7 @@ func leakList(c *gin.Context) {
 
 	// Call the render function with the name of the template to render
 	render(c, gin.H{"payload": articles},
-		"DecaLeak list",
+		"List of Leaks",
 		"List of the latest DecaLeaks.",
 		"",
 		c.Request.URL,
@@ -37,8 +37,8 @@ func leakListFirst(c *gin.Context) {
 
 func showIndex(c *gin.Context) {
 	render(c, gin.H{},
-		"DecaFans Home Page",
-		"DecaFans is a news page for getting all the latest information on the DecaGear headset.",
+		"Home Page",
+		"DecaFans is a news page run and maintained by fans of the DecaGear1 headset to help getting all the latest information.",
 		"",
 		c.Request.URL,
 		"index.html")

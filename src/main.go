@@ -2,6 +2,7 @@ package main
 
 import (
 	"firebase.google.com/go/db"
+	"fmt"
 	"github.com/Masterminds/sprig"
 	"github.com/frustra/bbcode"
 	"github.com/gin-gonic/gin"
@@ -127,7 +128,7 @@ func authorityLevel(auth int) string {
 // If the header doesn't specify this, HTML is rendered, provided that
 // the template name is present
 func render(c *gin.Context, data gin.H, title string, description string, image string, url *url.URL, templateName string, status ...int) {
-	data["title"] = title
+	data["title"] = fmt.Sprintf("%s - DecaFans", title)
 	data["description"] = description
 	data["url"] = url.String()
 	data["image"] = image

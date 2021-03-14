@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth/gothic"
 	"net/http"
@@ -59,12 +60,16 @@ func userProfile(c *gin.Context) {
 			abortWithMessage(c, http.StatusInternalServerError, err)
 		}
 		user.RefreshToken = ""
+		title := fmt.Sprintf("%s's profile", user.Username)
+		if user.Username[len(user.Username)-1] == 's' {
+			title = fmt.Sprintf("%s' profile", user.Username)
+		}
 		render(c, gin.H{"payload": map[string]interface{}{
 			"user":      user,
 			"leaksMade": userLeaks,
 		}},
-			user.Username+"'s profile",
-			user.Username+"#"+user.UserDiscriminator,
+			title,
+			fmt.Sprintf("%s#%s - %s", user.Username, user.UserDiscriminator, authorityLevel(user.AuthLevel)),
 			user.AvatarUrl,
 			c.Request.URL,
 			"profile.html")
