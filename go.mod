@@ -15,6 +15,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.1
 	github.com/huandu/xstrings v1.3.2 // indirect
+	github.com/ikeikeikeike/go-sitemap-generator v1.0.2
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect

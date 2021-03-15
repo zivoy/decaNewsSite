@@ -2,9 +2,12 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ikeikeikeike/go-sitemap-generator/stm"
 	"net/http"
 	"net/url"
 )
+
+var siteMap *stm.Sitemap
 
 func formatUrl() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -19,12 +22,39 @@ func pageLogo(c *gin.Context) string {
 	return logo.String()
 }
 
+func buildSitemap() *stm.Sitemap {
+	sm := stm.NewSitemap()
+	location := url.URL{}
+	location.Scheme = domainBase.Scheme
+	location.Host = domainBase.Host
+	sm.SetDefaultHost(location.String())
+	sm.SetVerbose(debug)
+	sm.SetPretty(true)
+
+	sm.Create()
+	sm.Add(stm.URL{"loc": "/"})
+	sm.Add(stm.URL{"loc": "/about"})
+
+	return sm
+}
+
+func generateArticlesSitemap(sitemap *stm.Sitemap) {
+	articles, _ := getAllArticles(0)
+	for a := range articles {
+
+	}
+}
+
 func initializeRoutes() {
 	router.Use(setUserStatus())
 	router.Use(formatUrl())
 
 	router.NoRoute(func(c *gin.Context) {
 		abortWithMessage(c, http.StatusNotFound)
+	})
+
+	router.GET("/sitemap.xml", func(c *gin.Context) {
+		_, _ = c.Writer.Write(siteMap.XMLContent())
 	})
 
 	router.GET("/", showIndex)

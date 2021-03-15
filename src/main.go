@@ -98,6 +98,8 @@ func main() {
 
 	initCacheClearing()
 
+	siteMap = buildSitemap()
+
 	BBCompiler = bbcode.NewCompiler(true, true)
 	initBBCode(&BBCompiler)
 

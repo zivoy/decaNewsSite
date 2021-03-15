@@ -2,7 +2,7 @@ User-agent: *
 Disallow: /api/*
 Disallow: /u/*
 Disallow: /admin/*
-Disallow: /leaks/create$
-Disallow: /leaks/create?
+Disallow: /leaks/create
 
 Allow: /
+Sitemap: https://decafans.com/sitemap.xml
