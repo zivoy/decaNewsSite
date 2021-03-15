@@ -6,3 +6,4 @@ Disallow: /leaks/create$
 Disallow: /leaks/create?
 
 Allow: /
+Allow: /u/profile/*
