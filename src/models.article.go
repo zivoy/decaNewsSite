@@ -128,7 +128,7 @@ func getAllowedLinks() []string {
 
 func allowedLinksForUserContext(c *gin.Context) []string {
 	usr, exists := c.Get("user")
-	if exists {
+	if exists && usr != nil {
 		if usr.(user).AuthLevel < linkLessAuthLevel {
 			return getAllowedLinks()
 		}
