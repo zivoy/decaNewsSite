@@ -30,7 +30,6 @@
     let editing = false;
 
     function startEdit() {
-        let allowed = AllowedLinks({{.allowed_links}})
         $("#leakBody").html($(`
             <fieldset>
                 <div class="field">
@@ -39,7 +38,7 @@
                         <textarea id="leak" name="leak" class="textarea"
                                   placeholder="Description of leak, be as descriptive as you want" required>${leak}</textarea>
                     </div>
-                    <p class="help">supports <a href="https://www.bbcode.org/reference.php" target="_blank">bbcode</a></p>
+                    <p class="help" id="bbcode"></p>
                 </div>
 
                 <div class="field">
@@ -67,6 +66,7 @@
                 </div>
             </fieldset>
         `));
+        $("p#bbcode").html("supports <a href='https://www.bbcode.org/reference.php' target='_blank'>bbcode</a>")
         setTimeVal($("#leakTime"), time)
         $("#leakImage").remove();
         $("#controlButtons").html(`
@@ -90,7 +90,7 @@
         });
 
         inputLink.on("input", () => {
-            link = linkChange(inputLink, linkInfo, undefined, allowed);
+            link = linkChange(inputLink, linkInfo, undefined, AllowedLinks({{.allowed_links}}));
             formReady();
         });
 
