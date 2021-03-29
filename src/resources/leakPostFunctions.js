@@ -47,13 +47,13 @@ function linkChange(field, info, source, allowedLinks) {
     return link
 }
 
-function leakChange(field, preview) {
+function leakChange(field, preview, processor) {
     field.removeClass("is-danger")
     let val = field.val().trim();
     if (val === "") {
         field.addClass("is-danger")
     }
-    preview.html(val.replaceAll("\n", "<br>"))
+    preview.html(processor(val))
     return val
 }
 

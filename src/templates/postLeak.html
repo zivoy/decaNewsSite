@@ -92,9 +92,26 @@
         </div>
     </div>
 </div>
+<script src="/static/bbcode-config.js"></script>
+<script defer src="/static/bbcode-parser.js"></script>
 <script>
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
+    }
+
+    parserTags["youtube"] = {
+        openTag: function(params,content) {
+
+            let yid = content;
+
+            return `<figure class="image"><iframe frameborder="0" style="height:max(225px,100%); width:min(100%,400px);" allowfullscreen src="https://www.youtube.com/embed/${yid}">`;
+        },
+        closeTag: function(params,content) {
+            return "</iframe></figure>";
+        },
+        content: function(params,content) {
+            return "";
+        }
     }
 
     let LeakTime = new Date();
@@ -135,7 +152,8 @@
 
         inputLeak.on("input", () => {
             preview.removeClass("is-invisible");
-            Leak = leakChange(inputLeak, $("p#leakPreview"));
+            Leak = leakChange(inputLeak, $("p#leakPreview"),
+                val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
             formReady();
         })
 
