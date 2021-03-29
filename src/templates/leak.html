@@ -30,6 +30,7 @@
     let editing = false;
 
     function startEdit() {
+        let allowed = AllowedLinks({{.allowed_links}})
         $("#leakBody").html($(`
             <fieldset>
                 <div class="field">
@@ -89,7 +90,7 @@
         });
 
         inputLink.on("input", () => {
-            link = linkChange(inputLink, linkInfo, undefined, AllowedLinks({{.allowed_links}}));
+            link = linkChange(inputLink, linkInfo, undefined, allowed);
             formReady();
         });
 
