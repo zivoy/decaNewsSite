@@ -133,8 +133,7 @@ func allowedLinksForUserContext(c *gin.Context) []string {
 			return getAllowedLinks()
 		}
 	}
-	r := make([]string, 1)
-	r[0] = "^(https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$"
+	r := []string{"^(https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$", ""}
 	return r
 }
 
