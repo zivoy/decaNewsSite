@@ -95,7 +95,7 @@
         });
 
         inputLeak.on("input", () => {
-            leak = leakChange(inputLeak, $("p#leakPreview"));
+            leak = leakChange(inputLeak, $("p#leakPreview"),val=>{return val.replaceAll("\n", "<br>")});
             formReady();
         })
 
