@@ -128,8 +128,10 @@ func getAllowedLinks() []string {
 
 func allowedLinksForUserContext(c *gin.Context) []string {
 	usr, exists := c.Get("user")
-	if !exists || usr.(user).AuthLevel < linkLessAuthLevel {
-		return getAllowedLinks()
+	if exists {
+		if usr.(user).AuthLevel < linkLessAuthLevel {
+			return getAllowedLinks()
+		}
 	}
 	r := make([]string, 1)
 	r[0] = "^(https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$"
