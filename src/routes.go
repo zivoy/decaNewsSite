@@ -71,6 +71,7 @@ func initializeRoutes() {
 
 		leaksRoutes.GET("/create", ensureLoggedIn(), canPost(), showArticleCreationPage)
 		leaksRoutes.POST("/create", ensureLoggedIn(), canPost(), createArticle)
+		leaksRoutes.POST("/update/:leak_id", ensureLoggedIn(), canPost(), updateArticle)
 	}
 
 	admin := router.Group("/admin")

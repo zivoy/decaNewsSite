@@ -1,5 +1,6 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
+<script defer src="/static/leakPostFunctions.js"></script>
 
 {{$linkLess := .linkLessAuthLevel }}
 
@@ -36,7 +37,8 @@
                         <input id="link" name="link" class="input" type="url" placeholder="Link to the leak in the chat"
                                required>
                         {{ if ge .user.AuthLevel $linkLess }}
-                        <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure you add one somewhere</p>
+                        <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure
+                            you add one somewhere</p>
                         {{end}}
                     </div>
                     <p class="help" id="linkInfo"></p>
@@ -112,184 +114,99 @@
     const inputImage = $("input#image");
     const preview = $("div#preview");
 
-    LeakTime.setSeconds(0);
-    LeakTime.setMilliseconds(0);
-    $("time#timeToSet").attr("datetime", LeakTime.toISOString());
+    $(document).ready(function () {
+        LeakTime.setSeconds(0);
+        LeakTime.setMilliseconds(0);
+        $("time#timeToSet").attr("datetime", LeakTime.toISOString());
 
-    setTimeVal(LeakTime)
+        setTimeVal(inputTime, LeakTime)
 
-    function setTimeVal(date) {
-        let now = new Date(date);
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        inputTime.val(now.toISOString().slice(0, 16));
-        inputTime.attr("max", now.toISOString().slice(0, 16));
-    }
-
-    inputTime.change(timeChange)
-
-    function timeChange() {
-        preview.removeClass("is-invisible")
-        inputTime.removeClass("is-danger")
-        try {
-            LeakTime = new Date(inputTime.val());
-            $("time#timeToSet").attr("datetime", LeakTime.toISOString());
-            fixTime()
-        } catch (err) {
-            inputTime.addClass("is-danger")
-            LeakTime = null
-            $("time#timeToSet").text("invalid date")
-        }
-        formReady()
-    }
-
-    inputLink.on("input", linkChange)
-
-    function linkChange() {
-        preview.removeClass("is-invisible")
-        inputLink.removeClass("is-danger is-success")
-        linkInfo.removeClass("is-danger is-success")
-        let source = $("a#source")
-        source.addClass("has-text-danger")
-        linkInfo.text("")
-        Link = ""
-        let val = inputLink.val().trim();
-        if (val === "") {
-            inputLink.addClass("is-danger")
-        }
-
-        {{ if ge .user.AuthLevel $linkLess }}
-        let vals = [
-            val.match(/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/)]
-        {{else}}
-        let vals = [
-        {{range $r:= .payload.allowed_links}}
-        val.match(new RegExp("{{$r}}")),
-        {{end}}
-        ]
-        {{end}}
-
-        if (vals.some(x => x)) {
-            inputLink.addClass("is-success")
-            Link = val
-            source.removeClass("has-text-danger")
-            source.attr("href", val)
-        } else {
-            linkInfo.text("This does not seem to be a authorised source link")
-            linkInfo.addClass("is-danger")
-            inputLink.addClass("is-danger")
-        }
-        formReady()
-    }
-
-    inputLeak.on("input", leakChange)
-
-    function leakChange() {
-        preview.removeClass("is-invisible")
-        inputLeak.removeClass("is-danger")
-        let val = inputLeak.val().trim();
-        Leak = val
-        if (val === "") {
-            inputLeak.addClass("is-danger")
-        }
-        $("p#leakPreview").html(val.replaceAll("\n","<br>"))
-        formReady()
-    }
-
-    inputImage.on("input", imageChange)
-
-    function imageChange() {
-        preview.removeClass("is-invisible");
-        inputImage.removeClass("is-danger")
-        let previewImage = $("img#previewImage");
-        let container = previewImage.parent().parent();
-        let val = inputImage.val();
-        Image = val
-
-        function isValidImageUrl(url, callback) {
-            $('<img>', {
-                src: url,
-                load: function () {
-                    callback(true);
-                },
-                error: function () {
-                    callback(false);
-                }
-            });
-        }
-
-        if (val !== "") {
-            isValidImageUrl(val, function (result) {
-                if (result) {
-                    previewImage.attr("src", val)
-                    container.removeClass("is-hidden")
-                } else {
-                    previewImage.attr("src", "")
-                    container.addClass("is-hidden")
-                    inputImage.addClass("is-danger")
-                    Image = ""
-                }
-            });
-        }
-        formReady()
-    }
-
-
-    function formReady() {
-        submitButton.prop("disabled", true);
-        {{ if ge .user.AuthLevel $linkLess }}
-        let linkValid = true
-        {{else}}
-        let linkValid = Link
-        {{end}}
-        if (Leak && LeakTime && User && linkValid) {
-            submitButton.prop("disabled", false);
-        }
-    }
-
-    function post() {
-        var form = $('<form></form>');
-
-        form.attr("method", "post");
-        form.addClass("is-hidden");
-        form.attr("action", "/leaks/create");
-
-        $.each({
-            description: Leak.replaceAll("\r\n","\n"),
-            time: LeakTime.getTime(),
-            image_url: Image,
-            source_url: Link
-        }, function (key, value) {
-            let field = $('<input></input>');
-            field.attr("type", "hidden");
-            field.attr("name", key);
-            field.attr("value", value);
-
-            form.append(field);
+        inputTime.change(() => {
+            preview.removeClass("is-invisible");
+            LeakTime = timeChange(inputTime);
+            formReady();
         });
 
-        $(document.body).append(form);
-        form.submit();
-    }
+        inputLink.on("input", () => {
+            preview.removeClass("is-invisible");
+            Link = linkChange(inputLink, linkInfo, AllowedLinks({{.payload.allowed_links}}));
+            formReady();
+        });
 
-    if (postError) {
-        Leak = "{{.payload.description}}"
-        LeakTime = new Date(parseInt("{{.payload.time}}"))
-        Image = "{{.payload.image_url}}"
-        Link = "{{.payload.source_url}}"
-        if (isNaN(LeakTime.getTime())) {
-            LeakTime = new Date()
+        inputLeak.on("input", () => {
+            preview.removeClass("is-invisible");
+            Leak = leakChange(inputLeak, $("p#leakPreview"));
+            formReady();
+        })
+
+        inputImage.on("input", () => {
+            preview.removeClass("is-invisible");
+            imageChange(inputImage, $("img#previewImage")).then(r => {
+                Image = r
+            });
+            formReady();
+        })
+
+        function formReady() {
+            submitButton.prop("disabled", true);
+            let linkValid =
+            //{{ if ge .user.AuthLevel $linkLess }}
+            true;
+            //{{else}}
+            Link;
+            //{{end}}
+            if (Leak && LeakTime && User && linkValid) {
+                submitButton.prop("disabled", false);
+            }
         }
-        setTimeVal(LeakTime);
-        inputLink.val(Link);
-        inputLeak.val(Leak);
-        inputImage.val(Image);
 
-        timeChange();
-        linkChange();
-        leakChange();
-        imageChange();
-        formReady();
-    }
+        function post() {
+            var form = $('<form></form>');
+
+            form.attr("method", "post");
+            form.addClass("is-hidden");
+            form.attr("action", "/leaks/create");
+
+            $.each({
+                description: Leak,
+                time: LeakTime.getTime(),
+                image_url: Image,
+                source_url: Link
+            }, function (key, value) {
+                let field = $('<input></input>');
+                field.attr("type", "hidden");
+                field.attr("name", key);
+                field.attr("value", value);
+
+                form.append(field);
+            });
+
+            $(document.body).append(form);
+            form.submit();
+        }
+
+        if (postError) {
+            Leak = "{{.payload.description}}"
+            LeakTime = new Date(parseInt("{{.payload.time}}"))
+            Image = "{{.payload.image_url}}"
+            Link = "{{.payload.source_url}}"
+            if (isNaN(LeakTime.getTime())) {
+                LeakTime = new Date()
+            }
+            setTimeVal(inputTime, LeakTime);
+            inputLink.val(Link);
+            inputLeak.val(Leak);
+            inputImage.val(Image);
+
+            LeakTime = timeChange(inputTime);
+            Link = linkChange(inputLink, linkInfo, AllowedLinks({{.payload.allowed_links}}));
+            Leak = leakChange(inputLeak, $("p#leakPreview"));
+            imageChange(inputImage, $("img#previewImage")).then(r => {
+                Image = r
+            });
+            formReady();
+        }
+    });
 
 </script>
 <script src="/static/convertTime.js"></script>

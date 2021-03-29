@@ -51,7 +51,7 @@ func getArticle(c *gin.Context) {
 	// Check if the article exists
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
-		render(c, gin.H{"payload": article}, "DecaLeak", article.Summary, article.ImageUrl, c.Request.URL,
+		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)}, "DecaLeak", article.Summary, article.ImageUrl, c.Request.URL,
 			"leak.html")
 	} else {
 		// If the article is not found, abort with an error
@@ -61,7 +61,7 @@ func getArticle(c *gin.Context) {
 
 func showArticleCreationPage(c *gin.Context) {
 	render(c, gin.H{"payload": map[string][]string{
-		"allowed_links": getAllowedLink(),
+		"allowed_links": allowedLinksForUserContext(c),
 	}, "linkLessAuthLevel": linkLessAuthLevel},
 		"Create new",
 		"Share a new DecaLeak",
@@ -95,4 +95,57 @@ func archiveLeak(c *gin.Context) {
 
 	addLog(1, requester, "Archiving Leak", map[string]interface{}{"leak_id": uid})
 
+}
+
+func updateArticle(c *gin.Context) {
+	leakID := c.Param("leak_id")
+	var leak article
+	var err error
+	if leak, err = getArticleByID(leakID); err != nil {
+		abortWithMessage(c, http.StatusNotFound, err)
+		return
+	}
+
+	description := c.PostForm("description")
+	time := c.PostForm("time")
+	imageUrl := c.PostForm("image_url")
+	sourceUrl := c.PostForm("source_url")
+
+	updaterUser, _ := c.Get("user")
+	updater := updaterUser.(user)
+
+	if description == "" {
+		description = leak.Description
+	}
+	if time == "" {
+		time = strconv.Itoa(int(leak.LeakTime))
+	}
+
+	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != time || leak.SourceLink != sourceUrl) {
+		return
+	}
+
+	newLeak, code := leakSanitization(description, time, imageUrl, sourceUrl, getUser(leak.ReporterUid), updater)
+	newLeak.ID = leak.ID
+	switch code {
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		abortWithMessage(c, 406)
+		return
+	}
+
+	err = setEntry(dataBase, articlePathString(leak.ID), newLeak)
+	if err != nil {
+		if debug {
+			fmt.Println(err)
+		}
+		abortWithMessage(c, 500, err)
+		return
+	}
+
+	addLog(2, updater.UID, "Updated Leak", map[string]interface{}{"article": leak.ID, "before": leak, "after": newLeak})
+	deleteCache(articleCache, leak.ID)
+	c.JSON(200, map[string]string{"success": "true"})
 }

@@ -1,0 +1,112 @@
+function setTimeVal(field, date) {
+    let now = new Date(date);
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    field.val(now.toISOString().slice(0, 16));
+    field.attr("max", now.toISOString().slice(0, 16));
+}
+
+function timeChange(field) {
+    field.removeClass("is-danger");
+    let time;
+    try {
+        time = new Date(field.val());
+        $("time#timeToSet").attr("datetime", time.toISOString());
+        fixTime()
+    } catch (err) {
+        field.addClass("is-danger")
+        time = null
+        $("time#timeToSet").text("invalid date")
+    }
+    return time
+}
+
+function linkChange(field, info, allowedLinks) {
+    field.removeClass("is-danger is-success")
+    info.removeClass("is-danger is-success")
+    let source = $("a#source")
+    source.addClass("has-text-danger")
+    info.text("")
+    let link = ""
+    let val = field.val().trim();
+    if (val === "") {
+        field.addClass("is-danger")
+    }
+
+    if (allowedLinks(val).some(x => x)) {
+        field.addClass("is-success")
+        link = val
+        source.removeClass("has-text-danger")
+        source.attr("href", val)
+    } else {
+        info.text("This does not seem to be an authorised source link")
+        info.addClass("is-danger")
+        field.addClass("is-danger")
+    }
+    return link
+}
+
+function leakChange(field, preview) {
+    field.removeClass("is-danger")
+    let val = field.val().trim();
+    if (val === "") {
+        field.addClass("is-danger")
+    }
+    preview.html(val.replaceAll("\n", "<br>"))
+    return val
+}
+
+async function imageChange(field, previewImage) {
+    let container = previewImage.parent().parent();
+    let val = field.val();
+
+    function isValidImageUrl(url, callback) {
+        $('<img>', {
+            src: url,
+            load: function () {
+                callback(true);
+            },
+            error: function () {
+                callback(false);
+            }
+        });
+    }
+
+    let done = false
+
+    if (val !== "") {
+        isValidImageUrl(val, function (result) {
+            if (result) {
+                field.removeClass("is-danger")
+                previewImage.attr("src", val)
+                container.removeClass("is-hidden")
+            } else {
+                previewImage.attr("src", "")
+                container.addClass("is-hidden")
+                field.addClass("is-danger")
+                val = ""
+            }
+            done = true
+        });
+    }
+    await new Promise(r => {
+        let timeout = () => {
+            if (done) {
+                r()
+            } else {
+                setTimeout(timeout, 10)
+            }
+        }
+        timeout()
+    });
+    return val
+}
+
+function AllowedLinks(ListOfLinks) {
+    return function (val){
+        let list = [];
+        for (let i of ListOfLinks){
+            list.push(val.match(new RegExp(i)));
+        }
+        return list;
+    }
+}

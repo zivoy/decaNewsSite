@@ -1,22 +1,137 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
-<!--todo make editing-->
+<script defer src="/static/leakPostFunctions.js"></script>
+
 <script>
-    function openModal(){
+    function openModal() {
         $("#archive-modal").addClass("is-active");
     }
-    function closeModal(){
+
+    function closeModal() {
         $("#archive-modal").removeClass("is-active");
     }
+
     function archivePost() {
         $("button#archive").addClass("is-loading")
         $.post("/api/v1/archive/{{.payload.ID}}", function () {
             // maybe add a message ¯\_(ツ)_/¯
             window.location.href = "/leaks";
-        }).fail(function() {
+        }).fail(function () {
             $("button#archive").removeClass("is-loading")
-            alert( "Error archiving leak" );
+            alert("Error archiving leak");
         });
+    }
+
+    let leak = "{{.payload.Description}}";
+    let link = "{{.payload.SourceLink}}";
+    let image = "{{.payload.ImageUrl}}";
+    let time = new Date(parseInt("{{.payload.LeakTime}}"));
+    let submitButton;
+    let editing = false;
+
+    function startEdit() {
+        $("#leakBody").html($(`
+            <fieldset>
+                <div class="field">
+                    <label class="label">Leak Description</label>
+                    <div class="control">
+                        <textarea id="leak" name="leak" class="textarea"
+                                  placeholder="Description of leak, be as descriptive as you want" required>${leak}</textarea>
+                    </div>
+                    <p class="help">supports bbcode</p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Source Link</label>
+                    <div class="control">
+                        <input id="link" name="link" class="input" type="url" placeholder="Link to the leak in the chat"
+                               value="${link}" required>
+                    </div>
+                    <p class="help" id="linkInfo"></p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Image</label>
+                    <div class="control">
+                        <input class="input" type="url" id="image" name="image" placeholder="Optional link to image"
+                            value="${image}">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Time</label>
+                    <div class="control">
+                        <input class="input" type="datetime-local" id="leakTime" name="leakTime" required>
+                    </div>
+                </div>
+            </fieldset>
+        `));
+        setTimeVal($("#leakTime"), time)
+        $("#leakImage").remove();
+        $("#controlButtons").html(`
+            <button class="button is-warning" id="cancelEdit" onclick="location.reload();">Cancel</button>
+            <button class="button is-primary" id="saveEdit" onclick="UpdateLeak()">Save</button>
+        `);
+
+        editing = true;
+
+        const inputTime = $("input#leakTime");
+        const inputLink = $("input#link");
+        const linkInfo = $("p#linkInfo");
+        const inputLeak = $("textarea#leak");
+        const inputImage = $("input#image");
+
+        submitButton = $("button#saveEdit");
+
+        inputTime.change(() => {
+            time = timeChange(inputTime);
+            formReady();
+        });
+
+        inputLink.on("input", () => {
+            link = linkChange(inputLink, linkInfo, AllowedLinks({{.allowed_links}}));
+            formReady();
+        });
+
+        inputLeak.on("input", () => {
+            leak = leakChange(inputLeak, $("p#leakPreview"));
+            formReady();
+        })
+
+        inputImage.on("input", () => {
+            imageChange(inputImage, $("img#previewImage")).then(r => {
+                image = r
+            });
+            formReady();
+        })
+
+        function formReady(){
+            submitButton.prop("disabled", true);
+            // maybe add a check for source url :/
+            if (leak && time) {
+                submitButton.prop("disabled", false);
+            }
+        }
+    }
+
+    function UpdateLeak(){
+        if (editing) {
+            submitButton.addClass("is-loading")
+            $.ajax({
+                url: "/leaks/update/{{.payload.ID}}",
+                type: "post",
+                data: {
+                    description: leak,
+                    time: time.getTime(),
+                    image_url: image,
+                    source_url: link
+                },
+                success: function(){
+                    submitButton.removeClass("is-loading")
+                    location.reload()
+                }
+            });
+        }
     }
 </script>
 <div class="modal" id="archive-modal">
@@ -27,12 +142,12 @@
             <button class="delete" aria-label="close" onclick="closeModal()"></button>
         </header>
         <section class="modal-card-body">
-           <p class="title">
-               Do you confirm you wish to archive this post?
-           </p>
+            <p class="title">
+                Do you confirm you wish to archive this post?
+            </p>
         </section>
         <footer class="modal-card-foot">
-            <button class="button is-danger" onclick="archivePost()">Save changes</button>
+            <button class="button is-danger" id="archive" onclick="archivePost()">Save changes</button>
             <button class="button" onclick="closeModal()">Cancel</button>
         </footer>
     </div>
@@ -42,7 +157,8 @@
         <div class="column is-half">
             <div class="level mb-2">
                 <div class="level-left">
-                    <a class="button is-primary level-item" href="/leaks"> <!-- todo make this go back to you previous location -->
+                    <a class="button is-primary level-item" href="/leaks">
+                        <!-- todo make this go back to you previous location -->
                         <span class="icon-text">
                             <span class="icon">
                                 <ion-icon class="ion-ionic" name="arrow-back-outline"></ion-icon>
@@ -51,22 +167,10 @@
                         </span>
                     </a>
                 </div>
-                {{if .user}}
-                <div class="level-right">
-                    {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 1)}}
-                    <div class="buttons level-item">
-                        {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 2)}}
-                        <button class="button is-danger" id="archive" onclick="openModal()">Archive</button>
-                        {{end}}
-                        <button class="button is-warning" id="edit" disabled>Edit</button>
-                    </div>
-                    {{end}}
-                </div>
-                {{end}}
             </div>
             <div class="card">
                 <div class="card-content">
-                    <div class="content">
+                    <div class="content" id="leakBody">
                         <p>
                             {{.payload.Description | compileBB | replace "\n" "<br>" | unescape}}
                         </p>
@@ -84,10 +188,28 @@
                     </div>
                 </div>
                 {{ if .payload.ImageUrl}}
-                <div class="card-image">
+                <div class="card-image" id="leakImage">
                     <figure class="image">
                         <img src="{{.payload.ImageUrl}}" alt="Leak Image">
                     </figure>
+                </div>
+                {{end}}
+            </div>
+            <div class="level mt-2">
+                <div class="level-left">
+                </div>
+                {{if .user}}
+                <div class="level-right">
+                    {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 1)}}
+                    <div class="buttons level-item" id="controlButtons">
+                        {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 2)}}
+                        <button class="button is-danger" onclick="openModal()">Archive</button>
+                        {{end}}
+                        {{ if .user.PostingPrivilege }}
+                        <button class="button is-warning" id="edit" onclick="startEdit()">Edit</button>
+                        {{ end }}
+                    </div>
+                    {{end}}
                 </div>
                 {{end}}
             </div>

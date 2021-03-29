@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ type article struct {
 	ImageUrl    string `json:"image_url"`
 	SourceLink  string `json:"source_url"`
 	ReporterUid string `json:"reporter_uid"`
+	EditedBy    string `json:"edited_by,omitempty"`
 }
 
 func articlePathString(uid string) string {
@@ -77,6 +79,12 @@ func getArticleByID(id string) (article, error) {
 			if err != nil && debug {
 				fmt.Println(err)
 			}
+			var edited string
+			if editor, ok := articleData["edited_by"]; ok {
+				edited = editor.(string)
+			} else {
+				edited = ""
+			}
 			return article{
 				ID:          id,
 				Description: articleData["description"].(string),
@@ -85,6 +93,7 @@ func getArticleByID(id string) (article, error) {
 				ImageUrl:    articleData["image_url"].(string),
 				SourceLink:  articleData["source_url"].(string),
 				ReporterUid: articleData["reporter_uid"].(string),
+				EditedBy:    edited,
 			}
 		})
 		return leak.(article), nil
@@ -104,21 +113,77 @@ func compileBBCode(in string) string {
 	return BBCompiler.Compile(in)
 }
 
-func getAllowedLink() []string {
-	ref := dataBase.NewRef("admin/allowed_links")
-	var data []string
-	if err := ref.Get(ctx, &data); err != nil && debug {
-		fmt.Println(err)
-		return nil
+func getAllowedLinks() []string {
+	items := getCache(allowedLinkCache, "links", func(string) interface{} {
+		ref := dataBase.NewRef("admin/allowed_links")
+		var data []string
+		if err := ref.Get(ctx, &data); err != nil && debug {
+			fmt.Println(err)
+			return nil
+		}
+		return data
+	})
+	return items.([]string)
+}
+
+func allowedLinksForUserContext(c *gin.Context) []string {
+	usr, exists := c.Get("user")
+	if !exists || usr.(user).AuthLevel < linkLessAuthLevel {
+		return getAllowedLinks()
 	}
-	return data
+	r := make([]string, 1)
+	r[0] = "^(https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$"
+	return r
 }
 
 func createNewLeak(description string, rawTime string, imageUrl string, sourceUrl string, reporter user) (article, error) {
-	time, err := strconv.Atoi(rawTime)
-	if err != nil {
+	leak, code := leakSanitization(description, rawTime, imageUrl, sourceUrl, reporter, user{UID: ""})
+
+	switch code {
+	case 1:
+		addLog(2, reporter.UID, "Unauthorised to Skip Source Link", map[string]interface{}{"leak_metadata": leak})
+		return article{}, errors.New("missing source url")
+	case 2:
+		addLog(2, reporter.UID, "Tried to Post an Invalid Link", map[string]interface{}{"leak_metadata": leak})
+		return article{}, errors.New("invalid url")
+	case 3:
+		addLog(2, reporter.UID, "No leak Body", map[string]interface{}{"leak_metadata": leak})
+		return article{}, errors.New("missing body")
+	case 4:
 		return article{}, errors.New("invalid time")
 	}
+
+	key, err := pushEntry(dataBase, "leaks", leak)
+	leak.ID = key
+
+	if err != nil {
+		addLog(2, reporter.UID, "Failed to Create Leak", map[string]interface{}{"article": leak.ID,
+			"leak_metadata": leak})
+		return article{}, err
+	}
+
+	addLog(2, reporter.UID, "Created Leak", map[string]interface{}{"article": leak.ID})
+
+	return leak, nil
+}
+
+/*
+cases:
+	0 - success
+	1 - missing source
+	2 - invalid source
+	3 - no body
+	4 - invalid time
+*/
+func leakSanitization(description string, rawTime string, imageUrl string, sourceUrl string, reporter user, editedBy user) (article, int) {
+	time, err := strconv.Atoi(rawTime)
+	if err != nil {
+		return article{}, 4
+	}
+
+	sourceUrl = strings.ReplaceAll(sourceUrl, "javascript:", "")
+
+	description = strings.ReplaceAll(description, "\r\n", "\n")
 
 	summery := BBCompiler.Compile(description)
 	summery = stripHtmlRegex(summery)
@@ -131,41 +196,46 @@ func createNewLeak(description string, rawTime string, imageUrl string, sourceUr
 		ImageUrl:    imageUrl,
 		SourceLink:  sourceUrl,
 		ReporterUid: reporter.UID,
+		EditedBy:    editedBy.UID,
 	}
 
-	if reporter.AuthLevel < linkLessAuthLevel && sourceUrl == "" {
-		addLog(2, reporter.UID, "Unauthorised to Skip Source Link", map[string]interface{}{"leak_metadata": leak})
-		return article{}, errors.New("missing source url")
+	checkPerms := reporter
+	if editedBy.UID != "" {
+		checkPerms = editedBy
+	}
+	if checkPerms.AuthLevel < linkLessAuthLevel && sourceUrl == "" {
+		return article{}, 1
 	}
 
-	if _, err := url.ParseRequestURI(sourceUrl); err != nil && reporter.AuthLevel < linkLessAuthLevel {
-		addLog(2, reporter.UID, "Tried to Post an Invalid Link", map[string]interface{}{"leak_metadata": leak})
-		return article{}, errors.New("invalid url")
+	if _, err := url.ParseRequestURI(sourceUrl); err != nil && checkPerms.AuthLevel < linkLessAuthLevel {
+		return article{}, 2
+	}
+
+	if checkPerms.AuthLevel < linkLessAuthLevel {
+		var regex *regexp.Regexp
+		valid := false
+		for _, s := range getAllowedLinks() {
+			regex = regexp.MustCompile(s)
+			if regex.MatchString(sourceUrl) {
+				valid = true
+			}
+		}
+		if !valid {
+			return article{}, 2
+		}
 	}
 
 	if description == "" {
-		addLog(2, reporter.UID, "No leak Body", map[string]interface{}{"leak_metadata": leak})
-		return article{}, errors.New("missing body")
+		return article{}, 3
 	}
-
-	key, err := pushEntry(dataBase, "leaks", leak)
-	if err != nil {
-		addLog(2, reporter.UID, "Failed to Create Leak", map[string]interface{}{"article": key,
-			"leak_metadata": leak})
-		return article{}, err
-	}
-
-	addLog(2, reporter.UID, "Created Leak", map[string]interface{}{"article": key})
-
-	leak.ID = key
-	return leak, nil
+	return leak, 0
 }
 
 func createArticle(c *gin.Context) {
 	description := c.PostForm("description")
 	time := c.PostForm("time")
 	imageUrl := c.PostForm("image_url")
-	sourceUrl := strings.ReplaceAll(c.PostForm("source_url"), "javascript:", "")
+	sourceUrl := c.PostForm("source_url")
 	//reporter := getUser(c.PostForm("reporter_uid"))
 	reporterUser, _ := c.Get("user")
 	reporter := reporterUser.(user)
@@ -182,7 +252,7 @@ func createArticle(c *gin.Context) {
 				"leakId":        a.ID,
 				"leakUrl":       leakLocation.String(), //c.Request.URL.Scheme, c.Request.URL.Host,
 				"leak":          a,
-				"allowed_links": getAllowedLink(),
+				"allowed_links": allowedLinksForUserContext(c),
 			}, "publishSuccess": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",
 			"Share a new DecaLeak",
@@ -201,7 +271,7 @@ func createArticle(c *gin.Context) {
 				"image_url":     imageUrl,
 				"source_url":    sourceUrl,
 				"reporter_uid":  reporter.UID,
-				"allowed_links": getAllowedLink(),
+				"allowed_links": allowedLinksForUserContext(c),
 				"error":         err,
 			}, "errorPublishing": true, "linkLessAuthLevel": linkLessAuthLevel},
 			"Create new",

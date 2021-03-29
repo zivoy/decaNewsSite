@@ -10,6 +10,7 @@ type cache struct {
 var userCache = map[string]cache{}
 var sessionsCache = map[string]cache{}
 var articleCache = map[string]cache{}
+var allowedLinkCache = map[string]cache{}
 
 var autoClearCache chan struct{}
 var clearingCache bool
