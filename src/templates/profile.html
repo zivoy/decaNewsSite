@@ -92,7 +92,7 @@
                     {{end}}
                     <div class="media-content" style="min-width: 170px;">
                         <div class="content">
-                            <a href="/leaks/leak/{{.ID}}">{{.Summary}}</a>
+                            <a href="/leaks/leak/{{.ID}}">{{.Summary | replace "\n" "<br>" | unescape}}</a>
                         </div>
                     </div>
 
