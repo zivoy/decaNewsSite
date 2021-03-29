@@ -89,7 +89,7 @@
         });
 
         inputLink.on("input", () => {
-            link = linkChange(inputLink, linkInfo, AllowedLinks({{.allowed_links}}));
+            link = linkChange(inputLink, linkInfo, undefined, AllowedLinks({{.allowed_links}}));
             formReady();
         });
 

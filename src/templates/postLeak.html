@@ -114,22 +114,22 @@
     const inputImage = $("input#image");
     const preview = $("div#preview");
 
-    $(document).ready(function () {
-        LeakTime.setSeconds(0);
-        LeakTime.setMilliseconds(0);
-        $("time#timeToSet").attr("datetime", LeakTime.toISOString());
+    LeakTime.setSeconds(0);
+    LeakTime.setMilliseconds(0);
+    $("time#timeToSet").attr("datetime", LeakTime.toISOString());
 
+    $(document).ready(function () {
         setTimeVal(inputTime, LeakTime)
 
         inputTime.change(() => {
             preview.removeClass("is-invisible");
-            LeakTime = timeChange(inputTime);
+            LeakTime = timeChange(inputTime, $("time#timeToSet"));
             formReady();
         });
 
         inputLink.on("input", () => {
             preview.removeClass("is-invisible");
-            Link = linkChange(inputLink, linkInfo, AllowedLinks({{.payload.allowed_links}}));
+            Link = linkChange(inputLink, linkInfo, $("a#source"), AllowedLinks({{.payload.allowed_links}}));
             formReady();
         });
 
@@ -146,68 +146,67 @@
             });
             formReady();
         })
-
-        function formReady() {
-            submitButton.prop("disabled", true);
-            let linkValid =
-            //{{ if ge .user.AuthLevel $linkLess }}
-            true;
-            //{{else}}
-            Link;
-            //{{end}}
-            if (Leak && LeakTime && User && linkValid) {
-                submitButton.prop("disabled", false);
-            }
-        }
-
-        function post() {
-            var form = $('<form></form>');
-
-            form.attr("method", "post");
-            form.addClass("is-hidden");
-            form.attr("action", "/leaks/create");
-
-            $.each({
-                description: Leak,
-                time: LeakTime.getTime(),
-                image_url: Image,
-                source_url: Link
-            }, function (key, value) {
-                let field = $('<input></input>');
-                field.attr("type", "hidden");
-                field.attr("name", key);
-                field.attr("value", value);
-
-                form.append(field);
-            });
-
-            $(document.body).append(form);
-            form.submit();
-        }
-
-        if (postError) {
-            Leak = "{{.payload.description}}"
-            LeakTime = new Date(parseInt("{{.payload.time}}"))
-            Image = "{{.payload.image_url}}"
-            Link = "{{.payload.source_url}}"
-            if (isNaN(LeakTime.getTime())) {
-                LeakTime = new Date()
-            }
-            setTimeVal(inputTime, LeakTime);
-            inputLink.val(Link);
-            inputLeak.val(Leak);
-            inputImage.val(Image);
-
-            LeakTime = timeChange(inputTime);
-            Link = linkChange(inputLink, linkInfo, AllowedLinks({{.payload.allowed_links}}));
-            Leak = leakChange(inputLeak, $("p#leakPreview"));
-            imageChange(inputImage, $("img#previewImage")).then(r => {
-                Image = r
-            });
-            formReady();
-        }
     });
 
+    function formReady() {
+        submitButton.prop("disabled", true);
+        let linkValid =
+            //{{ if ge .user.AuthLevel $linkLess }}
+            true;
+        //{{else}}
+        Link;
+        //{{end}}
+        if (Leak && LeakTime && User && linkValid) {
+            submitButton.prop("disabled", false);
+        }
+    }
+
+    function post() {
+        let form = $('<form></form>');
+
+        form.attr("method", "post");
+        form.addClass("is-hidden");
+        form.attr("action", "/leaks/create");
+
+        $.each({
+            description: Leak,
+            time: LeakTime.getTime(),
+            image_url: Image,
+            source_url: Link
+        }, function (key, value) {
+            let field = $('<input></input>');
+            field.attr("type", "hidden");
+            field.attr("name", key);
+            field.attr("value", value);
+
+            form.append(field);
+        });
+
+        $(document.body).append(form);
+        form.submit();
+    }
+
+    if (postError) {
+        Leak = "{{.payload.description}}"
+        LeakTime = new Date(parseInt("{{.payload.time}}"))
+        Image = "{{.payload.image_url}}"
+        Link = "{{.payload.source_url}}"
+        if (isNaN(LeakTime.getTime())) {
+            LeakTime = new Date()
+        }
+        setTimeVal(inputTime, LeakTime);
+        inputLink.val(Link);
+        inputLeak.val(Leak);
+        inputImage.val(Image);
+
+        LeakTime = timeChange(inputTime);
+        Link = linkChange(inputLink, linkInfo,  $("a#source"),AllowedLinks({{.payload.allowed_links}}));
+        Leak = leakChange(inputLeak, $("p#leakPreview"));
+        imageChange(inputImage, $("img#previewImage")).then(r => {
+            Image = r
+        });
+        formReady();
+    }
 </script>
 <script src="/static/convertTime.js"></script>
 

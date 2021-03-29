@@ -5,26 +5,26 @@ function setTimeVal(field, date) {
     field.attr("max", now.toISOString().slice(0, 16));
 }
 
-function timeChange(field) {
+function timeChange(field, preview) {
     field.removeClass("is-danger");
     let time;
     try {
         time = new Date(field.val());
-        $("time#timeToSet").attr("datetime", time.toISOString());
+        preview.attr("datetime", time.toISOString());
         fixTime()
     } catch (err) {
         field.addClass("is-danger")
         time = null
-        $("time#timeToSet").text("invalid date")
+        preview.text("invalid date")
     }
     return time
 }
 
-function linkChange(field, info, allowedLinks) {
+function linkChange(field, info, source, allowedLinks) {
     field.removeClass("is-danger is-success")
     info.removeClass("is-danger is-success")
-    let source = $("a#source")
-    source.addClass("has-text-danger")
+    if (source !== undefined)
+        source.addClass("has-text-danger")
     info.text("")
     let link = ""
     let val = field.val().trim();
@@ -35,8 +35,10 @@ function linkChange(field, info, allowedLinks) {
     if (allowedLinks(val).some(x => x)) {
         field.addClass("is-success")
         link = val
-        source.removeClass("has-text-danger")
-        source.attr("href", val)
+        if (source !== undefined) {
+            source.removeClass("has-text-danger")
+            source.attr("href", val)
+        }
     } else {
         info.text("This does not seem to be an authorised source link")
         info.addClass("is-danger")
@@ -102,9 +104,9 @@ async function imageChange(field, previewImage) {
 }
 
 function AllowedLinks(ListOfLinks) {
-    return function (val){
+    return function (val) {
         let list = [];
-        for (let i of ListOfLinks){
+        for (let i of ListOfLinks) {
             list.push(val.match(new RegExp(i)));
         }
         return list;
