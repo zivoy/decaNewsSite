@@ -6,6 +6,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func leakList(c *gin.Context) {
@@ -38,7 +39,7 @@ func leakListFirst(c *gin.Context) {
 func showIndex(c *gin.Context) {
 	render(c, gin.H{},
 		"Home Page",
-		"DecaFans is a news page run and maintained by fans of the DecaGear1 headset to help getting all the latest information.",
+		"DecaFans is a news page run and maintained by fans of the DecaGear1 headset to help getting all the latest information. Anyone can help contribute information to get the latest news on the headset.",
 		"",
 		c.Request.URL,
 		"index.html")
@@ -51,7 +52,8 @@ func getArticle(c *gin.Context) {
 	// Check if the article exists
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
-		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)}, "DecaLeak", article.Summary, article.ImageUrl, c.Request.URL,
+		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)}, "DecaLeak",
+			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "), article.ImageUrl, c.Request.URL,
 			"leak.html")
 	} else {
 		// If the article is not found, abort with an error

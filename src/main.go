@@ -101,6 +101,8 @@ func main() {
 	BBCompiler = bbcode.NewCompiler(true, true)
 	initBBCode(&BBCompiler)
 
+	//sanitiseAllLeaks()
+
 	err = router.Run(":5000")
 	if err != nil {
 		panic(err)

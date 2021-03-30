@@ -40,7 +40,7 @@ function linkChange(field, info, source, allowedLinks) {
             source.attr("href", val)
         }
     } else {
-        info.text("This does not seem to be an authorised source link")
+        info.text("This does not seem to be an authorised source URL")
         info.addClass("is-danger")
         field.addClass("is-danger")
     }

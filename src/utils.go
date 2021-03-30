@@ -82,3 +82,13 @@ func initBBCode(compiler *bbcode.Compiler) {
 		return out, true
 	})
 }
+
+var _repeatedEnter = regexp.MustCompile(`\n\n+`)
+var _repeatedSpace = regexp.MustCompile(`  +`)
+
+func cleanRepeatedEnter(input string) string {
+	return _repeatedEnter.ReplaceAllString(input, `\n`)
+}
+func cleanRepeatedSpace(input string) string {
+	return _repeatedSpace.ReplaceAllString(input, ` `)
+}

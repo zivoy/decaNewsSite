@@ -2,26 +2,42 @@
 {{ template "header.html" .}}
 <section class="hero is-primary">
     <div class="hero-body">
-        <p class="title">DecaFans</p>
-        <p class="subtitle">Number one place for all the latest DecaNews</p>
+        <h1 class="title">DecaFans</h1>
+        <h3 class="subtitle">Number one place for all the latest DecaNews</h3>
     </div>
 </section>
 <br>
-<div class="level">
-    <div class="level-left">
-        <p class="level-item">Join the official DecaGear</p>
-        <a class="level-item button is-info" target="_blank" href="https://discord.gg/d7YG7qD">
-            <span class="icon-text">
-                <span>Discord</span>
-                <span class="icon has-text-dark">
-                    <ion-icon class="ion-ionic" name="logo-discord"></ion-icon>
-                </span>
-            </span>
-        </a>
-    </div>
-    <div class="level-right">
-    </div>
-</div>
+<section class="has-text-centered-touch">
+    <p class="subtitle">
+        What is DecaFans, and how to contribute?
+    </p>
+    <p class="notification">
+        DecaFans is a website for people who are interested in the <a href="https://deca.net">DecaGear</a> headset.
+        <br>
+        The community made it to help share the latest information leaked and shared on the DecaGear Discord
+        server.
+        <br>
+        You can contribute to the site by sharing any information you have related to the DecaGear headset by going to
+        the <a href="/leaks">Leaks</a> tab.
+        <br>
+        <br>
+        Feel free to also contribute to the development of the site on
+        <a href="https://github.com/zivoy/decaNewsSite/">Github</a>. Bugs reports and suggestions are also greatly
+        appreciated.
+    </p>
 
+    <p class="subtitle">
+        What is there on this Site?
+    </p>
+    <p class="notification">
+        In the <a href="/leaks">Leaks</a> tab, you will find the latest information about the DecaGear headset gathered and shared by the community.
+        <br>
+        In <a href="/official">Official news</a>, you can find the Official channels for Megadodo. Most of this info is also in the discord.
+    </p>
+    <a target="_blank" href="https://discord.gg/d7YG7qD">
+        <img src="https://discordapp.com/api/guilds/765917490734694412/embed.png?style=banner2"
+             alt="Join the DecaGear Discord">
+    </a>
+</section>
 <!--Embed the footer.html template at this location-->
 {{ template "footer.html" .}}

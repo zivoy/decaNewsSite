@@ -187,8 +187,9 @@ func leakSanitization(description string, rawTime string, imageUrl string, sourc
 	description = strings.ReplaceAll(description, "\r\n", "\n")
 
 	summery := BBCompiler.Compile(description)
+	summery = strings.ReplaceAll(summery, "<br>", "\n")
 	summery = stripHtmlRegex(summery)
-	summery = clip(summery, 200)
+	summery = clip(cleanRepeatedEnter(cleanRepeatedSpace(summery)), 200)
 
 	leak := article{
 		Description: description,

@@ -36,12 +36,15 @@
                     <div class="control">
                         <input id="link" name="link" class="input" type="url" placeholder="Link to the leak in the chat"
                                required>
-                        {{ if ge .user.AuthLevel $linkLess }}
-                        <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure
-                            you add one somewhere</p>
-                        {{end}}
                     </div>
+                    {{ if ge .user.AuthLevel $linkLess }}
+                    <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure
+                        you add one somewhere</p>
+                    {{end}}
                     <p class="help" id="linkInfo"></p>
+                    <span class="icon is-hidden-touch has-tooltip-multiline" data-tooltip="Right click on a Discord message and click &quot;Copy Message Link&quot;">
+                        <ion-icon class="ion-ionic" name="help-circle-outline"></ion-icon>
+                    </span>
                 </div>
 
                 <div class="field">
@@ -49,8 +52,13 @@
                     <div class="control">
                         <input class="input" type="url" id="image" name="image" placeholder="Optional link to image">
                     </div>
-                    <p class="help">Can be a screenshot of a discussion or a relevant image to the leak</p>
-                    <p class="help">You can DM the image to a bot on Discord and then copy the URL</p>
+                    <p class="help">
+                        Can be a screenshot of a discussion or a relevant image to the leak
+                    </p>
+                    <span class="icon is-hidden-touch has-tooltip-multiline" data-tooltip="You can DM the image to a bot on&NewLine;Discord and then copy the URL">
+                        <ion-icon class="ion-ionic" name="help-circle-outline"></ion-icon>
+                    </span>
+                    <p class="help is-hidden-desktop">You can DM the image to a bot on Discord and then copy the URL</p>
                 </div>
 
                 <div class="field">
