@@ -39,7 +39,7 @@ func leakListFirst(c *gin.Context) {
 func showIndex(c *gin.Context) {
 	render(c, gin.H{},
 		"Home Page",
-		"DecaFans is a news page run and maintained by fans of the DecaGear1 headset to help getting all the latest information. Anyone can help contribute information to get the latest news on the headset.",
+		"DecaFans is a news page run and maintained by fans of the DecaGear1 headset to help getting all the latest information.",
 		"",
 		c.Request.URL,
 		"index.html")
