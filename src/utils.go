@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/frustra/bbcode"
 	"github.com/gin-gonic/gin"
+	"hash/fnv"
 	"html/template"
 	"regexp"
 	"strings"
@@ -91,4 +92,10 @@ func cleanRepeatedEnter(input string) string {
 }
 func cleanRepeatedSpace(input string) string {
 	return _repeatedSpace.ReplaceAllString(input, ` `)
+}
+
+func hashTo32(s string) uint32 {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return h.Sum32()
 }

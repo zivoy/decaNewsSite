@@ -185,6 +185,7 @@ func leakSanitization(description string, rawTime string, imageUrl string, sourc
 	sourceUrl = strings.ReplaceAll(sourceUrl, "javascript:", "")
 
 	description = strings.ReplaceAll(description, "\r\n", "\n")
+	description = strings.Trim(description, "\n ")
 
 	summery := BBCompiler.Compile(description)
 	summery = strings.ReplaceAll(summery, "<br>", "\n")

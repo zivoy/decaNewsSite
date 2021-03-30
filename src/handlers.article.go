@@ -52,7 +52,8 @@ func getArticle(c *gin.Context) {
 	// Check if the article exists
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
-		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)}, "DecaLeak",
+		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)},
+			fmt.Sprintf("DecaLeak %d", hashTo32(article.ID)),
 			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "), article.ImageUrl, c.Request.URL,
 			"leak.html")
 	} else {
