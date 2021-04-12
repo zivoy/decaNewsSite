@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
 	"github.com/markbates/goth"
+	"log"
 	"strings"
 	"time"
 )
@@ -43,7 +44,7 @@ func getUser(uid string) user {
 	userData := getCache(userCache, uid, func(uid string) interface{} {
 		userData, err := readEntry(dataBase, userPathString(uid))
 		if err != nil && debug {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		return user{
 			Username:          userData["username"].(string),
@@ -69,7 +70,7 @@ func userExists(uid string) bool {
 func addUser(uid string, user user) {
 	err := setEntry(dataBase, userPathString(uid), user)
 	if err != nil && debug {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	addCache(userCache, uid, user)
 }
@@ -78,7 +79,7 @@ func getSession(token string) userSession {
 	session := getCache(sessionsCache, token, func(token string) interface{} {
 		sessionData, err := readEntry(dataBase, sessionPathString(token))
 		if err != nil && debug {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		return userSession{
 			Cookie:  token,
@@ -144,7 +145,7 @@ func loggInUser(c *gin.Context, userVals goth.User) {
 	}
 	err := setEntry(dataBase, sessionPathString(cookie), session)
 	if err != nil && debug {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	addCache(sessionsCache, cookie, session)

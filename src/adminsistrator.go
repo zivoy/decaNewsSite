@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -32,7 +33,7 @@ func addLog(actionLevel int, actee string, description string, additionalInforma
 		Information: details,
 	})
 	if err != nil && debug {
-		fmt.Println(fmt.Errorf("log error: %w", err))
+		log.Println(fmt.Errorf("log error: %w", err))
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -77,7 +78,7 @@ func getArticleByID(id string) (article, error) {
 		leak := getCache(articleCache, id, func(string) interface{} {
 			articleData, err := readEntry(dataBase, articlePathString(id))
 			if err != nil && debug {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			var edited string
 			if editor, ok := articleData["edited_by"]; ok {
@@ -118,7 +119,7 @@ func getAllowedLinks() []string {
 		ref := dataBase.NewRef("admin/allowed_links")
 		var data []string
 		if err := ref.Get(ctx, &data); err != nil && debug {
-			fmt.Println(err)
+			log.Println(err)
 			return nil
 		}
 		return data
@@ -266,7 +267,7 @@ func createArticle(c *gin.Context) {
 	} else {
 		// error
 		if debug {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		render(c, gin.H{"status": "error",
 			"payload": map[string]interface{}{

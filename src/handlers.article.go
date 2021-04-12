@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"math"
 	"net/http"
 	"strconv"
@@ -85,15 +86,15 @@ func archiveLeak(c *gin.Context) {
 
 	leak, err := getArticleByID(uid)
 	if err != nil && debug {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	err = setEntry(dataBase, fmt.Sprintf("leaks/%s", uid), nil)
 	if err != nil && debug {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	err = setEntry(dataBase, fmt.Sprintf("admin/archived_leaks/%s", uid), leak)
 	if err != nil && debug {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	addLog(1, requester, "Archiving Leak", map[string]interface{}{"leak_id": uid})
@@ -142,7 +143,7 @@ func updateArticle(c *gin.Context) {
 	err = setEntry(dataBase, articlePathString(leak.ID), newLeak)
 	if err != nil {
 		if debug {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		abortWithMessage(c, 500, err)
 		return
