@@ -4,6 +4,7 @@ Disallow: /u/*
 Disallow: /admin/*
 Disallow: /leaks/create$
 Disallow: /leaks/create?
+Disallow: /official
 
 Allow: /
 Allow: /u/profile/*
