@@ -5,7 +5,7 @@ website for making and sharing news and leaks about the [decagear](https://deca.
 
 ## building and running
 ```shell
-docker build --build-arg LOCAL_FILE={{true || [false] -- optinal}} -t decafans .
+docker build --build-arg VERSION={{commit hash or version identifier}} --build-arg LOCAL_FILE={{true || [false] -- optinal}} -t decafans .
 ```
 if `LOCAL_FILE` is enabled, you need to make a file called `.env` in the src directory 
 using the data in [example.env](https://github.com/zivoy/decaNewsSite/blob/master/example.env).

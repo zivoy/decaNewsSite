@@ -22,7 +22,12 @@ RUN go build -o ./app ./src
 # load the config from a local file rather then getting it from the web
 ARG LOCAL_FILE=false
 
+ARG VERSION
+
 ENV DEV_MODE=$DEV_MODE
+ENV VERSION=$VERSION
+
+LABEL version=$VERSION
 
 EXPOSE 5000
 

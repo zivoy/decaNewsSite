@@ -32,7 +32,7 @@ var dataBase *db.Client
 var domainBase *url.URL
 var BBCompiler bbcode.Compiler
 
-var version = "2.0.0"
+var version string
 
 var authorities = map[int]string{
 	0: "Browser",
@@ -45,6 +45,10 @@ func main() {
 	dev, err := strconv.ParseBool(os.Getenv("DEV_MODE"))
 	if err != nil {
 		debug = false
+	}
+	version = os.Getenv("DEV_MODE")
+	if version == "" {
+		version = "UNVERSIONED"
 	}
 
 	var confMap map[string]string
