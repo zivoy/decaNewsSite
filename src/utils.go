@@ -10,9 +10,7 @@ import (
 	"strings"
 )
 
-const tagString = `<.*?>`
-
-var tagRegex = regexp.MustCompile(tagString)
+var tagRegex = regexp.MustCompile(`<.*?>`)
 
 func clip(input string, maxLength int) string {
 	if len(input) > maxLength {
@@ -42,6 +40,8 @@ func stripHtmlRegex(s string) string {
 	return tagRegex.ReplaceAllString(s, "")
 }
 
+var youtubeRE = regexp.MustCompile(`[a-zA-Z\-_0-9]{11}`)
+
 func initBBCode(compiler *bbcode.Compiler) {
 	// sanitise the url tag from JS
 	compiler.SetTag("url", func(node *bbcode.BBCodeNode) (*bbcode.HTMLTag, bool) {
@@ -67,7 +67,13 @@ func initBBCode(compiler *bbcode.Compiler) {
 		iframe.Name = "iframe"
 		iframe.Attrs["frameborder"] = "0"
 		text := bbcode.CompileText(node)
-		iframe.Attrs["src"] = fmt.Sprintf("https://www.youtube.com/embed/%s", text)
+		var youtubeID string
+		if youtubeRE.MatchString(text) {
+			youtubeID = youtubeRE.FindString(text)
+		} else {
+			youtubeID = text
+		}
+		iframe.Attrs["src"] = fmt.Sprintf("https://www.youtube.com/embed/%s", youtubeID)
 		iframe.Attrs["allowfullscreen"] = ""
 		iframe.AppendChild(nil)
 		// todo this needs improving :/
