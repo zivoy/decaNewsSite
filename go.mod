@@ -16,6 +16,7 @@ require (
 	github.com/gorilla/sessions v1.1.1
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/markbates/goth v1.67.1

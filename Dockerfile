@@ -1,6 +1,8 @@
 # todo make production and setip ci with github actions or something
 FROM golang:1.16-alpine
-MAINTAINER zivoy
+
+LABEL maintainer="zivoy"
+
 RUN apk add --no-cache git
 
 WORKDIR /app/decafans-server
@@ -17,20 +19,10 @@ COPY src/resources resources
 
 RUN go build -o ./app ./src
 
-ARG DB_CREDS
-ARG D_KEY
-ARG D_SECRET
-ARG DEBUG_MODE=false
-ARG HOST_PATH
-# http://localhost:5000 is an example for testing
-ARG RANDOM_SECRET
+# load the config from a local file rather then getting it from the web
+ARG LOCAL_FILE=false
 
-ENV DISCORD_KEY=$D_KEY
-ENV DISCORD_SECRET=$D_SECRET
-ENV DEBUG=$DEBUG_MODE
-ENV REDIRECT=$HOST_PATH
-ENV STORE_SECRET=$RANDOM_SECRET
-ENV GOOGLE_APPLICATION_CREDENTIALS=$DB_CREDS
+ENV DEV_MODE=$DEV_MODE
 
 EXPOSE 5000
 

@@ -7,13 +7,16 @@ import (
 	"github.com/frustra/bbcode"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
+	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/discord"
+	"strconv"
+
+	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 )
 
 //todo make tests
@@ -29,6 +32,8 @@ var dataBase *db.Client
 var domainBase *url.URL
 var BBCompiler bbcode.Compiler
 
+var version = "2.0.0"
+
 var authorities = map[int]string{
 	0: "Browser",
 	1: "Reporter",
@@ -37,10 +42,47 @@ var authorities = map[int]string{
 }
 
 func main() {
-	var err error
-	// go into production mode if there is an error with parsing the bool
-	debug, err = strconv.ParseBool(os.Getenv("DEBUG"))
+	dev, err := strconv.ParseBool(os.Getenv("DEV_MODE"))
+	if err != nil {
+		debug = false
+	}
 
+	var confMap map[string]string
+	if dev {
+		// on dev mode make a .env file with your configs
+		confMap, err = godotenv.Read(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file")
+			return
+		}
+	} else {
+		var conf string
+		location := os.Getenv("LOCATION")
+		serverPassword := os.Getenv("SERVER_PASSWORD")
+		filePassword := os.Getenv("FILE_PASSWORD")
+		if location == "" || serverPassword == "" || filePassword == "" {
+			log.Println(fmt.Sprintf("Missing credentials\n"+
+				"\tURL:         %t\n"+
+				"\tServer pass: %t\n"+
+				"\tFile pass:   %t", location != "", serverPassword != "", filePassword != ""))
+			failedSimplePage()
+			return
+		}
+		conf, err = getConfiguration(location, serverPassword, filePassword)
+		if err != nil {
+			log.Println(err)
+			failedSimplePage()
+			return
+		}
+		confMap, err = godotenv.Unmarshal(conf)
+		if err != nil {
+			log.Println(err)
+			failedSimplePage()
+			return
+		}
+	}
+
+	debug, err = strconv.ParseBool(confMap["DEBUG"])
 	if err != nil {
 		debug = false
 	}
@@ -49,14 +91,14 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	discordRedirect := os.Getenv("REDIRECT")
+	discordRedirect := confMap["REDIRECT"]
 	domainBase, err = url.Parse(discordRedirect)
 	if err != nil {
 		panic(err)
 	}
 
-	key := os.Getenv("STORE_SECRET") // Replace with your SESSION_SECRET or similar
-	maxAge := 86400 * 30             // 30 days
+	key := confMap["STORE_SECRET"]
+	maxAge := 86400 * 30 // 30 days
 
 	store = sessions.NewCookieStore([]byte(key))
 	store.MaxAge(maxAge)
@@ -67,7 +109,8 @@ func main() {
 
 	gothic.Store = store
 
-	discordProvider = discord.New(os.Getenv("DISCORD_KEY"), os.Getenv("DISCORD_SECRET"), discordRedirect+"/u/login/callback", discord.ScopeIdentify)
+	discordProvider = discord.New(confMap["DISCORD_KEY"], confMap["DISCORD_SECRET"],
+		discordRedirect+"/u/login/callback", discord.ScopeIdentify)
 	goth.UseProviders(discordProvider)
 
 	router = gin.Default()
@@ -84,7 +127,7 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 
 	// initDB
-	err = initializeApp([]byte(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")))
+	err = initializeApp([]byte(confMap["GOOGLE_APPLICATION_CREDENTIALS"]), confMap["DATABASE_URL"])
 	if err != nil {
 		panic(err)
 	}
@@ -138,6 +181,7 @@ func render(c *gin.Context, data gin.H, title string, description string, image 
 	data["is_logged_in"] = loggedInInterface.(bool)
 	userVals, _ := c.Get("user")
 	data["user"] = userVals
+	data["version"] = version
 
 	data["logo"] = pageLogo(c)
 
@@ -157,5 +201,4 @@ func render(c *gin.Context, data gin.H, title string, description string, image 
 		// Respond with HTML
 		c.HTML(stat, templateName, data)
 	}
-
 }

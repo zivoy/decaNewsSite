@@ -2,3 +2,5 @@ vendor/
 pkg/
 .idea/
 src/conf/
+src/.env
+docker.env

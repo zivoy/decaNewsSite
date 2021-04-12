@@ -6,3 +6,13 @@ decafans.com {
 www.decafans.com {
   redir https://decafans.com{uri}
 }
+
+config.decafans.com {
+  root * /var/www/decafanscreds
+
+  basicauth /* {
+    serverPoint JDJhJDE0JEUxRWs3LkhBSEFMT0xZT1VUSE9VR0hJV09VTERQVVRUSEVQQVNTV09SREhFUkVYRC5wYXNz
+  }
+
+  file_server
+}

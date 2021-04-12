@@ -11,12 +11,12 @@ import (
 var dataBaseApp *firebase.App
 var ctx context.Context
 
-func initializeApp(credPath []byte) error {
+func initializeApp(credPath []byte, databaseURL string) error {
 	opt := option.WithCredentialsJSON(credPath)
 	//option.WithCredentialsJSON(?)
 	ctx = context.Background()
 	conf := &firebase.Config{
-		DatabaseURL: "https://decanewsdb-default-rtdb.firebaseio.com/",
+		DatabaseURL: databaseURL,
 	}
 
 	app, err := firebase.NewApp(ctx, conf, opt)
