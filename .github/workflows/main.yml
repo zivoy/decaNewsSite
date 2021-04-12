@@ -42,7 +42,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           build-args:
-            VERSION=${{ GITHUB_SHA }}
+            VERSION=${{ github.sha }}
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/decafans:latest
 
