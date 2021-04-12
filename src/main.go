@@ -46,7 +46,7 @@ func main() {
 	if err != nil {
 		debug = false
 	}
-	version = os.Getenv("DEV_MODE")
+	version = os.Getenv("VERSION")
 	if version == "" {
 		version = "UNVERSIONED"
 	}
