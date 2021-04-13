@@ -66,7 +66,7 @@
                 </div>
             </fieldset>
         `));
-        $("p#bbcode").html("supports <a href='https://www.bbcode.org/reference.php' target='_blank'>bbcode</a>")
+        $("p#bbcode").html("supports <a href='https://www.bbcode.org/reference.php' target='_blank' rel='noopener'>bbcode</a>")
         setTimeVal($("#leakTime"), time)
         $("#leakImage").remove();
         $("#controlButtons").html(`
@@ -185,7 +185,7 @@
                             {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
                         <span> - </span>
                         {{if .payload.SourceLink}}
-                        <a target="_blank" href="{{.payload.SourceLink}}">Source</a>
+                        <a target="_blank" href="{{.payload.SourceLink}}" rel="noopener">Source</a>
                         {{else}}
                         <span class="has-text-danger">Source</span>
                         {{end}}
