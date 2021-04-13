@@ -3,15 +3,13 @@ module github.com/zivoy/decaNewsSite
 go 1.16
 
 require (
+	cloud.google.com/go/firestore v1.1.1 // indirect
 	firebase.google.com/go v3.13.0+incompatible
-	firebase.google.com/go/v4 v4.2.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/frustra/bbcode v0.0.0-20201127003707-6ef347fbe1c8
-	github.com/gin-gonic/gin v1.6.3
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
-	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/gin-gonic/gin v1.7.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.1
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -27,6 +25,5 @@ require (
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	golang.org/x/sys v0.0.0-20210228012217-479acdf4ea46 // indirect
 	google.golang.org/api v0.40.0
-	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
