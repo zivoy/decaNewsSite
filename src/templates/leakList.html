@@ -18,7 +18,7 @@
                     {{ if .ImageUrl}}
                     <figure class="media-left">
                         <a class="image is-128x128" href="/leaks/leak/{{.ID}}">
-                            <img src="{{.ImageUrl}}">
+                            <img src="{{.ImageUrl}}" alt="Leak Image..." loading="lazy">
                         </a>
                     </figure>
                     {{end}}
@@ -39,7 +39,7 @@
                                         {{- $user := getUser .ReporterUid -}}
                                         <span class="level-left">
                         <span class="image is-32x32 userImage">
-                            <img class="level-item is-rounded" src="{{$user.AvatarUrl}}">
+                            <img class="level-item is-rounded" src="{{$user.AvatarUrl}}" alt="{{$user.Username}}'s avatar" loading="lazy">
                         </span>
                         </span>
                                         <span class="level-right">
