@@ -23,6 +23,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/ugorji/go v1.2.4 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
-	google.golang.org/api v0.45.0
+	google.golang.org/api v0.46.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
