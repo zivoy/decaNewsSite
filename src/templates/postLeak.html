@@ -144,7 +144,7 @@
     $("time#timeToSet").attr("datetime", LeakTime.toISOString());
 
     $(document).ready(function () {
-        setTimeVal(inputTime, LeakTime)
+        setTimeVal(inputTime, LeakTime);
 
         inputTime.change(() => {
             preview.removeClass("is-invisible");
@@ -213,25 +213,33 @@
     }
 
     if (postError) {
-        Leak = "{{.payload.description}}"
-        LeakTime = new Date(parseInt("{{.payload.time}}"))
-        Image = "{{.payload.image_url}}"
-        Link = "{{.payload.source_url}}"
-        if (isNaN(LeakTime.getTime())) {
-            LeakTime = new Date()
-        }
-        setTimeVal(inputTime, LeakTime);
-        inputLink.val(Link);
-        inputLeak.val(Leak);
-        inputImage.val(Image);
+        window.addEventListener('load', function () {
+            Leak = "{{.payload.description}}"
+            LeakTime = new Date(parseInt("{{.payload.time}}"))
+            Image = "{{.payload.image_url}}"
+            Link = "{{.payload.source_url}}"
+            if (isNaN(LeakTime.getTime())) {
+                LeakTime = new Date()
+            }
+            setTimeVal(inputTime, LeakTime);
+            inputLink.val(Link);
+            inputLeak.val(Leak);
+            inputImage.val(Image);
 
-        LeakTime = timeChange(inputTime);
-        Link = linkChange(inputLink, linkInfo,  $("a#source"),AllowedLinks({{.payload.allowed_links}}));
-        Leak = leakChange(inputLeak, $("p#leakPreview"), val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
-        imageChange(inputImage, $("img#previewImage")).then(r => {
-            Image = r
+            LeakTime = timeChange(inputTime, $("time#timeToSet"));
+            Link = linkChange(inputLink, linkInfo,  $("a#source"),AllowedLinks({{.payload.allowed_links}}));
+            Leak = leakChange(inputLeak, $("p#leakPreview"), val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
+            imageChange(inputImage, $("img#previewImage")).then(r => {
+                Image = r
+            });
+            formReady();
         });
-        formReady();
+
+        console.log("returned from error");
+        let err = `
+        {{.payload.error}}
+        `
+        console.error(err)
     }
 </script>
 <script src="/static/convertTime.js"></script>
