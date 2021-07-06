@@ -227,7 +227,7 @@
             inputImage.val(Image);
 
             LeakTime = timeChange(inputTime, $("time#timeToSet"));
-            Link = linkChange(inputLink, linkInfo,  $("a#source"),AllowedLinks({{.payload.allowed_links}}));
+            Link = linkChange(inputLink, linkInfo,  $("a#source"), AllowedLinks({{.payload.allowed_links}}));
             Leak = leakChange(inputLeak, $("p#leakPreview"), val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
             imageChange(inputImage, $("img#previewImage")).then(r => {
                 Image = r
