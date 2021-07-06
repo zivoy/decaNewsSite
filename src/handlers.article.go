@@ -88,11 +88,11 @@ func archiveLeak(c *gin.Context) {
 	if err != nil && debug {
 		log.Println(err)
 	}
-	err = setEntry(dataBase, fmt.Sprintf("leaks/%s", uid), nil)
+	err = setEntry(dataBase, fmt.Sprintf(archivedArticleLocation+"/%s", uid), leak)
 	if err != nil && debug {
 		log.Println(err)
 	}
-	err = setEntry(dataBase, fmt.Sprintf("admin/archived_leaks/%s", uid), leak)
+	err = setEntry(dataBase, articlePathString(uid), nil)
 	if err != nil && debug {
 		log.Println(err)
 	}

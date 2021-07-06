@@ -24,8 +24,14 @@ type article struct {
 	EditedBy    string `json:"edited_by,omitempty"`
 }
 
+const (
+	articleLocation         = "leaks"
+	archivedArticleLocation = "admin/archived_leaks"
+	allowedLinkLocation     = "admin/allowed_links"
+)
+
 func articlePathString(uid string) string {
-	return fmt.Sprintf("leaks/%s", uid)
+	return fmt.Sprintf(articleLocation+"/%s", uid)
 }
 
 // you need this auth level to post with no link
@@ -34,7 +40,7 @@ const linkLessAuthLevel = 1
 // this function is really bad todo make this be done on the front end
 // todo implement splitting of pages
 func getAllArticles(page int) ([]article, error) {
-	ref := dataBase.NewRef("leaks")
+	ref := dataBase.NewRef(articleLocation)
 	var data map[string]article
 	if err := ref.Get(ctx, &data); err != nil {
 		return nil, fmt.Errorf("error reading from database: %v", err)
@@ -54,7 +60,7 @@ func getAllArticles(page int) ([]article, error) {
 }
 
 func getAllUsersArticles(uid string) ([]article, error) {
-	ref := dataBase.NewRef("leaks")
+	ref := dataBase.NewRef(articleLocation)
 	var data map[string]article
 	if err := ref.OrderByChild("reporter_uid").EqualTo(uid).Get(ctx, &data); err != nil {
 		return nil, fmt.Errorf("error reading from database: %v", err)
@@ -116,7 +122,7 @@ func compileBBCode(in string) string {
 
 func getAllowedLinks() []string {
 	items := getCache(allowedLinkCache, "links", func(string) interface{} {
-		ref := dataBase.NewRef("admin/allowed_links")
+		ref := dataBase.NewRef(allowedLinkLocation)
 		var data []string
 		if err := ref.Get(ctx, &data); err != nil && debug {
 			log.Println(err)
@@ -155,7 +161,7 @@ func createNewLeak(description string, rawTime string, imageUrl string, sourceUr
 		return article{}, errors.New("invalid time")
 	}
 
-	key, err := pushEntry(dataBase, "leaks", leak)
+	key, err := pushEntry(dataBase, articleLocation, leak)
 	leak.ID = key
 
 	if err != nil {

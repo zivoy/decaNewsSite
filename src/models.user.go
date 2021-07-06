@@ -32,12 +32,17 @@ type userSession struct {
 	Expires int64  `json:"expire"`
 }
 
+const (
+	sessionLocation = "sessions"
+	userLocation    = "users"
+)
+
 func userPathString(uid string) string {
-	return fmt.Sprintf("users/%s", uid)
+	return fmt.Sprintf(userLocation+"/%s", uid)
 }
 
 func sessionPathString(uid string) string {
-	return fmt.Sprintf("sessions/%s", uid)
+	return fmt.Sprintf(sessionLocation+"/%s", uid)
 }
 
 func getUser(uid string) user {
