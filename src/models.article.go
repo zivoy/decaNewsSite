@@ -178,7 +178,7 @@ cases:
 	4 - invalid time
 */
 func leakSanitization(description string, rawTime string, imageUrl string, sourceUrl string, reporter user, editedBy user) (article, int) {
-	time, err := strconv.Atoi(rawTime)
+	time, err := strconv.ParseInt(rawTime, 10, 64)
 	if err != nil {
 		return article{}, 4
 	}
