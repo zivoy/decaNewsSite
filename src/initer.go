@@ -6,7 +6,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -15,7 +17,10 @@ func failedSimplePage() {
 	// serve a basic page
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Encountered an error when getting configuration")
+		_, err := fmt.Fprint(w, "Encountered an error when getting configuration")
+		if err != nil {
+			log.Fatal(err)
+		}
 	})
 
 	err := http.ListenAndServe(":5000", nil)
@@ -39,7 +44,12 @@ func getConfiguration(configUrl string, serverPassword string, aesKey string) (s
 	if resp.StatusCode != 200 {
 		return "", errors.New("invalid credentials")
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(resp.Body)
 
 	// read to a buffer and decrypt
 	dataRaw, err := ioutil.ReadAll(resp.Body)
@@ -87,5 +97,5 @@ func decrypt(encryptedString string, keyString string) (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("%s", plaintext), nil
+	return string(plaintext), nil
 }

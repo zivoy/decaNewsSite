@@ -139,6 +139,7 @@ func UpdateUserRank(c *gin.Context) {
 	c.JSON(http.StatusNotFound, map[string]interface{}{"success": false, "message": "user not found"})
 }
 
+/*
 func sanitiseAllLeaks() {
 	leaks, _ := getAllArticles(0)
 	for _, leak := range leaks {
@@ -156,3 +157,4 @@ func sanitiseAllLeaks() {
 		_ = setEntry(dataBase, articlePathString(leak.ID), newLeak)
 	}
 }
+*/

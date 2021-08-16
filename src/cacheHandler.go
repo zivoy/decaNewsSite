@@ -34,10 +34,12 @@ func initCacheClearing() {
 	clearingCache = true
 }
 
+/*
 func stopClearingCache() {
 	close(autoClearCache)
 	clearingCache = false
 }
+*/
 
 func clearCache() {
 	userCache = make(map[string]cache)
