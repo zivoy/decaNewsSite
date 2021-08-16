@@ -11,17 +11,48 @@
 {{end}}
 
 <section class="section">
-    {{$privlage:=false}}
-    {{ if .user}}
-    {{$privlage:=.user.PostingPrivilege}}
-    {{end}}
-    {{ if coalesce $privlage true }}
-    <a class="button is-info mb-2" href="/leaks/create">
-        New Leak
-    </a>
-    {{end}}
-    {{template "pagination"}}
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                {{$privlage:=false}}
+                {{ if .user}}
+                {{$privlage:=.user.PostingPrivilege}}
+                {{end}}
+                {{ if coalesce $privlage true }}
+                <a class="button is-info mb-2" href="/leaks/create">
+                    New Leak
+                </a>
+                {{end}}
+            </div>
+        </div>
 
+        <div class="level-right">
+            <div id="amountDropdown" class="dropdown level-item">
+                <div class="dropdown-trigger">
+                    <button id="dropButton" class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                        <span id="dropDownText">All leaks</span>
+                        <span class="icon is-small">
+                            <ion-icon class="ion-ionic" name="chevron-down-outline" aria-hidden="true"></ion-icon>
+                        </span>
+                    </button>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            Leaks per page
+                        </div>
+                        <hr class="dropdown-divider">
+                        <div id="leakAmounts">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--todo search bar here-->
+        </div>
+    </div>
+
+    {{template "pagination"}}
     <div class="columns is-vcentered is-multiline is-centered">
         {{range .payload}}
         <div class="column">

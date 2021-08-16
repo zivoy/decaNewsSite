@@ -1,30 +1,37 @@
 window.addEventListener('load', function () {
-    prevButton.click(function(){
-        goToPage(currPage-1)
-        load()
-    })
-    nextButton.click(function(){
-        goToPage(currPage+1)
-        load()
-    })
-    max = Math.ceil(articlesAmount / perPage)
-    goToPage(currPage, false,true,true)
-    load()
+    prevButton.click(function () {
+        goToPage(currPage - 1)
+    });
+    nextButton.click(function () {
+        goToPage(currPage + 1)
+    });
+    $("#dropButton").click(function () {
+        dropDown.toggleClass("is-active")
+    });
+
+    populateAmountList()
+
+    updateNumberOfPages()
+    goToPage(currPage, false, true, true)
 });
 
-window.onpopstate = function(e){
-    if(e.state) {
+window.onpopstate = function (e) {
+    if (e.state) {
         console.log(e)
-        goToPage(e.state.leak, false,true)
-        load()
+        goToPage(e.state.leak, false, true)
     }
 };
 
+
+const choices = [-1, 5, 10, 20, 50]
+
+
 const prevButton = $("a.pagination-previous")
 const nextButton = $("a.pagination-next")
+const dropDown = $("#amountDropdown")
 
-let perPage = 1;
-let max = 0
+let perPage = parseInt(getStorageDefault("amountPerPage", choices[0]));
+let numberOfPages = 0
 
 const ellipsis = `<li><span class="pagination-ellipsis">&hellip;</span></li>`;
 const currentPage = `<li><a class="pagination-link is-current" aria-label="Page {p}" aria-current="page">{p}</a></li>`;
@@ -34,8 +41,8 @@ function paginate(page, high) {
     let low = 1;
     let items = [];
 
-    function addPage(number){
-        if (number===page){
+    function addPage(number) {
+        if (number === page) {
             return currentPage.replaceAll("{p}", number);
         }
         return gotoPage.replaceAll("{p}", number);
@@ -74,34 +81,83 @@ function paginate(page, high) {
 
     $("ul.pagination-list").html(items.join("\n"));
 
-    $("a.pagination-link").click(function(a){
+    $("a.pagination-link").click(function (a) {
         goToPage(a.target.text)
-        load()
     })
 }
 
-function goToPage(page, reload = true, inplace=false, override=false){
+function goToPage(page, reload = true, inplace = false, override = false) {
     page = parseInt(page)
-    page = Math.min(max,Math.max(page,1))
+    page = Math.min(numberOfPages, Math.max(page, 1))
 
     if (page !== currPage || override)
         if (inplace)
-            window.history.replaceState({leak:page}, `Leak page ${page}`, `/leaks/list/${page}`);
+            window.history.replaceState({leak: page}, `Leak page ${page}`, `/leaks/list/${page}`);
         else
-            window.history.pushState({leak:page}, `Leak page ${page}`, `/leaks/list/${page}`);
+            window.history.pushState({leak: page}, `Leak page ${page}`, `/leaks/list/${page}`);
     else if (reload)
         location.reload();
     currPage = page
+    load()
+}
+
+
+function updateNumberOfPages(nPerPage) {
+    if (nPerPage !== undefined) {
+        perPage = nPerPage
+        localStorage.setItem("amountPerPage", nPerPage)
+    }
+    if (perPage === -1)
+        numberOfPages = 1
+    else
+        numberOfPages = Math.ceil(articlesAmount / perPage)
 }
 
 function load() {
     prevButton.addClass("is-invisible")
     nextButton.addClass("is-invisible")
-    max = Math.ceil(articlesAmount / perPage)
+    updateNumberOfPages()
 
-    paginate(currPage, max)
+    paginate(currPage, numberOfPages)
     if (currPage !== 1)
         prevButton.removeClass("is-invisible")
-    if (currPage !== max)
+    if (currPage !== numberOfPages)
         nextButton.removeClass("is-invisible")
+
+    updateDropDownText()
+}
+
+function getStorageDefault(key, defaultVal) {
+    let val = localStorage.getItem(key)
+    if (!val) {
+        localStorage.setItem(key, defaultVal)
+        val = defaultVal
+    }
+    return val
+}
+
+// dropdown
+function populateAmountList() {
+    $("#leakAmounts").empty()
+    choices.forEach(function (i) {
+        $('<a/>', {
+            "class": `dropdown-item ${i === perPage ? "is-active" : ""}`,
+            text: i === -1 ? "all" : i,
+            on: {
+                click: function () {
+                    dropDown.removeClass("is-active")
+                    updateNumberOfPages(i)
+                    goToPage(currPage, false, true, true)
+                    populateAmountList()
+                }
+            }
+        }).appendTo("#leakAmounts");
+    })
+}
+
+function updateDropDownText() {
+    if (perPage === -1)
+        $("#dropDownText").text("All leaks")
+    else
+        $("#dropDownText").text(`${perPage} leak${perPage === 1 ? "" : "s"} per page`)
 }
