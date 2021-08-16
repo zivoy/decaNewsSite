@@ -15,11 +15,6 @@ parserTags["youtube"] = {
     }
 }
 
-let LeakTime = new Date();
-let Link = "";
-let Leak = "";
-let Image = "";
-
 const inputTime = $("input#leakTime");
 const inputLink = $("input#link");
 const linkInfo = $("p#linkInfo");
@@ -87,7 +82,8 @@ function post() {
         description: Leak,
         time: LeakTime.getTime(),
         image_url: Image,
-        source_url: Link
+        source_url: Link,
+        title: ""
     }, function (key, value) {
         let field = $('<input/>');
         field.attr("type", "hidden");

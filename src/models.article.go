@@ -153,8 +153,9 @@ func allowedLinksForUserContext(c *gin.Context) []string {
 	return r
 }
 
-func createNewLeak(description string, rawTime string, imageUrl string, sourceUrl string, reporter user) (article, error) {
-	leak, code := leakSanitization(description, rawTime, imageUrl, sourceUrl, reporter, user{UID: ""}, "", time.Now().Unix(), 0)
+func createNewLeak(title, description, rawTime, imageUrl, sourceUrl string, reporter user) (article, error) {
+	leak, code := leakSanitization(title, description, rawTime, imageUrl, sourceUrl,
+		reporter, user{UID: ""}, time.Now().Unix(), 0)
 
 	switch code {
 	case 1:
@@ -172,13 +173,15 @@ func createNewLeak(description string, rawTime string, imageUrl string, sourceUr
 
 	key, err := pushEntry(dataBase, "leaks", leak)
 	leak.ID = key
-	leak.Title = fmt.Sprintf("DecaLeak %d", hashTo32(key))
+	if title == "" {
+		leak.Title = fmt.Sprintf("DecaLeak %d", hashTo32(key))
+		err2 := setEntry(dataBase, fmt.Sprintf("%s/title", articlePathString(leak.ID)), leak.Title)
 
-	err2 := setEntry(dataBase, fmt.Sprintf("%s/title", articlePathString(leak.ID)), leak.Title)
-
-	if err2 != nil {
-		err = err2
+		if err2 != nil {
+			err = err2
+		}
 	}
+
 	if err != nil {
 		addLog(2, reporter.UID, "Failed to Create Leak", map[string]interface{}{"article": leak.ID,
 			"leak_metadata": leak})
@@ -198,8 +201,8 @@ cases:
 	3 - no body
 	4 - invalid time
 */
-func leakSanitization(description string, rawTime string, imageUrl string, sourceUrl string,
-	reporter user, editedBy user, title string, created int64, edited int64) (article, int) {
+func leakSanitization(title, description, rawTime, imageUrl, sourceUrl string, reporter, editedBy user,
+	created, edited int64) (article, int) {
 	leakTime, err := strconv.ParseInt(rawTime, 10, 64)
 	if err != nil {
 		return article{}, 4
@@ -215,6 +218,8 @@ func leakSanitization(description string, rawTime string, imageUrl string, sourc
 	summery = stripHtmlRegex(summery)
 	summery = cleanRepeatedEnter(cleanRepeatedSpace(summery))
 	summery = clip(strings.Trim(summery, "\n "), 200)
+
+	title = clip(title, 60)
 
 	leak := article{
 		Description: description,
@@ -267,10 +272,11 @@ func createArticle(c *gin.Context) {
 	imageUrl := c.PostForm("image_url")
 	sourceUrl := c.PostForm("source_url")
 	//reporter := getUser(c.PostForm("reporter_uid"))
+	title := c.PostForm("title")
 	reporterUser, _ := c.Get("user")
 	reporter := reporterUser.(user)
 
-	if a, err := createNewLeak(description, leakTime, imageUrl, sourceUrl, reporter); err == nil {
+	if a, err := createNewLeak(title, description, leakTime, imageUrl, sourceUrl, reporter); err == nil {
 		// success
 		leakLocation := url.URL{
 			Scheme: domainBase.Scheme,
@@ -301,6 +307,7 @@ func createArticle(c *gin.Context) {
 				"image_url":     imageUrl,
 				"source_url":    sourceUrl,
 				"reporter_uid":  reporter.UID,
+				"title":         title,
 				"allowed_links": allowedLinksForUserContext(c),
 				"error":         err,
 			}, "errorPublishing": true, "linkLessAuthLevel": linkLessAuthLevel},

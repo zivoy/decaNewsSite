@@ -100,6 +100,11 @@
 </div>
 <script>
     const User = "{{.user.UID}}";
+    let LeakTime = new Date();
+    let Link = "";
+    let Leak = "";
+    let Image = "";
+    let Title = ""
 
     //const postError = "true" === "{{.errorPublishing}}"
     //const postSuccess = "true" === "{{.publishSuccess}}"
@@ -119,6 +124,7 @@
         LeakTime = new Date(parseInt("{{.payload.time}}"))
         Image = "{{.payload.image_url}}"
         Link = "{{.payload.source_url}}"
+        Title = "{{.payload.title}}"
         if (isNaN(LeakTime.getTime())) {
             LeakTime = new Date()
         }

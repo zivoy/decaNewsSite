@@ -128,11 +128,13 @@ func updateArticle(c *gin.Context) {
 	}
 
 	// nothing was changed
-	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != leakTime || leak.SourceLink != sourceUrl || leak.Title != title) {
+	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != leakTime ||
+		leak.SourceLink != sourceUrl || leak.Title != title) {
 		return
 	}
 
-	newLeak, code := leakSanitization(description, leakTime, imageUrl, sourceUrl, getUser(leak.ReporterUid), updater, leak.Title, leak.DateCreate, time.Now().Unix())
+	newLeak, code := leakSanitization(leak.Title, description, leakTime, imageUrl, sourceUrl,
+		getUser(leak.ReporterUid), updater, leak.DateCreate, time.Now().Unix())
 	newLeak.ID = leak.ID
 	switch code {
 	case 1:
@@ -152,7 +154,8 @@ func updateArticle(c *gin.Context) {
 		return
 	}
 
-	addLog(2, updater.UID, "Updated Leak", map[string]interface{}{"article": leak.ID, "before": leak, "after": newLeak})
+	addLog(2, updater.UID, "Updated Leak",
+		map[string]interface{}{"article": leak.ID, "before": leak, "after": newLeak})
 	deleteCache(articleCache, leak.ID)
 	c.JSON(200, map[string]string{"success": "true"})
 }
