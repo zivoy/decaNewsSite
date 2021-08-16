@@ -131,6 +131,7 @@ function load() {
     updateDropDownText()
     loadItems()
     sessionStorage.setItem("lastPage", window.location.pathname)
+    imageErr()
 }
 
 // dropdown
