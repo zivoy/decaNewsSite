@@ -20,4 +20,4 @@ function setRank(rank) {
 }
 //todo move to the admin page
 
-sessionStorage.setItem("lastPage", window.location.pathname)
+sessionStorage.setItem("currentPage", window.location.pathname)
