@@ -32,6 +32,7 @@ const prevButton = $("a.pagination-previous")
 const nextButton = $("a.pagination-next")
 const dropDown = $("#amountDropdown")
 const itemList = $("#leakItems")
+const pagination = $("nav.pagination")
 
 let perPage = parseInt(getStorageDefault("amountPerPage", choices[0]));
 let numberOfPages = 0
@@ -120,7 +121,12 @@ function updateNumberOfPages(nPerPage) {
 function load() {
     prevButton.addClass("is-invisible")
     nextButton.addClass("is-invisible")
+    pagination.removeClass("is-hidden")
     updateNumberOfPages()
+
+    if (numberOfPages === 1){
+        pagination.addClass("is-hidden")
+    }
 
     paginate(currPage, numberOfPages)
     if (currPage !== 1)
