@@ -16,7 +16,9 @@ function _fixTime(element) {
 }
 
 function fixTime() {
-    $("time").each(function(){_fixTime($(this))})
+    $("time").each(function () {
+        _fixTime($(this))
+    })
 
 }
 

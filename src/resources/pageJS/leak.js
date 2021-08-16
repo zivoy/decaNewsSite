@@ -87,7 +87,9 @@ function startEdit() {
     });
 
     inputLeak.on("input", () => {
-        leak = leakChange(inputLeak, $("p#leakPreview"),val=>{return val.replaceAll("\n", "<br>")});
+        leak = leakChange(inputLeak, $("p#leakPreview"), val => {
+            return val.replaceAll("\n", "<br>")
+        });
         formReady();
     })
 
@@ -98,7 +100,7 @@ function startEdit() {
         formReady();
     })
 
-    function formReady(){
+    function formReady() {
         submitButton.prop("disabled", true);
         // maybe add a check for source url :/
         if (leak && time) {
@@ -107,7 +109,7 @@ function startEdit() {
     }
 }
 
-function UpdateLeak(){
+function UpdateLeak() {
     if (editing) {
         submitButton.addClass("is-loading")
         $.ajax({
@@ -120,7 +122,7 @@ function UpdateLeak(){
                 source_url: link,
                 title: ""
             },
-            success: function(){
+            success: function () {
                 submitButton.removeClass("is-loading")
                 location.reload()
             }
@@ -128,6 +130,6 @@ function UpdateLeak(){
     }
 }
 
-$("#backButton").click(function(){
-    window.location.href = getStorageDefault("lastPage","/leaks",sessionStorage);
+$("#backButton").click(function () {
+    window.location.href = getStorageDefault("lastPage", "/leaks", sessionStorage);
 });

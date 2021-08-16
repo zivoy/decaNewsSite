@@ -18,6 +18,7 @@ function setRank(rank) {
         location.reload()
     });
 }
+
 //todo move to the admin page
 
 sessionStorage.setItem("currentPage", window.location.pathname)

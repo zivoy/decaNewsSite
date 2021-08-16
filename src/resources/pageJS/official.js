@@ -11,7 +11,7 @@ function loadIframe(placeholder, data) {
     frameLocation.append(iframe)
 }
 
-loadIframe($("a.deca-news"),{
+loadIframe($("a.deca-news"), {
     src: "https://www.deca.net/news/",
     class: "deca-news",
     style: "position: static; visibility: visible; display: inline-block; width: 100%; padding: 0px; " +
@@ -26,15 +26,15 @@ let discord = "https://discord.com/widget?id=765917490734694412&theme=light"
 if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
     discord = "https://discord.com/widget?id=765917490734694412&theme=dark"
 }
-loadIframe($("a.deca-discord"),{
+loadIframe($("a.deca-discord"), {
     src: discord,
     class: "deca-discord",
-    sandbox:"allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts",
+    sandbox: "allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts",
     allowtransparency: "true",
     scrolling: "no",
-    width:"100%",
+    width: "100%",
     frameborder: "0",
-    height:"98%"
+    height: "98%"
 })
 
 // loadIframe($("a.deca-linkedin"),{

@@ -124,7 +124,7 @@ function load() {
     pagination.removeClass("is-hidden")
     updateNumberOfPages()
 
-    if (numberOfPages === 1){
+    if (numberOfPages === 1) {
         pagination.addClass("is-hidden")
     }
 
@@ -166,13 +166,15 @@ function updateDropDownText() {
         $("#dropDownText").text(`${perPage} leak${perPage === 1 ? "" : "s"} per page`)
 }
 
-function loadItems(){
+function loadItems() {
     itemList.empty()
     if (perPage === -1)
-        articles.each(function(_,k){itemList.append(k)})
-    else{
+        articles.each(function (_, k) {
+            itemList.append(k)
+        })
+    else {
         let start = (currPage - 1) * perPage
-        for (let i=start; i<start+perPage;i++)
+        for (let i = start; i < start + perPage; i++)
             itemList.append(articles[i])
     }
 }

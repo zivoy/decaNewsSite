@@ -3,14 +3,14 @@ if (window.history.replaceState) {
 }
 
 parserTags["youtube"] = {
-    openTag: function(params,content) {
+    openTag: function (params, content) {
 
         return `<figure class="image"><iframe frameborder="0" style="height:max(225px,100%); width:min(100%,400px);" allowfullscreen src="https://www.youtube.com/embed/${content}">`;
     },
-    closeTag: function() {
+    closeTag: function () {
         return "</iframe></figure>";
     },
-    content: function() {
+    content: function () {
         return "";
     }
 }
@@ -45,7 +45,9 @@ $(document).ready(function () {
     inputLeak.on("input", () => {
         preview.removeClass("is-invisible");
         Leak = leakChange(inputLeak, $("p#leakPreview"),
-            val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
+            val => {
+                return BBCodeParser.process(val.replaceAll("\n", "<br>"))
+            });
         formReady();
     })
 
