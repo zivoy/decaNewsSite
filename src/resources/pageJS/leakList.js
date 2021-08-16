@@ -130,15 +130,7 @@ function load() {
 
     updateDropDownText()
     loadItems()
-}
-
-function getStorageDefault(key, defaultVal) {
-    let val = localStorage.getItem(key)
-    if (!val) {
-        localStorage.setItem(key, defaultVal)
-        val = defaultVal
-    }
-    return val
+    sessionStorage.setItem("lastPage", window.location.pathname)
 }
 
 // dropdown

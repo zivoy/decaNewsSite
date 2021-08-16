@@ -126,3 +126,7 @@ function UpdateLeak(){
         });
     }
 }
+
+$("#backButton").click(function(){
+    window.location.href = getStorageDefault("lastPage","/leaks",sessionStorage);
+});
