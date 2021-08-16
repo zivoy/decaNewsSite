@@ -86,15 +86,17 @@
         </div>
     </div>
 </section>
+
 <script>
     let leak = "{{.payload.Description}}";
     let link = "{{.payload.SourceLink}}";
     let image = "{{.payload.ImageUrl}}";
     let time = new Date(parseInt("{{.payload.LeakTime}}"));
     const id = "{{.payload.ID}}"
+</script>
+<script defer src="/static/leakPostFunctions.js">
     const allowedLinks = AllowedLinks({{.allowed_links}})
 </script>
-<script defer src="/static/leakPostFunctions.js"></script>
 <script src="/static/convertTime.js"></script>
 <script src="/static/pageJS/leak.js"></script>
 

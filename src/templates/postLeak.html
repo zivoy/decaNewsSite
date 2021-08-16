@@ -1,7 +1,5 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
-<script defer src="/static/leakPostFunctions.js"></script>
-
 {{$linkLess := .linkLessAuthLevel }}
 
 {{if .publishSuccess}}
@@ -105,7 +103,8 @@
 
     //const postError = "true" === "{{.errorPublishing}}"
     //const postSuccess = "true" === "{{.publishSuccess}}"
-
+</script>
+<script defer src="/static/leakPostFunctions.js">
     const allowedLinks = AllowedLinks({{.allowed_links}})
 </script>
 <script src="/static/bbcode-config.js"></script>
