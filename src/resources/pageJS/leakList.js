@@ -10,6 +10,8 @@ window.addEventListener('load', function () {
     });
 
     populateAmountList()
+    itemList.removeClass("is-hidden")
+    articles = itemList.children()
 
     updateNumberOfPages()
     goToPage(currPage, false, true, true)
@@ -29,9 +31,11 @@ const choices = [-1, 5, 10, 20, 50]
 const prevButton = $("a.pagination-previous")
 const nextButton = $("a.pagination-next")
 const dropDown = $("#amountDropdown")
+const itemList = $("#leakItems")
 
 let perPage = parseInt(getStorageDefault("amountPerPage", choices[0]));
 let numberOfPages = 0
+let articles = {}
 
 const ellipsis = `<li><span class="pagination-ellipsis">&hellip;</span></li>`;
 const currentPage = `<li><a class="pagination-link is-current" aria-label="Page {p}" aria-current="page">{p}</a></li>`;
@@ -125,6 +129,7 @@ function load() {
         nextButton.removeClass("is-invisible")
 
     updateDropDownText()
+    loadItems()
 }
 
 function getStorageDefault(key, defaultVal) {
@@ -160,4 +165,15 @@ function updateDropDownText() {
         $("#dropDownText").text("All leaks")
     else
         $("#dropDownText").text(`${perPage} leak${perPage === 1 ? "" : "s"} per page`)
+}
+
+function loadItems(){
+    itemList.empty()
+    if (perPage === -1)
+        articles.each(function(_,k){itemList.append(k)})
+    else{
+        let start = (currPage - 1) * perPage
+        for (let i=start; i<start+perPage;i++)
+            itemList.append(articles[i])
+    }
 }
