@@ -150,14 +150,6 @@ func main() {
 
 	//sanitiseAllLeaks()
 
-	// todo migration code -- remove
-	arts, _ := getAllArticles()
-	clearCache()
-	for _, i := range arts {
-		_, _ = getArticleByID(i.ID)
-	}
-	/////
-
 	err = router.Run(":5000")
 	if err != nil {
 		panic(err)

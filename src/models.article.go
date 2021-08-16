@@ -98,21 +98,7 @@ func getArticleByID(id string) (article, error) {
 				editedWhen = 0
 			}
 
-			////todo migration code -- remove
-			var title, created interface{}
-			var ok bool
-			update := false
-			if title, ok = articleData["title"]; !ok {
-				title = fmt.Sprintf("DecaLeak %d", hashTo32(id))
-			}
-
-			if created, ok = articleData["created_time"]; !ok {
-				created = articleData["time"]
-				update = true
-			}
-			///
-
-			art := article{
+			return article{
 				ID:          id,
 				Description: articleData["description"].(string),
 				Summary:     articleData["summary"].(string),
@@ -122,18 +108,9 @@ func getArticleByID(id string) (article, error) {
 				ReporterUid: articleData["reporter_uid"].(string),
 				EditedBy:    edited,
 				DateEdit:    editedWhen,
-				Title:       title.(string),
-				DateCreate:  int64(created.(float64)),
+				Title:       articleData["title"].(string),
+				DateCreate:  int64(articleData["created_time"].(float64)),
 			}
-			/////  todo migration code
-			if update {
-				err = setEntry(dataBase, articlePathString(art.ID), art)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-			/////
-			return art
 		})
 		return leak.(article), nil
 	}
