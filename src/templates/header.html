@@ -50,8 +50,9 @@
     <script async src="/static/noImg.js"></script>
     <script>
         last = sessionStorage.getItem("currentPage");
-        sessionStorage.setItem("currentPage", window.location.pathname);
-        if (last)
+        curr = window.location.pathname
+        sessionStorage.setItem("currentPage", curr);
+        if (last && last !== curr)
             sessionStorage.setItem("lastPage", last);
     </script>
 </head>
