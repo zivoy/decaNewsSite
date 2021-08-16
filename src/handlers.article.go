@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func leakList(c *gin.Context) {
@@ -54,7 +55,7 @@ func getArticle(c *gin.Context) {
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
 		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)},
-			fmt.Sprintf("DecaLeak %d", hashTo32(article.ID)),
+			article.Title,
 			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "), article.ImageUrl, c.Request.URL,
 			"leak.html")
 	} else {
@@ -111,9 +112,10 @@ func updateArticle(c *gin.Context) {
 	}
 
 	description := c.PostForm("description")
-	time := c.PostForm("time")
+	leakTime := c.PostForm("leakTime")
 	imageUrl := c.PostForm("image_url")
 	sourceUrl := c.PostForm("source_url")
+	title := c.PostForm("title")
 
 	updaterUser, _ := c.Get("user")
 	updater := updaterUser.(user)
@@ -121,15 +123,16 @@ func updateArticle(c *gin.Context) {
 	if description == "" {
 		description = leak.Description
 	}
-	if time == "" {
-		time = strconv.Itoa(int(leak.LeakTime))
+	if leakTime == "" {
+		leakTime = strconv.Itoa(int(leak.LeakTime))
 	}
 
-	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != time || leak.SourceLink != sourceUrl) {
+	// nothing was changed
+	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != leakTime || leak.SourceLink != sourceUrl || leak.Title != title) {
 		return
 	}
 
-	newLeak, code := leakSanitization(description, time, imageUrl, sourceUrl, getUser(leak.ReporterUid), updater)
+	newLeak, code := leakSanitization(description, leakTime, imageUrl, sourceUrl, getUser(leak.ReporterUid), updater, leak.Title, leak.DateCreate, time.Now().Unix())
 	newLeak.ID = leak.ID
 	switch code {
 	case 1:

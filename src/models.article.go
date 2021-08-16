@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type article struct {
@@ -22,6 +23,9 @@ type article struct {
 	SourceLink  string `json:"source_url"`
 	ReporterUid string `json:"reporter_uid"`
 	EditedBy    string `json:"edited_by,omitempty"`
+	Title       string `json:"title"`
+	DateCreate  int64  `json:"created_time"`
+	DateEdit    int64  `json:"edited_time,omitempty"`
 }
 
 func articlePathString(uid string) string {
@@ -80,13 +84,36 @@ func getArticleByID(id string) (article, error) {
 			if err != nil && debug {
 				log.Println(err)
 			}
+
+			// was edited
 			var edited string
 			if editor, ok := articleData["edited_by"]; ok {
 				edited = editor.(string)
 			} else {
 				edited = ""
 			}
-			return article{
+			var editedWhen int64
+			if editTime, ok := articleData["edited_time"]; ok {
+				editedWhen = int64(editTime.(float64))
+			} else {
+				editedWhen = 0
+			}
+
+			////todo migration code -- remove
+			var title, created interface{}
+			var ok bool
+			update := false
+			if title, ok = articleData["title"]; !ok {
+				title = fmt.Sprintf("DecaLeak %d", hashTo32(id))
+			}
+
+			if created, ok = articleData["created_time"]; !ok {
+				created = articleData["time"]
+				update = true
+			}
+			///
+
+			art := article{
 				ID:          id,
 				Description: articleData["description"].(string),
 				Summary:     articleData["summary"].(string),
@@ -95,7 +122,19 @@ func getArticleByID(id string) (article, error) {
 				SourceLink:  articleData["source_url"].(string),
 				ReporterUid: articleData["reporter_uid"].(string),
 				EditedBy:    edited,
+				DateEdit:    editedWhen,
+				Title:       title.(string),
+				DateCreate:  int64(created.(float64)),
 			}
+			/////  todo migration code
+			if update {
+				err = setEntry(dataBase, articlePathString(art.ID), art)
+				if err != nil {
+					log.Println(err)
+				}
+			}
+			/////
+			return art
 		})
 		return leak.(article), nil
 	}
@@ -139,7 +178,7 @@ func allowedLinksForUserContext(c *gin.Context) []string {
 }
 
 func createNewLeak(description string, rawTime string, imageUrl string, sourceUrl string, reporter user) (article, error) {
-	leak, code := leakSanitization(description, rawTime, imageUrl, sourceUrl, reporter, user{UID: ""})
+	leak, code := leakSanitization(description, rawTime, imageUrl, sourceUrl, reporter, user{UID: ""}, "", time.Now().Unix(), 0)
 
 	switch code {
 	case 1:
@@ -157,7 +196,13 @@ func createNewLeak(description string, rawTime string, imageUrl string, sourceUr
 
 	key, err := pushEntry(dataBase, "leaks", leak)
 	leak.ID = key
+	leak.Title = fmt.Sprintf("DecaLeak %d", hashTo32(key))
 
+	err2 := setEntry(dataBase, fmt.Sprintf("%s/title", articlePathString(leak.ID)), leak.Title)
+
+	if err2 != nil {
+		err = err2
+	}
 	if err != nil {
 		addLog(2, reporter.UID, "Failed to Create Leak", map[string]interface{}{"article": leak.ID,
 			"leak_metadata": leak})
@@ -177,8 +222,9 @@ cases:
 	3 - no body
 	4 - invalid time
 */
-func leakSanitization(description string, rawTime string, imageUrl string, sourceUrl string, reporter user, editedBy user) (article, int) {
-	time, err := strconv.ParseInt(rawTime, 10, 64)
+func leakSanitization(description string, rawTime string, imageUrl string, sourceUrl string,
+	reporter user, editedBy user, title string, created int64, edited int64) (article, int) {
+	leakTime, err := strconv.ParseInt(rawTime, 10, 64)
 	if err != nil {
 		return article{}, 4
 	}
@@ -197,11 +243,14 @@ func leakSanitization(description string, rawTime string, imageUrl string, sourc
 	leak := article{
 		Description: description,
 		Summary:     summery,
-		LeakTime:    int64(time),
+		LeakTime:    leakTime,
 		ImageUrl:    imageUrl,
 		SourceLink:  sourceUrl,
 		ReporterUid: reporter.UID,
 		EditedBy:    editedBy.UID,
+		Title:       title,
+		DateCreate:  created,
+		DateEdit:    edited,
 	}
 
 	checkPerms := reporter
@@ -238,14 +287,14 @@ func leakSanitization(description string, rawTime string, imageUrl string, sourc
 
 func createArticle(c *gin.Context) {
 	description := c.PostForm("description")
-	time := c.PostForm("time")
+	leakTime := c.PostForm("time")
 	imageUrl := c.PostForm("image_url")
 	sourceUrl := c.PostForm("source_url")
 	//reporter := getUser(c.PostForm("reporter_uid"))
 	reporterUser, _ := c.Get("user")
 	reporter := reporterUser.(user)
 
-	if a, err := createNewLeak(description, time, imageUrl, sourceUrl, reporter); err == nil {
+	if a, err := createNewLeak(description, leakTime, imageUrl, sourceUrl, reporter); err == nil {
 		// success
 		leakLocation := url.URL{
 			Scheme: domainBase.Scheme,
@@ -272,7 +321,7 @@ func createArticle(c *gin.Context) {
 		render(c, gin.H{"status": "error",
 			"payload": map[string]interface{}{
 				"description":   description,
-				"time":          time,
+				"time":          leakTime,
 				"image_url":     imageUrl,
 				"source_url":    sourceUrl,
 				"reporter_uid":  reporter.UID,
