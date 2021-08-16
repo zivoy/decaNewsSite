@@ -7,13 +7,24 @@ window.addEventListener('load', function () {
         goToPage(currPage+1)
         load()
     })
+    max = Math.ceil(articlesAmount / perPage)
+    goToPage(currPage, false,true,true)
     load()
 });
+
+window.onpopstate = function(e){
+    if(e.state) {
+        console.log(e)
+        goToPage(e.state.leak, false,true)
+        load()
+    }
+};
 
 const prevButton = $("a.pagination-previous")
 const nextButton = $("a.pagination-next")
 
 let perPage = 1;
+let max = 0
 
 const ellipsis = `<li><span class="pagination-ellipsis">&hellip;</span></li>`;
 const currentPage = `<li><a class="pagination-link is-current" aria-label="Page {p}" aria-current="page">{p}</a></li>`;
@@ -69,11 +80,16 @@ function paginate(page, high) {
     })
 }
 
-function goToPage(page){
+function goToPage(page, reload = true, inplace=false, override=false){
     page = parseInt(page)
-    if (page !== currPage)
-        window.history.pushState({leak:page}, `Leak page ${page}`, `/leaks/list/${page}`);
-    else
+    page = Math.min(max,Math.max(page,1))
+
+    if (page !== currPage || override)
+        if (inplace)
+            window.history.replaceState({leak:page}, `Leak page ${page}`, `/leaks/list/${page}`);
+        else
+            window.history.pushState({leak:page}, `Leak page ${page}`, `/leaks/list/${page}`);
+    else if (reload)
         location.reload();
     currPage = page
 }
@@ -81,14 +97,11 @@ function goToPage(page){
 function load() {
     prevButton.addClass("is-invisible")
     nextButton.addClass("is-invisible")
-    let max = Math.ceil(articlesAmount / perPage)
-    page = Math.min(max,Math.max(currPage,1))
-    if (page !== currPage)
-        goToPage(page)
+    max = Math.ceil(articlesAmount / perPage)
 
-    paginate(page, max)
-    if (page !== 1)
+    paginate(currPage, max)
+    if (currPage !== 1)
         prevButton.removeClass("is-invisible")
-    if (page !== max)
+    if (currPage !== max)
         nextButton.removeClass("is-invisible")
 }
