@@ -1,0 +1,12 @@
+.icon {
+    vertical-align: middle;
+    display: inline-table;
+}
+.userImage {
+    margin-right: .3em;
+}
+
+img.no-img {
+    object-fit: cover;
+    object-position: 50% 50%;
+}
