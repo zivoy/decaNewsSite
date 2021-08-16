@@ -3,28 +3,6 @@
 {{$viewing:=.payload.user}}
 {{$viewer:=.user}}
 
-<script>
-    function reloadCache() {
-        $("button#reload").addClass("is-loading")
-        $.post("/admin/api/clearCache/user/{{$viewing.UID}}", function () {
-            location.reload()
-        });
-    }
-
-    function togglePosting() {
-        $("button#cPost").addClass("is-loading")
-        $.post("/admin/api/togglePosting/{{$viewing.UID}}", function () {
-            location.reload()
-        });
-    }
-
-    function setRank(rank) {
-        $(`button#rank_${rank}`).addClass("is-loading")
-        $.post("/admin/api/updateRank/{{$viewing.UID}}", {rank: rank}, function () {
-            location.reload()
-        });
-    }
-</script>
 <section class="section">
     {{if .is_logged_in}}
     {{ if (ge $viewer.AuthLevel 2)}}
@@ -112,5 +90,6 @@
     </div>
 </section>
 <script src="/static/convertTime.js"></script>
+<script src="/static/pageJS/profile.js"></script>
 
 {{ template "footer.html" .}}

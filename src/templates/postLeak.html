@@ -100,149 +100,50 @@
         </div>
     </div>
 </div>
+<script>
+    const User = "{{.user.UID}}";
+
+    //const postError = "true" === "{{.errorPublishing}}"
+    //const postSuccess = "true" === "{{.publishSuccess}}"
+
+    const allowedLinks = AllowedLinks({{.allowed_links}})
+</script>
 <script src="/static/bbcode-config.js"></script>
 <script defer src="/static/bbcode-parser.js"></script>
+<script src="/static/pageJS/postLeak.js"></script>
+<script src="/static/convertTime.js"></script>
+
+{{if .errorPublishing}}
 <script>
-    if (window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.href);
-    }
-
-    parserTags["youtube"] = {
-        openTag: function(params,content) {
-
-            let yid = content;
-
-            return `<figure class="image"><iframe frameborder="0" style="height:max(225px,100%); width:min(100%,400px);" allowfullscreen src="https://www.youtube.com/embed/${yid}">`;
-        },
-        closeTag: function(params,content) {
-            return "</iframe></figure>";
-        },
-        content: function(params,content) {
-            return "";
+    window.addEventListener('load', function () {
+        Leak = "{{.payload.description}}"
+        LeakTime = new Date(parseInt("{{.payload.time}}"))
+        Image = "{{.payload.image_url}}"
+        Link = "{{.payload.source_url}}"
+        if (isNaN(LeakTime.getTime())) {
+            LeakTime = new Date()
         }
-    }
-
-    let LeakTime = new Date();
-    const User = "{{.user.UID}}";
-    let Link = "";
-    let Leak = "";
-    let Image = "";
-
-    const postError = "true" === "{{.errorPublishing}}"
-    const postSuccess = "true" === "{{.publishSuccess}}"
-
-    const inputTime = $("input#leakTime");
-    const inputLink = $("input#link");
-    const linkInfo = $("p#linkInfo");
-    const submitButton = $("button#submit");
-    const inputLeak = $("textarea#leak");
-    const inputImage = $("input#image");
-    const preview = $("div#preview");
-
-    LeakTime.setSeconds(0);
-    LeakTime.setMilliseconds(0);
-    $("time#timeToSet").attr("datetime", LeakTime.toISOString());
-
-    $(document).ready(function () {
         setTimeVal(inputTime, LeakTime);
+        inputLink.val(Link);
+        inputLeak.val(Leak);
+        inputImage.val(Image);
 
-        inputTime.change(() => {
-            preview.removeClass("is-invisible");
-            LeakTime = timeChange(inputTime, $("time#timeToSet"));
-            formReady();
+        LeakTime = timeChange(inputTime, $("time#timeToSet"));
+        Link = linkChange(inputLink, linkInfo,  $("a#source"), allowedLinks);
+        Leak = leakChange(inputLeak, $("p#leakPreview"), val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
+        imageChange(inputImage, $("img#previewImage")).then(r => {
+            Image = r
         });
-
-        inputLink.on("input", () => {
-            preview.removeClass("is-invisible");
-            Link = linkChange(inputLink, linkInfo, $("a#source"), AllowedLinks({{.payload.allowed_links}}));
-            formReady();
-        });
-
-        inputLeak.on("input", () => {
-            preview.removeClass("is-invisible");
-            Leak = leakChange(inputLeak, $("p#leakPreview"),
-                val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
-            formReady();
-        })
-
-        inputImage.on("input", () => {
-            preview.removeClass("is-invisible");
-            imageChange(inputImage, $("img#previewImage")).then(r => {
-                Image = r
-            });
-            formReady();
-        })
+        formReady();
     });
 
-    function formReady() {
-        submitButton.prop("disabled", true);
-        let linkValid =
-            //{{ if ge .user.AuthLevel $linkLess }}
-            true;
-        //{{else}}
-        Link;
-        //{{end}}
-        if (Leak && LeakTime && User && linkValid) {
-            submitButton.prop("disabled", false);
-        }
-    }
-
-    function post() {
-        let form = $('<form></form>');
-
-        form.attr("method", "post");
-        form.addClass("is-hidden");
-        form.attr("action", "/leaks/create");
-
-        $.each({
-            description: Leak,
-            time: LeakTime.getTime(),
-            image_url: Image,
-            source_url: Link
-        }, function (key, value) {
-            let field = $('<input></input>');
-            field.attr("type", "hidden");
-            field.attr("name", key);
-            field.attr("value", value);
-
-            form.append(field);
-        });
-
-        $(document.body).append(form);
-        form.submit();
-    }
-
-    if (postError) {
-        window.addEventListener('load', function () {
-            Leak = "{{.payload.description}}"
-            LeakTime = new Date(parseInt("{{.payload.time}}"))
-            Image = "{{.payload.image_url}}"
-            Link = "{{.payload.source_url}}"
-            if (isNaN(LeakTime.getTime())) {
-                LeakTime = new Date()
-            }
-            setTimeVal(inputTime, LeakTime);
-            inputLink.val(Link);
-            inputLeak.val(Leak);
-            inputImage.val(Image);
-
-            LeakTime = timeChange(inputTime, $("time#timeToSet"));
-            Link = linkChange(inputLink, linkInfo,  $("a#source"),AllowedLinks({{.payload.allowed_links}}));
-            Leak = leakChange(inputLeak, $("p#leakPreview"), val=>{return BBCodeParser.process(val.replaceAll("\n", "<br>"))});
-            imageChange(inputImage, $("img#previewImage")).then(r => {
-                Image = r
-            });
-            formReady();
-        });
-
-        console.log("returned from error");
-        let err = `
-        {{.payload.error}}
-        `
-        console.error(err)
-    }
+    console.log("returned from error");
+    let err = `
+    {{.payload.error}}
+    `
+    console.error(err)
 </script>
-<script src="/static/convertTime.js"></script>
+{{end}}
 
 
 <!--Embed the footer.html template at this location-->
