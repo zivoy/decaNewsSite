@@ -141,7 +141,7 @@ func UpdateUserRank(c *gin.Context) {
 
 /*
 func sanitiseAllLeaks() {
-	leaks, _ := getAllArticles(0)
+	leaks, _ := getAllArticles()
 	for _, leak := range leaks {
 		if leak.ID == "" {
 			continue

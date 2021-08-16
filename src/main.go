@@ -151,7 +151,7 @@ func main() {
 	//sanitiseAllLeaks()
 
 	// todo migration code -- remove
-	arts, _ := getAllArticles(0)
+	arts, _ := getAllArticles()
 	clearCache()
 	for _, i := range arts {
 		_, _ = getArticleByID(i.ID)

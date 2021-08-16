@@ -17,15 +17,15 @@ func leakList(c *gin.Context) {
 		abortWithMessage(c, http.StatusBadRequest)
 		return
 	}
-	page = int(math.Min(float64(page), 1))
-	articles, err := getAllArticles(page)
+	page = int(math.Max(float64(page), 1))
+	articles, err := getAllArticles()
 	if err != nil {
 		abortWithMessage(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Call the render function with the name of the template to render
-	render(c, gin.H{"payload": articles},
+	render(c, gin.H{"payload": articles, "amount": len(articles), "page": page},
 		"List of Leaks",
 		"List of the latest DecaLeaks.",
 		"",

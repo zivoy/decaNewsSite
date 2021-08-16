@@ -35,9 +35,8 @@ func articlePathString(uid string) string {
 // you need this auth level to post with no link
 const linkLessAuthLevel = 1
 
-// this function is really bad todo make this be done on the front end
-// todo implement splitting of pages
-func getAllArticles(_ int) ([]article, error) {
+// todo implement caching
+func getAllArticles() ([]article, error) {
 	ref := dataBase.NewRef("leaks")
 	var data map[string]article
 	if err := ref.Get(ctx, &data); err != nil {
