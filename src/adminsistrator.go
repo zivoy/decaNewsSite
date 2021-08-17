@@ -138,21 +138,3 @@ func UpdateUserRank(c *gin.Context) {
 	}
 	c.JSON(http.StatusNotFound, map[string]interface{}{"success": false, "message": "user not found"})
 }
-
-func sanitiseAllLeaks() {
-	leaks, _ := getAllArticles(0)
-	for _, leak := range leaks {
-		if leak.ID == "" {
-			continue
-		}
-		updater := user{UID: ""}
-		if leak.EditedBy != "" {
-			updater.UID = leak.EditedBy
-		}
-
-		newLeak, _ := leakSanitization(leak.Description, strconv.Itoa(int(leak.LeakTime)), leak.ImageUrl, leak.SourceLink, getUser(leak.ReporterUid), updater)
-		newLeak.ID = leak.ID
-
-		_ = setEntry(dataBase, articlePathString(leak.ID), newLeak)
-	}
-}
