@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -57,21 +59,44 @@ var cacheList = map[int]cacheInterface{
 }
 
 const ServerCommunicationEndpoint = "SERVER-COMM"
-const ServerPollRate = 2 // 2 seconds to prevent spams
-
-const expireTime = 60 * 2 // 2 minute cache // maybe put this in db and have it be configurable by admin
-
-var autoClearCache chan struct{}
+const ServerPollRate = 5 * time.Second // 2 seconds to prevent spams
+const expireTime = 60 * 2              // 2 minute cache // maybe put this in db and have it be configurable by admin
 
 const autoClearPoint = ServerCommunicationEndpoint + "/autoClear"
+const actionHash = ServerCommunicationEndpoint + "/actionHash"
 
-var clearingCache bool
+var clearingCache = false
+var autoClearCache chan struct{}
 
 // cache for communicating between servers
 var actionCache = Cache{
 	list:     make(CacheList),
-	basePath: ServerCommunicationEndpoint + "/cacheClear",
-	id:       10,
+	basePath: ServerCommunicationEndpoint + "/cacheAction",
+	id:       -1,
+}
+
+const (
+	deleteAction = iota
+)
+
+type cacheAction struct {
+	DatabaseId int    `json:"database"`
+	ItemId     string `json:"item"`
+	ActionType int    `json:"type"`
+	id         string
+}
+
+func (c cacheAction) createCacheId() string {
+	c.id = fmt.Sprintf("%d-%s", time.Now().Unix(), c.ItemId) // todo find out why this is broken
+	return c.id
+}
+
+func actionCacheHash() string {
+	var protoHash uint32 = 0
+	for _, v := range actionCache.list {
+		protoHash = protoHash + hashTo32(v.Cache.(cacheAction).id)
+	}
+	return strconv.Itoa(int(protoHash))
 }
 
 // auto clear caches to save on ram for rarely visited pages that got cached
@@ -90,7 +115,6 @@ func initCacheClearing() {
 			}
 		}
 	}()
-	setAutoClear(true)
 }
 
 func stopClearingCache() {
@@ -99,6 +123,13 @@ func stopClearingCache() {
 }
 
 func setAutoClear(val bool) {
+	if clearingCache == val {
+		return
+	} else if clearingCache && !val {
+		stopClearingCache()
+	} else {
+		initCacheClearing()
+	}
 	clearingCache = val
 	err := setEntry(dataBase, autoClearPoint, val)
 	if err != nil {
@@ -109,6 +140,59 @@ func setAutoClear(val bool) {
 func wipeCache() {
 	for _, c := range cacheList {
 		c.clear()
+	}
+}
+
+func updateActionCache() {
+	hashHere := actionCacheHash()
+	if pathExists(dataBase, actionHash) {
+		farHash, err := readValue(dataBase, actionHash)
+		if err != nil {
+			log.Println("failed to get cache action hash")
+			return
+		}
+		if farHash.(string) == hashHere {
+			return // no changes
+		}
+	}
+
+	actions, err := readEntry(dataBase, actionCache.basePath)
+	// remove actions present locally
+	for _, v := range actionCache.list {
+		id := v.Cache.(cacheAction).id
+		if _, ok := actions[v.Cache.(cacheAction).id]; ok {
+			delete(actions, id)
+		}
+	}
+
+	// add to local cache
+	for id, data := range actions {
+		v := data.(map[string]interface{})
+		item := cacheAction{
+			DatabaseId: int(v["database"].(float64)),
+			ItemId:     v["item"].(string),
+			ActionType: int(v["type"].(float64)),
+			id:         id,
+		}
+
+		// get expire time
+		rawTime := strings.Split(id, "-")[0]
+		createdTime, err := strconv.ParseInt(rawTime, 10, 64)
+		if err != nil {
+			log.Println("Error decoding action time")
+			continue
+		}
+
+		actionCache.list[id] = cache{
+			Expire: createdTime + expireTime,
+			Cache:  item,
+		}
+	}
+
+	err = setEntry(dataBase, actionHash, hashHere)
+	if err != nil {
+		log.Println("failed to set cache action hash")
+		return
 	}
 }
 
@@ -148,13 +232,14 @@ func (c Cache) add(id string, data interface{}) {
 }
 
 func (c Cache) delete(id string) {
-	deleteID := fmt.Sprintf("%d-%s", time.Now().Unix(), id)
-	deleteDATA := map[string]interface{}{
-		"database": c.id,
-		"item":     id,
+	deleteDATA := cacheAction{
+		DatabaseId: c.id,
+		ItemId:     id,
+		ActionType: deleteAction,
 	}
-	actionCache.add(deleteID, deleteDATA)
-	err := setEntry(dataBase, actionCache.path(deleteID), deleteDATA)
+	deleteDATA.id = deleteDATA.createCacheId()
+	actionCache.add(deleteDATA.id, deleteDATA)
+	err := setEntry(dataBase, actionCache.path(deleteDATA.id), deleteDATA)
 	if err != nil && debug {
 		//addLog(3, updater.UID, "cache delete failed", map[string]interface{}{"id": id, "cacheList": c.id})
 		log.Println("failed to send cache clear req for", c.id, "on", id, err)
@@ -162,21 +247,29 @@ func (c Cache) delete(id string) {
 	delete(c.list, id)
 }
 
-var serverPolled int64 = 0
+// server heartbeat
+func startServerComms() {
+	go func() {
+		for now := range time.Tick(ServerPollRate) {
+			// service action cache
+			updateActionCache()
+			for id, data := range actionCache.list {
+				if data.Expire-now.Unix() < 0 {
+					delete(actionCache.list, id)
+					err := setEntry(dataBase, actionCache.path(id), nil)
+					if err != nil {
+						log.Println("failed to clear cache for ", id, err)
+					}
+				}
+			}
 
-func getServerComms() {
-	timeNow := time.Now().Unix()
-	if (serverPolled+ServerPollRate)-timeNow < 0 {
-		serverPolled = timeNow
-		// get list of cache clears
-		// get poll var
-
-	}
+			// maybe dont get this every time?
+			value, err := readValue(dataBase, autoClearPoint)
+			if err != nil {
+				log.Println("failed to get autoClearVal")
+			} else {
+				setAutoClear(value.(bool))
+			}
+		}
+	}()
 }
-
-/*todo function that gets all cache events
-err := setEntry(dataBase, dataCache.path(id), nil)
-if err != nil && debug {
-	log.Println("failed to clear cache for ",dataCache.id,err)
-}
-*/

@@ -26,8 +26,9 @@ type article struct {
 
 const (
 	articleLocation         = "leaks"
-	archivedArticleLocation = "admin/archived_leaks"
-	allowedLinkLocation     = "admin/allowed_links"
+	adminBasePath = "admin"
+	archivedArticleLocation = adminBasePath+"/archived_leaks"
+	allowedLinkLocation     = adminBasePath+"/allowed_links"
 )
 
 func articlePathString(uid string) string {

@@ -42,6 +42,7 @@ var authorities = map[int]string{
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	dev, err := strconv.ParseBool(os.Getenv("DEV_MODE"))
 	if err != nil {
 		debug = false
@@ -143,7 +144,8 @@ func main() {
 	// Initialize the routes
 	initializeRoutes()
 
-	initCacheClearing()
+	setAutoClear(true)
+	startServerComms()
 
 	BBCompiler = bbcode.NewCompiler(true, true)
 	initBBCode(&BBCompiler)
