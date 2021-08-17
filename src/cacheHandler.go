@@ -76,19 +76,30 @@ var actionCache = Cache{
 }
 
 const (
-	deleteAction = iota
+	clearValue = iota
+	clearList
 )
 
 type cacheAction struct {
-	DatabaseId int    `json:"database"`
-	ItemId     string `json:"item"`
-	ActionType int    `json:"type"`
-	id         string
+	CacheListId int    `json:"database"`
+	ItemId      string `json:"item"`
+	ActionType  int    `json:"type"`
+	id          string
 }
 
 func (c cacheAction) createCacheId() string {
 	c.id = fmt.Sprintf("%d-%s", time.Now().Unix(), c.ItemId) // todo find out why this is broken
 	return c.id
+}
+
+func (c cacheAction) execute() {
+	targetCache := cacheList[c.CacheListId].(Cache)
+	switch c.ActionType {
+	case clearValue:
+		delete(targetCache.list, c.ItemId)
+	case clearList:
+		targetCache.clear()
+	}
 }
 
 func actionCacheHash() string {
@@ -169,10 +180,10 @@ func updateActionCache() {
 	for id, data := range actions {
 		v := data.(map[string]interface{})
 		item := cacheAction{
-			DatabaseId: int(v["database"].(float64)),
-			ItemId:     v["item"].(string),
-			ActionType: int(v["type"].(float64)),
-			id:         id,
+			CacheListId: int(v["database"].(float64)),
+			ItemId:      v["item"].(string),
+			ActionType:  int(v["type"].(float64)),
+			id:          id,
 		}
 
 		// get expire time
@@ -187,6 +198,9 @@ func updateActionCache() {
 			Expire: createdTime + expireTime,
 			Cache:  item,
 		}
+
+		// act on new items
+		item.execute()
 	}
 
 	err = setEntry(dataBase, actionHash, hashHere)
@@ -233,9 +247,9 @@ func (c Cache) add(id string, data interface{}) {
 
 func (c Cache) delete(id string) {
 	deleteDATA := cacheAction{
-		DatabaseId: c.id,
-		ItemId:     id,
-		ActionType: deleteAction,
+		CacheListId: c.id,
+		ItemId:      id,
+		ActionType:  clearValue,
 	}
 	deleteDATA.id = deleteDATA.createCacheId()
 	actionCache.add(deleteDATA.id, deleteDATA)
