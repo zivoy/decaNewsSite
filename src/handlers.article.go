@@ -150,6 +150,6 @@ func updateArticle(c *gin.Context) {
 	}
 
 	addLog(2, updater.UID, "Updated Leak", map[string]interface{}{"article": leak.ID, "before": leak, "after": newLeak})
-	deleteCache(articleCache, leak.ID)
+	articleCache.delete(leak.ID)
 	c.JSON(200, map[string]string{"success": "true"})
 }

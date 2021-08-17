@@ -50,7 +50,7 @@ func getAllArticles(page int) ([]article, error) {
 	for k, v := range data {
 		v.ID = k
 		articleList = append(articleList, v)
-		addCache(articleCache, k, v)
+		articleCache.add(k, v)
 	}
 
 	sort.Slice(articleList, func(i, j int) bool {
@@ -70,7 +70,7 @@ func getAllUsersArticles(uid string) ([]article, error) {
 	for k, v := range data {
 		v.ID = k
 		articleList = append(articleList, v)
-		addCache(articleCache, k, v)
+		articleCache.add(k, v)
 	}
 
 	sort.Slice(articleList, func(i, j int) bool {
@@ -81,7 +81,7 @@ func getAllUsersArticles(uid string) ([]article, error) {
 
 func getArticleByID(id string) (article, error) {
 	if articleExists(id) {
-		leak := getCache(articleCache, id, func(string) interface{} {
+		leak := articleCache.get(id, func(string) interface{} {
 			articleData, err := readEntry(dataBase, articlePathString(id))
 			if err != nil && debug {
 				log.Println(err)
@@ -109,7 +109,7 @@ func getArticleByID(id string) (article, error) {
 }
 
 func articleExists(id string) bool {
-	_, exists := articleCache[id]
+	exists := articleCache.has(id)
 	if !exists {
 		exists = pathExists(dataBase, articlePathString(id))
 	}
@@ -121,7 +121,7 @@ func compileBBCode(in string) string {
 }
 
 func getAllowedLinks() []string {
-	items := getCache(allowedLinkCache, "links", func(string) interface{} {
+	items := allowedLinkCache.get("links", func(string) interface{} {
 		ref := dataBase.NewRef(allowedLinkLocation)
 		var data []string
 		if err := ref.Get(ctx, &data); err != nil && debug {

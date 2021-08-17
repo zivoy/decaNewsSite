@@ -41,7 +41,7 @@ func loginCallback(c *gin.Context) {
 func logout(c *gin.Context) {
 	token, _ := c.Cookie("token")
 	_ = deletePath(dataBase, sessionPathString(token))
-	deleteCache(sessionsCache, token)
+	sessionsCache.delete(token)
 	// Clear the cookie
 	_ = gothic.Logout(c.Writer, c.Request)
 	deleteCookie(c, "token")

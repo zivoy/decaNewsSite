@@ -61,7 +61,7 @@ func clearUserCache(c *gin.Context) {
 
 	addLog(0, requester, "Refresh Cache", map[string]interface{}{"user_affected": uid})
 
-	deleteCache(userCache, uid)
+	userCache.delete(uid)
 	c.JSON(http.StatusOK, map[string]interface{}{"success": true})
 }
 
