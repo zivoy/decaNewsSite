@@ -1,6 +1,5 @@
-FROM golang:1.16-alpine
-
-LABEL maintainer="zivoy"
+FROM golang:1.16 as BUILDER
+LABEL stage=builder
 
 WORKDIR /app/decafans-server
 
@@ -8,13 +7,22 @@ COPY go.mod .
 COPY go.sum .
 
 RUN go mod download
-RUN go mod verify
 
 COPY src src
 
-RUN go build -o ../app ./src
+RUN CGO_ENABLED=0 GOOS=linux go build -o ../main ./src
 
 RUN mv ./src/templates ../templates && mv ./src/resources ../resources
+
+
+FROM alpine:latest
+LABEL maintainer="zivoy"
+
+WORKDIR /root/
+
+COPY --from=BUILDER /app/main app
+COPY --from=BUILDER /app/templates templates
+COPY --from=BUILDER /app/resources resources
 
 # load the config from a local file rather then getting it from the web
 ARG LOCAL_FILE=false
@@ -27,8 +35,5 @@ ENV VERSION=$VERSION
 LABEL version=$VERSION
 
 EXPOSE 5000
-
-WORKDIR /app
-RUN rm -rf decafans-server
 
 CMD ["./app"]
