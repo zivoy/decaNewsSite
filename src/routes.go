@@ -29,6 +29,30 @@ func initializeRoutes() {
 
 	router.GET("/", showIndex)
 
+	router.GET("/health", func(c *gin.Context) {
+		render(c, gin.H{"pageTitle": "Server is healthy",
+			"pageSubtitle": "Server is alive!",
+			"explanation":  "There are no errors",
+		}, "Server Health", "Server is alive!", "", c.Request.URL, "health.html")
+	})
+
+	router.GET("/readiness", func(c *gin.Context) {
+		title := "Server Readiness"
+		template := "health.html"
+		if HearRateAlive {
+			render(c, gin.H{"pageTitle": "Server is ready",
+				"pageSubtitle": "Server ready to serve",
+				"explanation":  "There are no errors",
+			}, title, "server is ready!", "", c.Request.URL, template)
+		} else {
+			render(c, gin.H{"pageTitle": "Server is not ready",
+				"pageSubtitle": "Server is having issues",
+				"explanation":  "There was an issue with the heartbeat to the database",
+				"err":          true,
+			}, title, "server is not ready!", "", c.Request.URL, template, http.StatusInternalServerError)
+		}
+	})
+
 	router.Static("/static", "./resources")
 	router.StaticFile("/favicon.png", "./resources/decafansLogoSmall.png")
 	router.StaticFile("/favicon.ico", "./resources/DecaFans-favicon.ico")

@@ -263,8 +263,11 @@ func (c Cache) delete(id string) {
 
 // server heartbeat
 func startServerComms() {
+	ServerComms = true
+	HearRateAlive = true
 	go func() {
 		for now := range time.Tick(ServerPollRate) {
+			HearRateAlive = true
 			// service action cache
 			updateActionCache()
 			for id, data := range actionCache.list {
@@ -283,6 +286,9 @@ func startServerComms() {
 				log.Println("failed to get autoClearVal")
 			} else {
 				setAutoClear(value.(bool))
+			}
+			if !ServerComms {
+				break
 			}
 		}
 	}()

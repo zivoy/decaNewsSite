@@ -1,0 +1,11 @@
+{{ template "header.html" .}}
+
+<div class="has-text-centered">
+
+
+    <p class="title {{if .err}}has-text-danger{{else}}has-text-success{{end}}">{{.pageTitle}}</p>
+    <p class="subtitle">{{.pageSubtitle}}</p>
+    <p>{{.explanation}}</p>
+</div>
+
+{{ template "footer.html" .}}

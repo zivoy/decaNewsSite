@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"firebase.google.com/go/db"
 	"fmt"
 	"github.com/Masterminds/sprig"
@@ -11,7 +12,10 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/discord"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 
 	"log"
 	"net/http"
@@ -34,6 +38,9 @@ var BBCompiler bbcode.Compiler
 
 var version string
 
+var ServerComms bool   // for turning off the heartbeat routine
+var HearRateAlive bool // to know if the server can reach the database
+
 var authorities = map[int]string{
 	0: "Browser",
 	1: "Reporter",
@@ -43,6 +50,7 @@ var authorities = map[int]string{
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	dev, err := strconv.ParseBool(os.Getenv("DEV_MODE"))
 	if err != nil {
 		debug = false
@@ -150,12 +158,42 @@ func main() {
 	BBCompiler = bbcode.NewCompiler(true, true)
 	initBBCode(&BBCompiler)
 
-	//sanitiseAllLeaks()
-
-	err = router.Run(":5000")
-	if err != nil {
-		panic(err)
+	srv := &http.Server{
+		Addr:    ":5000",
+		Handler: router,
 	}
+
+	go func() {
+		log.Println("Starting Server")
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+	shutdown(srv)
+}
+
+func shutdown(srv *http.Server) {
+	interruptChan := make(chan os.Signal, 1)
+	signal.Notify(interruptChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	// Block
+	<-interruptChan
+
+	// shutdown looping routines
+	stopClearingCache()
+	ServerComms = false
+
+	// close the firebase connection
+
+	// Create a deadline to wait for.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("--- Shutting down ---")
+	os.Exit(0)
 }
 
 func authorityLevel(auth int) string {

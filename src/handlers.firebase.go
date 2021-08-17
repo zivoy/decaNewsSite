@@ -31,6 +31,7 @@ func initializeApp(credPath []byte, databaseURL string) error {
 func initDB() (*db.Client, error) {
 	client, err := dataBaseApp.Database(ctx)
 	if err != nil {
+		HearRateAlive = false
 		return nil, fmt.Errorf("error initializing database client: %v", err)
 	}
 
@@ -41,6 +42,7 @@ func readEntry(client *db.Client, path string) (map[string]interface{}, error) {
 	ref := client.NewRef(path)
 	var data map[string]interface{}
 	if err := ref.Get(ctx, &data); err != nil {
+		HearRateAlive = false
 		return nil, fmt.Errorf("error reading from database: %v", err)
 	}
 	return data, nil
@@ -50,6 +52,7 @@ func readValue(client *db.Client, path string) (interface{}, error) {
 	ref := client.NewRef(path)
 	var data interface{}
 	if err := ref.Get(ctx, &data); err != nil {
+		HearRateAlive = false
 		return nil, fmt.Errorf("error reading from database: %v", err)
 	}
 	return data, nil
@@ -65,6 +68,7 @@ func pathExists(client *db.Client, path string) bool {
 func setEntry(client *db.Client, path string, value interface{}) error {
 	ref := client.NewRef(path)
 	if err := ref.Set(ctx, value); err != nil {
+		HearRateAlive = false
 		return fmt.Errorf("error setting to database: %v", err)
 	}
 	return nil
@@ -73,6 +77,7 @@ func setEntry(client *db.Client, path string, value interface{}) error {
 func deletePath(client *db.Client, path string) error {
 	ref := client.NewRef(path)
 	if err := ref.Set(ctx, nil); err != nil {
+		HearRateAlive = false
 		return fmt.Errorf("error setting to database: %v", err)
 	}
 	return nil
@@ -82,6 +87,7 @@ func pushEntry(client *db.Client, path string, value interface{}) (string, error
 	ref := client.NewRef(path)
 	loc, err := ref.Push(ctx, value)
 	if err != nil {
+		HearRateAlive = false
 		return "", fmt.Errorf("error setting to database: %v", err)
 	}
 	return loc.Key, nil
