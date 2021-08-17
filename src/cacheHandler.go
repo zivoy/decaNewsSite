@@ -128,12 +128,10 @@ func initCacheClearing() {
 	}()
 }
 
-/*
 func stopClearingCache() {
 	close(autoClearCache)
 	clearingCache = false
 }
-*/
 
 func setAutoClear(val bool) {
 	if clearingCache == val {
