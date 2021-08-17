@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+//todo have reload also use refresh token
 func performLogin(c *gin.Context) {
 	q := c.Request.URL.Query()
 	q.Add("provider", "discord")

@@ -1,4 +1,3 @@
-# todo make production and setip ci with github actions or something
 FROM golang:1.16-alpine
 
 LABEL maintainer="zivoy"
