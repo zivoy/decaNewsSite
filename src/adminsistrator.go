@@ -61,7 +61,7 @@ func clearUserCache(c *gin.Context) {
 
 	addLog(0, requester, "Refresh Cache", map[string]interface{}{"user_affected": uid})
 
-	deleteCache(userCache, uid)
+	userCache.delete(uid)
 	c.JSON(http.StatusOK, map[string]interface{}{"success": true})
 }
 
@@ -138,23 +138,3 @@ func UpdateUserRank(c *gin.Context) {
 	}
 	c.JSON(http.StatusNotFound, map[string]interface{}{"success": false, "message": "user not found"})
 }
-
-/*
-func sanitiseAllLeaks() {
-	leaks, _ := getAllArticles()
-	for _, leak := range leaks {
-		if leak.ID == "" {
-			continue
-		}
-		updater := user{UID: ""}
-		if leak.EditedBy != "" {
-			updater.UID = leak.EditedBy
-		}
-
-		newLeak, _ := leakSanitization(leak.Description, strconv.Itoa(int(leak.LeakTime)), leak.ImageUrl, leak.SourceLink, getUser(leak.ReporterUid), updater)
-		newLeak.ID = leak.ID
-
-		_ = setEntry(dataBase, articlePathString(leak.ID), newLeak)
-	}
-}
-*/

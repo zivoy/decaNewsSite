@@ -46,6 +46,15 @@ func readEntry(client *db.Client, path string) (map[string]interface{}, error) {
 	return data, nil
 }
 
+func readValue(client *db.Client, path string) (interface{}, error) {
+	ref := client.NewRef(path)
+	var data interface{}
+	if err := ref.Get(ctx, &data); err != nil {
+		return nil, fmt.Errorf("error reading from database: %v", err)
+	}
+	return data, nil
+}
+
 func pathExists(client *db.Client, path string) bool {
 	ref := client.NewRef(path)
 	var data map[string]interface{}

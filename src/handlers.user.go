@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+//todo have reload also use refresh token
 func performLogin(c *gin.Context) {
 	q := c.Request.URL.Query()
 	q.Add("provider", "discord")
@@ -41,7 +42,7 @@ func loginCallback(c *gin.Context) {
 func logout(c *gin.Context) {
 	token, _ := c.Cookie("token")
 	_ = deletePath(dataBase, sessionPathString(token))
-	deleteCache(sessionsCache, token)
+	sessionsCache.delete(token)
 	// Clear the cookie
 	_ = gothic.Logout(c.Writer, c.Request)
 	deleteCookie(c, "token")

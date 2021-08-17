@@ -13,6 +13,6 @@ config.decafans.com {
   basicauth /* {
     serverPoint JDJhJDE0JEUxRWs3LkhBSEFMT0xZT1VUSE9VR0hJV09VTERQVVRUSEVQQVNTV09SREhFUkVYRC5wYXNz
   }
-
+  # todo maybe https://masterminds.github.io/sprig/crypto.html#encryptAES
   file_server
 }

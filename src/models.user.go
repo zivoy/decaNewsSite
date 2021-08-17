@@ -32,16 +32,21 @@ type userSession struct {
 	Expires int64  `json:"expire"`
 }
 
+const (
+	sessionLocation = "sessions"
+	userLocation    = "users"
+)
+
 func userPathString(uid string) string {
-	return fmt.Sprintf("users/%s", uid)
+	return fmt.Sprintf(userLocation+"/%s", uid)
 }
 
 func sessionPathString(uid string) string {
-	return fmt.Sprintf("sessions/%s", uid)
+	return fmt.Sprintf(sessionLocation+"/%s", uid)
 }
 
 func getUser(uid string) user {
-	userData := getCache(userCache, uid, func(uid string) interface{} {
+	userData := userCache.get(uid, func(uid string) interface{} {
 		userData, err := readEntry(dataBase, userPathString(uid))
 		if err != nil && debug {
 			log.Println(err)
@@ -60,7 +65,7 @@ func getUser(uid string) user {
 }
 
 func userExists(uid string) bool {
-	_, exists := userCache[uid]
+	exists := userCache.has(uid)
 	if !exists {
 		exists = pathExists(dataBase, userPathString(uid))
 	}
@@ -72,11 +77,11 @@ func addUser(uid string, user user) {
 	if err != nil && debug {
 		log.Println(err)
 	}
-	addCache(userCache, uid, user)
+	userCache.add(uid, user)
 }
 
 func getSession(token string) userSession {
-	session := getCache(sessionsCache, token, func(token string) interface{} {
+	session := sessionsCache.get(token, func(token string) interface{} {
 		sessionData, err := readEntry(dataBase, sessionPathString(token))
 		if err != nil && debug {
 			log.Println(err)
@@ -99,7 +104,7 @@ func getUserByToken(token string) (user, error) {
 }
 
 func isValidSession(token string) bool {
-	_, exists := sessionsCache[token]
+	exists := sessionsCache.has(token)
 	if !exists {
 		exists = pathExists(dataBase, sessionPathString(token))
 	}
@@ -109,7 +114,7 @@ func isValidSession(token string) bool {
 			return true
 		}
 		_ = deletePath(dataBase, sessionPathString(token))
-		deleteCache(sessionsCache, token)
+		sessionsCache.delete(token)
 	}
 	return false
 }
@@ -148,6 +153,6 @@ func loggInUser(c *gin.Context, userVals goth.User) {
 		log.Println(err)
 	}
 
-	addCache(sessionsCache, cookie, session)
+	sessionsCache.add(cookie, session)
 	setCookie(c, "token", cookie, store.Options.MaxAge)
 }

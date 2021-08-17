@@ -28,8 +28,15 @@ type article struct {
 	DateEdit    int64  `json:"edited_time,omitempty"`
 }
 
+const (
+	articleLocation         = "leaks"
+	adminBasePath = "admin"
+	archivedArticleLocation = adminBasePath+"/archived_leaks"
+	allowedLinkLocation     = adminBasePath+"/allowed_links"
+)
+
 func articlePathString(uid string) string {
-	return fmt.Sprintf("leaks/%s", uid)
+	return fmt.Sprintf(articleLocation+"/%s", uid)
 }
 
 // you need this auth level to post with no link
@@ -37,7 +44,7 @@ const linkLessAuthLevel = 1
 
 // todo implement caching
 func getAllArticles() ([]article, error) {
-	ref := dataBase.NewRef("leaks")
+	ref := dataBase.NewRef(articleLocation)
 	var data map[string]article
 	if err := ref.Get(ctx, &data); err != nil {
 		return nil, fmt.Errorf("error reading from database: %v", err)
@@ -47,7 +54,7 @@ func getAllArticles() ([]article, error) {
 	for k, v := range data {
 		v.ID = k
 		articleList = append(articleList, v)
-		addCache(articleCache, k, v)
+		articleCache.add(k, v)
 	}
 
 	sort.Slice(articleList, func(i, j int) bool {
@@ -57,7 +64,7 @@ func getAllArticles() ([]article, error) {
 }
 
 func getAllUsersArticles(uid string) ([]article, error) {
-	ref := dataBase.NewRef("leaks")
+	ref := dataBase.NewRef(articleLocation)
 	var data map[string]article
 	if err := ref.OrderByChild("reporter_uid").EqualTo(uid).Get(ctx, &data); err != nil {
 		return nil, fmt.Errorf("error reading from database: %v", err)
@@ -67,7 +74,7 @@ func getAllUsersArticles(uid string) ([]article, error) {
 	for k, v := range data {
 		v.ID = k
 		articleList = append(articleList, v)
-		addCache(articleCache, k, v)
+		articleCache.add(k, v)
 	}
 
 	sort.Slice(articleList, func(i, j int) bool {
@@ -78,7 +85,7 @@ func getAllUsersArticles(uid string) ([]article, error) {
 
 func getArticleByID(id string) (article, error) {
 	if articleExists(id) {
-		leak := getCache(articleCache, id, func(string) interface{} {
+		leak := articleCache.get(id, func(string) interface{} {
 			articleData, err := readEntry(dataBase, articlePathString(id))
 			if err != nil && debug {
 				log.Println(err)
@@ -118,7 +125,7 @@ func getArticleByID(id string) (article, error) {
 }
 
 func articleExists(id string) bool {
-	_, exists := articleCache[id]
+	exists := articleCache.has(id)
 	if !exists {
 		exists = pathExists(dataBase, articlePathString(id))
 	}
@@ -130,8 +137,8 @@ func compileBBCode(in string) string {
 }
 
 func getAllowedLinks() []string {
-	items := getCache(allowedLinkCache, "links", func(string) interface{} {
-		ref := dataBase.NewRef("admin/allowed_links")
+	items := allowedLinkCache.get("links", func(string) interface{} {
+		ref := dataBase.NewRef(allowedLinkLocation)
 		var data []string
 		if err := ref.Get(ctx, &data); err != nil && debug {
 			log.Println(err)
@@ -171,7 +178,7 @@ func createNewLeak(title, description, rawTime, imageUrl, sourceUrl string, repo
 		return article{}, errors.New("invalid time")
 	}
 
-	key, err := pushEntry(dataBase, "leaks", leak)
+	key, err := pushEntry(dataBase, articleLocation, leak)
 	leak.ID = key
 	if title == "" {
 		leak.Title = fmt.Sprintf("DecaLeak %d", hashTo32(key))

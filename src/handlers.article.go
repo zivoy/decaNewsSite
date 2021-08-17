@@ -89,11 +89,11 @@ func archiveLeak(c *gin.Context) {
 	if err != nil && debug {
 		log.Println(err)
 	}
-	err = setEntry(dataBase, fmt.Sprintf("leaks/%s", uid), nil)
+	err = setEntry(dataBase, fmt.Sprintf(archivedArticleLocation+"/%s", uid), leak)
 	if err != nil && debug {
 		log.Println(err)
 	}
-	err = setEntry(dataBase, fmt.Sprintf("admin/archived_leaks/%s", uid), leak)
+	err = setEntry(dataBase, articlePathString(uid), nil)
 	if err != nil && debug {
 		log.Println(err)
 	}
@@ -112,7 +112,7 @@ func updateArticle(c *gin.Context) {
 	}
 
 	description := c.PostForm("description")
-	leakTime := c.PostForm("leakTime")
+	leakTime := c.PostForm("time")
 	imageUrl := c.PostForm("image_url")
 	sourceUrl := c.PostForm("source_url")
 	title := c.PostForm("title")
@@ -156,6 +156,6 @@ func updateArticle(c *gin.Context) {
 
 	addLog(2, updater.UID, "Updated Leak",
 		map[string]interface{}{"article": leak.ID, "before": leak, "after": newLeak})
-	deleteCache(articleCache, leak.ID)
+	articleCache.delete(leak.ID)
 	c.JSON(200, map[string]string{"success": "true"})
 }
