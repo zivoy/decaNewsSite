@@ -66,8 +66,8 @@ func leaksApiAmountFunc(c *gin.Context) {
 	art, err := getAllArticles(0, -1)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, apiError{"error": true, "message": "problem fetching articles"})
+		c.JSON(http.StatusInternalServerError, getApiError("problem fetching articles"))
 		return
 	}
-	c.JSON(http.StatusOK, map[string]int{"hello": len(art)})
+	c.JSON(http.StatusOK, map[string]int{"leaks": len(art)})
 }
