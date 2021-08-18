@@ -3,17 +3,17 @@
 {{$linkLess := .linkLessAuthLevel }}
 
 {{if .publishSuccess}}
-<div class="notification is-success">
-    <p class="title">Success</p>
-    <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakId}}</a></p>
-</div>
+    <div class="notification is-success">
+        <p class="title">Success</p>
+        <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakId}}</a></p>
+    </div>
 {{end}}
 {{if .errorPublishing}}
-<div class="notification is-warning">
-    <p class="title">Error!</p>
-    <p>something went wrong :/</p>
-    {{/* maybe bring back values */}}
-</div>
+    <div class="notification is-warning">
+        <p class="title">Error!</p>
+        <p>something went wrong :/</p>
+        {{/* maybe bring back values */}}
+    </div>
 {{end}}
 
 <div class="columns is-centered">
@@ -37,8 +37,8 @@
                                required>
                     </div>
                     {{ if ge .user.AuthLevel $linkLess }}
-                    <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure
-                        you add one somewhere</p>
+                        <p class="help">As a {{.user.AuthLevel | authLevelName}} you dont need a source, but make sure
+                            you add one somewhere</p>
                     {{end}}
                     <p class="help" id="linkInfo"></p>
                     <span class="icon is-hidden-touch has-tooltip-multiline"
@@ -121,38 +121,38 @@
 <script src="/static/convertTime.js"></script>
 
 {{if .errorPublishing}}
-<script>
-    window.addEventListener('load', function () {
-        Leak = "{{.payload.description}}"
-        LeakTime = new Date(parseInt("{{.payload.time}}"))
-        Image = "{{.payload.image_url}}"
-        Link = "{{.payload.source_url}}"
-        Title = "{{.payload.title}}"
-        if (isNaN(LeakTime.getTime())) {
-            LeakTime = new Date()
-        }
-        setTimeVal(inputTime, LeakTime);
-        inputLink.val(Link);
-        inputLeak.val(Leak);
-        inputImage.val(Image);
+    <script>
+        window.addEventListener('load', function () {
+            Leak = "{{.payload.description}}"
+            LeakTime = new Date(parseInt("{{.payload.time}}"))
+            Image = "{{.payload.image_url}}"
+            Link = "{{.payload.source_url}}"
+            Title = "{{.payload.title}}"
+            if (isNaN(LeakTime.getTime())) {
+                LeakTime = new Date()
+            }
+            setTimeVal(inputTime, LeakTime);
+            inputLink.val(Link);
+            inputLeak.val(Leak);
+            inputImage.val(Image);
 
-        LeakTime = timeChange(inputTime, $("time#timeToSet"));
-        Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);
-        Leak = leakChange(inputLeak, $("p#leakPreview"), val => {
-            return BBCodeParser.process(val.replaceAll("\n", "<br>"))
+            LeakTime = timeChange(inputTime, $("time#timeToSet"));
+            Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);
+            Leak = leakChange(inputLeak, $("p#leakPreview"), val => {
+                return BBCodeParser.process(val.replaceAll("\n", "<br>"))
+            });
+            imageChange(inputImage, $("img#previewImage")).then(r => {
+                Image = r
+            });
+            formReady();
         });
-        imageChange(inputImage, $("img#previewImage")).then(r => {
-            Image = r
-        });
-        formReady();
-    });
 
-    console.log("returned from error");
-    let err = `
+        console.log("returned from error");
+        let err = `
     {{.payload.error}}
     `
-    console.error(err)
-</script>
+        console.error(err)
+    </script>
 {{end}}
 
 

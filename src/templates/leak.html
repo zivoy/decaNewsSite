@@ -46,40 +46,40 @@
                         <time datetime="{{.payload.LeakTime}}"></time>
                         <span> - </span>
                         <strong><a href="/u/profile/{{ .payload.ReporterUid }}">
-                            {{- $user := getUser .payload.ReporterUid -}}
-                            {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
+                                {{- $user := getUser .payload.ReporterUid -}}
+                                {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
                         <span> - </span>
                         {{if .payload.SourceLink}}
-                        <a target="_blank" href="{{.payload.SourceLink}}" rel="noopener">Source</a>
+                            <a target="_blank" href="{{.payload.SourceLink}}" rel="noopener">Source</a>
                         {{else}}
-                        <span class="has-text-danger">Source</span>
+                            <span class="has-text-danger">Source</span>
                         {{end}}
                     </div>
                 </div>
                 {{ if .payload.ImageUrl}}
-                <div class="card-image" id="leakImage">
-                    <figure class="image">
-                        <img src="{{.payload.ImageUrl}}" alt="Leak Image">
-                    </figure>
-                </div>
+                    <div class="card-image" id="leakImage">
+                        <figure class="image">
+                            <img src="{{.payload.ImageUrl}}" alt="Leak Image">
+                        </figure>
+                    </div>
                 {{end}}
             </div>
             <div class="level mt-2">
                 <div class="level-left">
                 </div>
                 {{if .user}}
-                <div class="level-right">
-                    {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 1)}}
-                    <div class="buttons level-item" id="controlButtons">
-                        {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 2)}}
-                        <button class="button is-danger" onclick="openModal()">Archive</button>
+                    <div class="level-right">
+                        {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 1)}}
+                            <div class="buttons level-item" id="controlButtons">
+                                {{ if or (eq .payload.ReporterUid .user.UID) (ge .user.AuthLevel 2)}}
+                                    <button class="button is-danger" onclick="openModal()">Archive</button>
+                                {{end}}
+                                {{ if .user.PostingPrivilege }}
+                                    <button class="button is-warning" id="edit" onclick="startEdit()">Edit</button>
+                                {{ end }}
+                            </div>
                         {{end}}
-                        {{ if .user.PostingPrivilege }}
-                        <button class="button is-warning" id="edit" onclick="startEdit()">Edit</button>
-                        {{ end }}
                     </div>
-                    {{end}}
-                </div>
                 {{end}}
             </div>
         </div>

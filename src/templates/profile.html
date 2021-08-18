@@ -5,34 +5,35 @@
 
 <section class="section">
     {{if .is_logged_in}}
-    {{ if (ge $viewer.AuthLevel 2)}}
-    <div class="level">
-        <div class="level-left">
-            <div class="buttons level-item">
-                <button class="button is-info" id="reload" onclick="reloadCache()">
-                    reload cache
-                </button>
+        {{ if (ge $viewer.AuthLevel 2)}}
+            <div class="level">
+                <div class="level-left">
+                    <div class="buttons level-item">
+                        <button class="button is-info" id="reload" onclick="reloadCache()">
+                            reload cache
+                        </button>
+                        {{ if ne $viewer.UID $viewing.UID}}
+                            <button id="cPost"
+                                    class="button is-danger {{- if not $viewing.PostingPrivilege}} is-light{{end}}"
+                                    onclick="togglePosting()">
+                                {{if $viewing.PostingPrivilege}}
+                                    revoke posting privileges
+                                {{else}}
+                                    grant posting privileges
+                                {{end}}
+                            </button>
+                        {{end}}
+                    </div>
+                </div>
                 {{ if ne $viewer.UID $viewing.UID}}
-                <button id="cPost" class="button is-danger {{- if not $viewing.PostingPrivilege}} is-light{{end}}"
-                        onclick="togglePosting()">
-                    {{if $viewing.PostingPrivilege}}
-                    revoke posting privileges
-                    {{else}}
-                    grant posting privileges
-                    {{end}}
-                </button>
+                    <div class="level-right">
+                        <div class="buttons has-addons level-item">
+                            {{makeButtonList $viewer.AuthLevel $viewing.AuthLevel}}
+                        </div>
+                    </div>
                 {{end}}
             </div>
-        </div>
-        {{ if ne $viewer.UID $viewing.UID}}
-        <div class="level-right">
-            <div class="buttons has-addons level-item">
-                {{makeButtonList $viewer.AuthLevel $viewing.AuthLevel}}
-            </div>
-        </div>
         {{end}}
-    </div>
-    {{end}}
     {{end}}
     <div class="columns">
         <div class="column is-offset-1-desktop is-5-fullhd is-8">
@@ -58,34 +59,34 @@
     </div>
     <div class="columns {{/* is-vcentered */ -}} is-multiline is-centered">
         {{range .payload.leaksMade}}
-        <div class="column">
-            <div class="box">
-                <article class="media">
-                    {{ if .ImageUrl}}
-                    <figure class="media-left">
-                        <a class="image is-64x64" href="/leaks/leak/{{.ID}}">
-                            <img src="{{.ImageUrl}}">
-                        </a>
-                    </figure>
-                    {{end}}
-                    <div class="media-content" style="min-width: 170px;">
-                        <div class="content">
-                            <a href="/leaks/leak/{{.ID}}">{{.Summary | replace "\n" "<br>" | unescape}}</a>
+            <div class="column">
+                <div class="box">
+                    <article class="media">
+                        {{ if .ImageUrl}}
+                            <figure class="media-left">
+                                <a class="image is-64x64" href="/leaks/leak/{{.ID}}">
+                                    <img src="{{.ImageUrl}}">
+                                </a>
+                            </figure>
+                        {{end}}
+                        <div class="media-content" style="min-width: 170px;">
+                            <div class="content">
+                                <a href="/leaks/leak/{{.ID}}">{{.Summary | replace "\n" "<br>" | unescape}}</a>
+                            </div>
                         </div>
-                    </div>
 
-                </article>
-                <div class="level is-size-7">
-                    <div class="level-left">
-                    </div>
-                    <div class="level-right">
-                        <figure class="is-hidden-touch">
-                            <time datetime="{{.LeakTime}}"></time>
-                        </figure>
+                    </article>
+                    <div class="level is-size-7">
+                        <div class="level-left">
+                        </div>
+                        <div class="level-right">
+                            <figure class="is-hidden-touch">
+                                <time datetime="{{.LeakTime}}"></time>
+                            </figure>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         {{end}}
     </div>
 </section>

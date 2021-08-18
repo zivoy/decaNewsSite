@@ -37,8 +37,8 @@
 
         <div class="navbar-end">
             {{ if .is_logged_in }}
-            <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link" href="/u/profile/{{.user.UID}}">
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link" href="/u/profile/{{.user.UID}}">
                     <span class="is-hidden-desktop">
                         <span class="icon is-medium">
                             <img class="is-rounded userImage" src="{{ .user.AvatarUrl }}?size=64" width="64"
@@ -47,47 +47,47 @@
                         <span>{{.user.Username}}</span>
                     </span>
 
-                    <span class="level is-hidden-touch">
+                        <span class="level is-hidden-touch">
                         <span class="icon level-item userImage">
                             <img class="is-rounded" src="{{ .user.AvatarUrl }}?size=64" width="64" height="64">
                           </span>
                         <span class="level-item">{{.user.Username}}</span>
                     </span>
-                </a>
-                <div class="navbar-dropdown">
-                    <a class="navbar-item" href="/u/profile/{{.user.UID}}">
-                        {{.user.Username}}#{{ .user.UserDiscriminator }}
                     </a>
-                    {{ if .user.PostingPrivilege}}
-                    <a class="navbar-item" href="/leaks/create">
-                        Create Leak
-                    </a>
-                    {{end}}
-                    {{ if (ge .user.AuthLevel 2)}}
-                    <a class="navbar-item" href="/admin/dashboard">
-                        Administrate
-                    </a>
-                    {{end}}
-                    <hr class="navbar-divider">
-                    <a class="navbar-item" href="/u/logout">
-                        logout
-                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="/u/profile/{{.user.UID}}">
+                            {{.user.Username}}#{{ .user.UserDiscriminator }}
+                        </a>
+                        {{ if .user.PostingPrivilege}}
+                            <a class="navbar-item" href="/leaks/create">
+                                Create Leak
+                            </a>
+                        {{end}}
+                        {{ if (ge .user.AuthLevel 2)}}
+                            <a class="navbar-item" href="/admin/dashboard">
+                                Administrate
+                            </a>
+                        {{end}}
+                        <hr class="navbar-divider">
+                        <a class="navbar-item" href="/u/logout">
+                            logout
+                        </a>
+                    </div>
                 </div>
-            </div>
             {{end}}
             {{ if not .is_logged_in }}
-            <div class="navbar-item">
-                <div class="buttons">
-                    <a class="button is-light" href="/u/login">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-light" href="/u/login">
                         <span class="icon-text">
                         <span class="icon has-text-dark">
                             <ion-icon class="ion-ionic" name="logo-discord"></ion-icon>
                           </span>
                         <span>Log in / Sign up</span>
                         </span>
-                    </a>
+                        </a>
+                    </div>
                 </div>
-            </div>
             {{end}}
         </div>
     </div>
