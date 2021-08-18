@@ -61,6 +61,7 @@ $(document).ready(function () {
 });
 
 function formReady() {
+    stopLeave = true;
     submitButton.prop("disabled", true);
     let linkValid =
         //{{ if ge .user.AuthLevel $linkLess }}
@@ -97,5 +98,6 @@ function post() {
 
     $(document.body).append(form);
     form.submit();
+    stopLeave = false;
 }
 

@@ -101,6 +101,7 @@ function startEdit() {
     })
 
     function formReady() {
+        stopLeave = true;
         submitButton.prop("disabled", true);
         // maybe add a check for source url :/
         if (leak && time) {

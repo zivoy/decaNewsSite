@@ -1,3 +1,16 @@
+let stopLeave = false
+
+window.addEventListener("beforeunload", function (e) {
+    delete e["returnValue"]
+    if (stopLeave === true) {
+        // Cancel the event
+        e.preventDefault();
+        e.returnValue = "You have made changes to the page";
+
+        return e.returnValue;
+    }
+});
+
 function setTimeVal(field, date) {
     let now = new Date(date);
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
