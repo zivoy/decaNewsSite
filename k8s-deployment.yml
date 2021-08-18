@@ -3,6 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: decafans
+  annotations:
+    keel.sh/policy: all
 spec:
   replicas: 3
   selector:
@@ -15,7 +17,7 @@ spec:
     spec:
       containers:
         - name: decafans
-          image: zivoy/decafans:latest
+          image: zivoy/decafans
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
