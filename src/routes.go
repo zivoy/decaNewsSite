@@ -1,10 +1,8 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -124,58 +122,15 @@ func initializeRoutes() {
 
 	apiRoot := router.Group("/api")
 	{
-		apiRoot.GET("/", func(c *gin.Context) {
-			c.Redirect(http.StatusTemporaryRedirect, "/api/v1")
-		})
+		apiRoot.GET("/", apiRootFunc)
 		apiV1 := apiRoot.Group("/v1")
 		{
-			apiV1.GET("/", func(c *gin.Context) {
-				c.JSON(http.StatusOK, map[string]string{"hello": "world"})
-			})
+			apiV1.GET("/", apiV1RootFunc)
+
 			leekApi := apiV1.Group("/leaks")
 			{
-				leekApi.GET("/get", func(c *gin.Context) {
-					var low, high int64
-					var err error
-					if l, ok := c.GetQuery("low"); !ok {
-						low = 0
-					} else {
-						low, err = strconv.ParseInt(l, 10, 32)
-						if err != nil {
-							log.Println(err)
-							c.JSON(http.StatusBadRequest, apiError{"error": true, "message": l + " in low is invalid"})
-							return
-						}
-					}
-
-					if h, ok := c.GetQuery("high"); !ok {
-						high = -1
-					} else {
-						high, err = strconv.ParseInt(h, 10, 32)
-						if err != nil {
-							log.Println(err)
-							c.JSON(http.StatusBadRequest, apiError{"error": true, "message": h + " in high is invalid"})
-							return
-						}
-					}
-
-					art, err := getAllArticles(int(low), int(high))
-					if err != nil {
-						log.Println(err)
-						c.JSON(http.StatusInternalServerError, apiError{"error": true, "message": "problem fetching articles"})
-						return
-					}
-					c.JSON(http.StatusOK, art)
-				})
-				leekApi.GET("/amount", func(c *gin.Context) {
-					art, err := getAllArticles(0, -1)
-					if err != nil {
-						log.Println(err)
-						c.JSON(http.StatusInternalServerError, apiError{"error": true, "message": "problem fetching articles"})
-						return
-					}
-					c.JSON(http.StatusOK, map[string]int{"hello": len(art)})
-				})
+				leekApi.GET("/get", leaksApiGetFunc)
+				leekApi.GET("/amount", leaksApiAmountFunc)
 			}
 			apiV1.POST("/archive/:uid", ensureLoggedIn(), archiveLeak)
 		}
