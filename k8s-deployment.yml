@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: decafans
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: decafans
+  template:
+    metadata:
+      labels:
+        app: decafans
+    spec:
+      containers:
+        - name: decafans
+          image: zivoy/decafans:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: decafans-config  #kubectl create configmap decafans-config --from-env-file=
+          env:
+            - name: LOCATION
+              value: "https://config.decafans.com/latest.env"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 3
+            timeoutSeconds: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: decafans-service
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP  # might give users a more stable experience
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+  selector:
+    app: decafans
