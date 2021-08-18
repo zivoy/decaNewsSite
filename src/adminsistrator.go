@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type adminLog struct {
@@ -107,7 +108,7 @@ func generateAuthButtons(viewerAuth int, viewedAuth int) template.HTML {
 	return unescape(returnString)
 }
 
-// takes `rank` in post request
+// UpdateUserRank takes `rank` in post request
 func UpdateUserRank(c *gin.Context) {
 	uid := c.Param("uid")
 	requesterUser, _ := c.Get("user")
