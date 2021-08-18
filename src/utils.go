@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/frustra/bbcode"
-	"github.com/gin-gonic/gin"
 	"hash/fnv"
 	"html/template"
 	"regexp"
 	"strings"
+
+	"github.com/frustra/bbcode"
+	"github.com/gin-gonic/gin"
 )
 
 var tagRegex = regexp.MustCompile(`<.*?>`)

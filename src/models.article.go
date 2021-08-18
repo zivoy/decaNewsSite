@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type article struct {
@@ -30,37 +31,44 @@ type article struct {
 
 const (
 	articleLocation         = "leaks"
-	adminBasePath = "admin"
-	archivedArticleLocation = adminBasePath+"/archived_leaks"
-	allowedLinkLocation     = adminBasePath+"/allowed_links"
+	adminBasePath           = "admin"
+	archivedArticleLocation = adminBasePath + "/archived_leaks"
+	allowedLinkLocation     = adminBasePath + "/allowed_links"
 )
-
-func articlePathString(uid string) string {
-	return fmt.Sprintf(articleLocation+"/%s", uid)
-}
 
 // you need this auth level to post with no link
 const linkLessAuthLevel = 1
 
-// todo implement caching
-func getAllArticles() ([]article, error) {
-	ref := dataBase.NewRef(articleLocation)
-	var data map[string]article
-	if err := ref.Get(ctx, &data); err != nil {
+func getAllArticles(low, high int) ([]article, error) {
+	var err error
+	returned := articleListCache.get("articles", func(_ string) interface{} {
+		ref := dataBase.NewRef(articleLocation)
+		var data map[string]article
+		if err = ref.Get(ctx, &data); err != nil {
+			return nil
+		}
+
+		articleList := make([]article, 0)
+		for k, v := range data {
+			v.ID = k
+			articleList = append(articleList, v)
+			articleCache.add(k, v)
+		}
+
+		sort.Slice(articleList, func(i, j int) bool {
+			return articleList[i].LeakTime > articleList[j].LeakTime
+		})
+		return articleList
+	})
+	if returned == nil {
 		return nil, fmt.Errorf("error reading from database: %v", err)
 	}
 
-	articleList := make([]article, 0)
-	for k, v := range data {
-		v.ID = k
-		articleList = append(articleList, v)
-		articleCache.add(k, v)
+	articleList := returned.([]article)
+	if high == -1 {
+		high = len(articleList)
 	}
-
-	sort.Slice(articleList, func(i, j int) bool {
-		return articleList[i].LeakTime > articleList[j].LeakTime
-	})
-	return articleList, nil
+	return articleList[low:high], nil
 }
 
 func getAllUsersArticles(uid string) ([]article, error) {
@@ -86,7 +94,7 @@ func getAllUsersArticles(uid string) ([]article, error) {
 func getArticleByID(id string) (article, error) {
 	if articleExists(id) {
 		leak := articleCache.get(id, func(string) interface{} {
-			articleData, err := readEntry(dataBase, articlePathString(id))
+			articleData, err := readEntry(dataBase, articleCache.path(id))
 			if err != nil && debug {
 				log.Println(err)
 			}
@@ -127,7 +135,7 @@ func getArticleByID(id string) (article, error) {
 func articleExists(id string) bool {
 	exists := articleCache.has(id)
 	if !exists {
-		exists = pathExists(dataBase, articlePathString(id))
+		exists = pathExists(dataBase, articleCache.path(id))
 	}
 	return exists
 }
@@ -182,7 +190,7 @@ func createNewLeak(title, description, rawTime, imageUrl, sourceUrl string, repo
 	leak.ID = key
 	if title == "" {
 		leak.Title = fmt.Sprintf("DecaLeak %d", hashTo32(key))
-		err2 := setEntry(dataBase, fmt.Sprintf("%s/title", articlePathString(leak.ID)), leak.Title)
+		err2 := setEntry(dataBase, fmt.Sprintf("%s/title", articleCache.path(leak.ID)), leak.Title)
 
 		if err2 != nil {
 			err = err2
@@ -196,6 +204,13 @@ func createNewLeak(title, description, rawTime, imageUrl, sourceUrl string, repo
 	}
 
 	addLog(2, reporter.UID, "Created Leak", map[string]interface{}{"article": leak.ID})
+
+	clearData := cacheAction{
+		CacheListId: articleListCache.id,
+		ItemId:      "articles",
+		ActionType:  clearList,
+	}
+	sendAction(clearData)
 
 	return leak, nil
 }

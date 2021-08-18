@@ -50,6 +50,11 @@ var allowedLinkCache = Cache{
 	basePath: allowedLinkLocation,
 	id:       3,
 }
+var articleListCache = Cache{
+	list:     make(CacheList),
+	basePath: articleLocation,
+	id:       4,
+}
 
 var cacheList = map[int]cacheInterface{
 	userCache.id:        userCache,
@@ -251,13 +256,7 @@ func (c Cache) delete(id string) {
 		ItemId:      id,
 		ActionType:  clearValue,
 	}
-	deleteDATA.id = deleteDATA.createCacheId()
-	actionCache.add(deleteDATA.id, deleteDATA)
-	err := setEntry(dataBase, actionCache.path(deleteDATA.id), deleteDATA)
-	if err != nil && debug {
-		//addLog(3, updater.UID, "cache delete failed", map[string]interface{}{"id": id, "cacheList": c.id})
-		log.Println("failed to send cache clear req for", c.id, "on", id, err)
-	}
+	sendAction(deleteDATA)
 	delete(c.list, id)
 }
 
@@ -292,4 +291,14 @@ func startServerComms() {
 			}
 		}
 	}()
+}
+
+func sendAction(action cacheAction) {
+	action.id = action.createCacheId()
+	actionCache.add(action.id, action)
+	err := setEntry(dataBase, actionCache.path(action.id), action)
+	if err != nil && debug {
+		//addLog(3, updater.UID, "cache delete failed", map[string]interface{}{"id": id, "cacheList": c.id})
+		log.Println("failed to send cache clear req for", action.CacheListId, "on", action.ItemId, err)
+	}
 }

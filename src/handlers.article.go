@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func leakList(c *gin.Context) {
@@ -18,7 +19,7 @@ func leakList(c *gin.Context) {
 		return
 	}
 	page = int(math.Max(float64(page), 1))
-	articles, err := getAllArticles()
+	articles, err := getAllArticles(0, -1)
 	if err != nil {
 		abortWithMessage(c, http.StatusInternalServerError, err)
 		return
@@ -93,7 +94,7 @@ func archiveLeak(c *gin.Context) {
 	if err != nil && debug {
 		log.Println(err)
 	}
-	err = setEntry(dataBase, articlePathString(uid), nil)
+	err = setEntry(dataBase, articleCache.path(uid), nil)
 	if err != nil && debug {
 		log.Println(err)
 	}
@@ -145,7 +146,7 @@ func updateArticle(c *gin.Context) {
 		return
 	}
 
-	err = setEntry(dataBase, articlePathString(leak.ID), newLeak)
+	err = setEntry(dataBase, articleCache.path(leak.ID), newLeak)
 	if err != nil {
 		if debug {
 			log.Println(err)
@@ -157,5 +158,13 @@ func updateArticle(c *gin.Context) {
 	addLog(2, updater.UID, "Updated Leak",
 		map[string]interface{}{"article": leak.ID, "before": leak, "after": newLeak})
 	articleCache.delete(leak.ID)
+
+	clearData := cacheAction{
+		CacheListId: articleListCache.id,
+		ItemId:      "articles",
+		ActionType:  clearList,
+	}
+	sendAction(clearData)
+
 	c.JSON(200, map[string]string{"success": "true"})
 }
