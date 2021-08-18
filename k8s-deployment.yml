@@ -18,7 +18,6 @@ spec:
       containers:
         - name: decafans
           image: zivoy/decafans
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
           envFrom:
