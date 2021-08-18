@@ -1,9 +1,7 @@
 package main
 
 import (
-	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,61 +23,21 @@ func initializeRoutes() {
 	router.Use(setUserStatus())
 	router.Use(formatUrl())
 
-	router.NoRoute(func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
-			c.JSON(404, apiError{"error": true, "message": "Page not found"})
-		} else {
-			abortWithMessage(c, http.StatusNotFound)
-		}
-	})
+	router.NoRoute(noRouteFunc)
 
 	router.GET("/", showIndex)
 
-	router.GET("/health", func(c *gin.Context) {
-		render(c, gin.H{"pageTitle": "Server is healthy",
-			"pageSubtitle": "Server is alive!",
-			"explanation":  "There are no errors",
-		}, "Server Health", "Server is alive!", "", c.Request.URL, "health.html")
-	})
+	router.GET("/health", healthFunc)
 
-	router.GET("/readiness", func(c *gin.Context) {
-		title := "Server Readiness"
-		template := "health.html"
-		if HearRateAlive {
-			render(c, gin.H{"pageTitle": "Server is ready",
-				"pageSubtitle": "Server ready to serve",
-				"explanation":  "There are no errors",
-			}, title, "server is ready!", "", c.Request.URL, template)
-		} else {
-			render(c, gin.H{"pageTitle": "Server is not ready",
-				"pageSubtitle": "Server is having issues",
-				"explanation":  "There was an issue with the heartbeat to the database",
-				"err":          true,
-			}, title, "server is not ready!", "", c.Request.URL, template, http.StatusInternalServerError)
-		}
-	})
+	router.GET("/readiness", readinessFunc)
 
 	router.Static("/static", "./resources")
 	router.StaticFile("/favicon.png", "./resources/decafansLogoSmall.png")
 	router.StaticFile("/favicon.ico", "./resources/DecaFans-favicon.ico")
 	router.StaticFile("/robots.txt", "./resources/robots.txt")
 
-	router.GET("/official", func(c *gin.Context) {
-		render(c, gin.H{},
-			"Official DecaGear1 news page",
-			"Official news from Megadodo about the DecaGear1 headset.",
-			"",
-			c.Request.URL,
-			"official.html")
-	})
-	router.GET("/about", func(c *gin.Context) {
-		render(c, gin.H{},
-			"About",
-			"DecaFans is a site maintained and run by fans of the DecaGear1 headset to share the latest news and leaks.",
-			"",
-			c.Request.URL,
-			"about.html")
-	})
+	router.GET("/official", officialPageFunc)
+	router.GET("/about", aboutPageFunc)
 
 	userRoutes := router.Group("/u")
 	{
@@ -107,9 +65,7 @@ func initializeRoutes() {
 	admin := router.Group("/admin")
 	admin.Use(minAuthLevel(2))
 	{
-		admin.GET("/", func(c *gin.Context) {
-			c.Redirect(http.StatusPermanentRedirect, "/admin/dashboard")
-		})
+		admin.GET("/", adminRedirectFunc)
 		admin.GET("/dashboard", adminBoard)
 
 		adminApi := admin.Group("/api")
