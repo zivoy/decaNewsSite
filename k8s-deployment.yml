@@ -47,6 +47,7 @@ metadata:
   name: decafans-service
 spec:
   type: LoadBalancer
+  loadBalancerIP: 10.64.140.40
   sessionAffinity: ClientIP  # might give users a more stable experience
   ports:
     - port: 5000
