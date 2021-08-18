@@ -57,10 +57,10 @@ var articleListCache = Cache{
 }
 
 var cacheList = map[int]cacheInterface{
-	userCache.id:        userCache,
-	sessionsCache.id:    sessionsCache,
-	articleCache.id:     articleCache,
-	allowedLinkCache.id: allowedLinkCache,
+	userCache.id:        &userCache,
+	sessionsCache.id:    &sessionsCache,
+	articleCache.id:     &articleCache,
+	allowedLinkCache.id: &allowedLinkCache,
 }
 
 const ServerCommunicationEndpoint = "SERVER-COMM"
@@ -92,13 +92,13 @@ type cacheAction struct {
 	id          string
 }
 
-func (c cacheAction) createCacheId() string {
-	c.id = fmt.Sprintf("%d-%s", time.Now().Unix(), c.ItemId) // todo find out why this is broken
+func (c *cacheAction) createCacheId() string {
+	c.id = fmt.Sprintf("%d-%s", time.Now().Unix(), c.ItemId)
 	return c.id
 }
 
 func (c cacheAction) execute() {
-	targetCache := cacheList[c.CacheListId].(Cache)
+	targetCache := cacheList[c.CacheListId].(*Cache)
 	switch c.ActionType {
 	case clearValue:
 		delete(targetCache.list, c.ItemId)
@@ -173,6 +173,10 @@ func updateActionCache() {
 	}
 
 	actions, err := readEntry(dataBase, actionCache.basePath)
+	if err != nil {
+		log.Println("failed to get cache action")
+		return
+	}
 	// remove actions present locally
 	for _, v := range actionCache.list {
 		id := v.Cache.(cacheAction).id
@@ -215,7 +219,7 @@ func updateActionCache() {
 	}
 }
 
-func (c Cache) clear() {
+func (c *Cache) clear() {
 	c.list = make(CacheList)
 }
 
@@ -294,8 +298,7 @@ func startServerComms() {
 }
 
 func sendAction(action cacheAction) {
-	action.id = action.createCacheId()
-	actionCache.add(action.id, action)
+	actionCache.add(action.createCacheId(), action)
 	err := setEntry(dataBase, actionCache.path(action.id), action)
 	if err != nil && debug {
 		//addLog(3, updater.UID, "cache delete failed", map[string]interface{}{"id": id, "cacheList": c.id})
