@@ -2,10 +2,24 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+func formatUrl() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Request.URL.Host = domainBase.Host
+		c.Request.URL.Scheme = domainBase.Scheme
+	}
+}
+
+func pageLogo(c *gin.Context) string {
+	logo, _ := url.Parse(c.Request.URL.String())
+	logo.Path = "/static/DecaFans-big.png"
+	return logo.String()
+}
 
 func noRouteFunc(c *gin.Context) {
 	if strings.HasPrefix(c.Request.URL.Path, "/api/") {
