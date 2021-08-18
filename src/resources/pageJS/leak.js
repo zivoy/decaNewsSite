@@ -112,6 +112,7 @@ function startEdit() {
 
 function UpdateLeak() {
     if (editing) {
+        stopLeave = false;
         submitButton.addClass("is-loading")
         $.ajax({
             url: `/leaks/update/${id}`,
