@@ -33,6 +33,16 @@ function timeChange(field, preview) {
     return time
 }
 
+function titleChange(field, preview) {
+    let val = field.val().trim();
+    let prev = val
+    if (val.length > 60) {
+        prev = val.substring(0,59) + "…"
+    }
+    preview.html(prev)
+    return val
+}
+
 function linkChange(field, info, source, allowedLinks) {
     field.removeClass("is-danger is-success")
     info.removeClass("is-danger is-success")

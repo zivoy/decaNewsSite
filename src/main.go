@@ -2,8 +2,13 @@ package main
 
 import (
 	"context"
-	"firebase.google.com/go/db"
 	"fmt"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+
+	"firebase.google.com/go/db"
 	"github.com/Masterminds/sprig"
 	"github.com/frustra/bbcode"
 	"github.com/gin-gonic/gin"
@@ -12,10 +17,6 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/discord"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
 
 	"log"
 	"net/http"
@@ -134,6 +135,7 @@ func main() {
 	functions["makeButtonList"] = generateAuthButtons
 	functions["unescape"] = unescape
 	functions["compileBB"] = compileBBCode
+	functions["hashString"] = hashTo32
 
 	router.SetFuncMap(functions)
 

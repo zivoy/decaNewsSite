@@ -127,6 +127,9 @@ func updateArticle(c *gin.Context) {
 	if leakTime == "" {
 		leakTime = strconv.Itoa(int(leak.LeakTime))
 	}
+	if title == "" {
+		title = fmt.Sprintf("DecaLeak %d", hashTo32(leakID))
+	}
 
 	// nothing was changed
 	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != leakTime ||
@@ -134,7 +137,7 @@ func updateArticle(c *gin.Context) {
 		return
 	}
 
-	newLeak, code := leakSanitization(leak.Title, description, leakTime, imageUrl, sourceUrl,
+	newLeak, code := leakSanitization(title, description, leakTime, imageUrl, sourceUrl,
 		getUser(leak.ReporterUid), updater, leak.DateCreate, time.Now().Unix())
 	newLeak.ID = leak.ID
 	switch code {

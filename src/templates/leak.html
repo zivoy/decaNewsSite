@@ -38,7 +38,7 @@
                 </div>
                 <div class="level-right">
                     <div class="box">
-                        <b>
+                        <b id="leakTitle">
                             {{.payload.Title}}
                         </b>
                     </div>
@@ -128,6 +128,7 @@
     let image = "{{.payload.ImageUrl}}";
     let time = new Date(parseInt("{{.payload.LeakTime}}"));
     let title = "{{.payload.Title}}"
+    const dTitle = "DecaLeak {{.payload.ID | hashString}}"
     const id = "{{.payload.ID}}"
 </script>
 <script defer src="/static/leakPostFunctions.js">

@@ -241,6 +241,7 @@ func leakSanitization(title, description, rawTime, imageUrl, sourceUrl string, r
 	summery = cleanRepeatedEnter(cleanRepeatedSpace(summery))
 	summery = clip(strings.Trim(summery, "\n "), 200)
 
+	title = strings.Trim(title, " ")
 	title = clip(title, 60)
 
 	leak := article{

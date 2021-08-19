@@ -25,6 +25,14 @@ function startEdit() {
     $("#leakBody").html($(`
             <fieldset>
                 <div class="field">
+                    <label class="label">Leak Title</label>
+                    <div class="control">
+                        <input id="title" name="title" class="input" type="text" placeholder="${dTitle}"
+                               value="${title}">
+                    </div>
+                </div>
+            
+                <div class="field">
                     <label class="label">Leak Description</label>
                     <div class="control">
                         <textarea id="leak" name="leak" class="textarea"
@@ -68,6 +76,7 @@ function startEdit() {
 
     editing = true;
 
+    const inputTitle = $("input#title");
     const inputTime = $("input#leakTime");
     const inputLink = $("input#link");
     const linkInfo = $("p#linkInfo");
@@ -75,6 +84,11 @@ function startEdit() {
     const inputImage = $("input#image");
 
     submitButton = $("button#saveEdit");
+
+    inputTitle.on("input", () => {
+        title = titleChange(inputTitle, $("b#leakTitle"));
+        formReady();
+    });
 
     inputTime.change(() => {
         time = timeChange(inputTime);
