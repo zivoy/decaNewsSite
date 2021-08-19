@@ -86,7 +86,7 @@ function startEdit() {
     submitButton = $("button#saveEdit");
 
     inputTitle.on("input", () => {
-        title = titleChange(inputTitle, $("b#leakTitle"));
+        title = titleChange(inputTitle, $("b#leakTitle"), dTitle);
         formReady();
     });
 

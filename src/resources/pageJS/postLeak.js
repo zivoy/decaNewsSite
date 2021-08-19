@@ -60,7 +60,7 @@ $(document).ready(function () {
     })
 
     inputTitle.on("input", () => {
-        title = titleChange(inputTitle, $("b#leakTitle"));
+        title = titleChange(inputTitle, $("b#leakTitle"), "DecaLeak ##########");
         formReady();
     });
 });

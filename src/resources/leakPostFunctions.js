@@ -33,12 +33,14 @@ function timeChange(field, preview) {
     return time
 }
 
-function titleChange(field, preview) {
+function titleChange(field, preview, def = "") {
     let val = field.val().trim();
     let prev = val
     if (val.length > 60) {
-        prev = val.substring(0,59) + "…"
+        prev = val.substring(0, 59) + "…"
     }
+    if (val === "")
+        prev = def
     preview.html(prev)
     return val
 }
