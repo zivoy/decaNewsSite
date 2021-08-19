@@ -67,7 +67,11 @@
                         {{end}}
                         <div class="media-content" style="min-width: 170px;">
                             <div class="content">
-                                <a href="/leaks/leak/{{.ID}}">{{.Summary | replace "\n" "<br>" | unescape}}</a>
+                                <a href="/leaks/leak/{{.ID}}">
+                                    <strong>{{.Title}}</strong>
+                                    <br>
+                                    {{.Summary | replace "\n" "<br>" | unescape}}
+                                </a>
                             </div>
                         </div>
                     </article>
@@ -105,8 +109,7 @@
 
 <script>
     const articlesAmount = {{ .amount }}
-        let
-    currPage = {{ .page }}
+    let currPage = {{ .page }}
 </script>
 
 <script src="/static/convertTime.js"></script>
