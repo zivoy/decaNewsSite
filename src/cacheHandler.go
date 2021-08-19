@@ -61,6 +61,7 @@ var cacheList = map[int]cacheInterface{
 	sessionsCache.id:    &sessionsCache,
 	articleCache.id:     &articleCache,
 	allowedLinkCache.id: &allowedLinkCache,
+	articleListCache.id: &articleListCache,
 }
 
 const ServerCommunicationEndpoint = "SERVER-COMM"
