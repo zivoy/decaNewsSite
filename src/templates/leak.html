@@ -70,17 +70,19 @@
                                                 {{- $user := getUser .payload.ReporterUid -}}
                                                 {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
                                     </div>
-                                    <hr class="dropdown-divider">
-                                    <div class="dropdown-item">
-                                        <strong>
-                                            <time datetime="{{.payload.DateEdit}}000"></time>
-                                        </strong>
-                                    </div>
-                                    <div class="dropdown-item">
-                                        Edited by <strong><a href="/u/profile/{{ .payload.EditedBy }}">
-                                                {{- $editor := getUser .payload.EditedBy -}}
-                                                {{$editor.Username}}#{{$editor.UserDiscriminator}}</a></strong>
-                                    </div>
+                                    {{ if .payload.EditedBy }}
+                                        <hr class="dropdown-divider">
+                                        <div class="dropdown-item">
+                                            <strong>
+                                                <time datetime="{{.payload.DateEdit}}000"></time>
+                                            </strong>
+                                        </div>
+                                        <div class="dropdown-item">
+                                            Edited by <strong><a href="/u/profile/{{ .payload.EditedBy }}">
+                                                    {{- $editor := getUser .payload.EditedBy -}}
+                                                    {{$editor.Username}}#{{$editor.UserDiscriminator}}</a></strong>
+                                        </div>
+                                    {{ end }}
                                 </div>
                             </div>
                         </div>
