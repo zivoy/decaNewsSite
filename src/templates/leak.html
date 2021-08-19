@@ -37,14 +37,14 @@
                     </a>
                 </div>
                 <div class="level-right">
-                    <div class="box">
+                    <div class="box level-item">
                         <b id="leakTitle">
                             {{.payload.Title}}
                         </b>
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card" style="overflow: visible">
                 <div class="card-content">
                     <div class="content" id="leakBody">
                         <p>
@@ -54,11 +54,11 @@
                         <span> - </span>
                         <div class="dropdown is-hoverable">
                             <div class="dropdown-trigger">
-                                <a class="is-ghost" aria-haspopup="true" aria-controls="dropdown-menu">
+                                <a aria-haspopup="true" aria-controls="info-dropdown">
                                     <span><strong>leak info</strong></span>
                                 </a>
                             </div>
-                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                            <div class="dropdown-menu" id="info-dropdown" role="info">
                                 <div class="dropdown-content">
                                     <div class="dropdown-item">
                                         <strong>
