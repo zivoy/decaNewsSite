@@ -211,6 +211,7 @@ func createNewLeak(title, description, rawTime, imageUrl, sourceUrl string, repo
 		ActionType:  clearList,
 	}
 	sendAction(clearData)
+	articleListCache.clear()
 
 	return leak, nil
 }

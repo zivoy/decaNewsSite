@@ -168,6 +168,7 @@ func updateArticle(c *gin.Context) {
 		ActionType:  clearList,
 	}
 	sendAction(clearData)
+	articleListCache.clear()
 
 	c.JSON(200, map[string]string{"success": "true"})
 }
