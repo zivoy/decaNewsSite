@@ -52,20 +52,19 @@
                         </p>
                         <time datetime="{{.payload.LeakTime}}"></time>
                         <span> - </span>
-                        <div class="dropdown is-hoverable">
+                        <div class="dropdown is-hoverable {{- if not .payload.ImageUrl}} is-up{{end}}">
                             <div class="dropdown-trigger">
                                 <a aria-haspopup="true" aria-controls="info-dropdown">
                                     <span><strong>leak info</strong></span>
                                 </a>
                             </div>
-                            <div class="dropdown-menu" id="info-dropdown" role="info">
+                            <div class="dropdown-menu" id="info-dropdown" role="menu">
                                 <div class="dropdown-content">
                                     <div class="dropdown-item">
                                         <strong>
                                             <time datetime="{{.payload.DateCreate}}000"></time>
                                         </strong>
-                                    </div>
-                                    <div class="dropdown-item">
+                                        <br>
                                         created by <strong><a href="/u/profile/{{ .payload.ReporterUid }}">
                                                 {{- $user := getUser .payload.ReporterUid -}}
                                                 {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
@@ -76,8 +75,7 @@
                                             <strong>
                                                 <time datetime="{{.payload.DateEdit}}000"></time>
                                             </strong>
-                                        </div>
-                                        <div class="dropdown-item">
+                                            <br>
                                             Edited by <strong><a href="/u/profile/{{ .payload.EditedBy }}">
                                                     {{- $editor := getUser .payload.EditedBy -}}
                                                     {{$editor.Username}}#{{$editor.UserDiscriminator}}</a></strong>
