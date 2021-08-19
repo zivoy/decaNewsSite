@@ -36,6 +36,13 @@
                         </span>
                     </a>
                 </div>
+                <div class="level-right">
+                    <div class="box">
+                        <b>
+                            {{.payload.Title}}
+                        </b>
+                    </div>
+                </div>
             </div>
             <div class="card">
                 <div class="card-content">
@@ -45,9 +52,38 @@
                         </p>
                         <time datetime="{{.payload.LeakTime}}"></time>
                         <span> - </span>
-                        <strong><a href="/u/profile/{{ .payload.ReporterUid }}">
-                                {{- $user := getUser .payload.ReporterUid -}}
-                                {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
+                        <div class="dropdown is-hoverable">
+                            <div class="dropdown-trigger">
+                                <a class="is-ghost" aria-haspopup="true" aria-controls="dropdown-menu">
+                                    <span><strong>leak info</strong></span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">
+                                        <strong>
+                                            <time datetime="{{.payload.DateCreate}}000"></time>
+                                        </strong>
+                                    </div>
+                                    <div class="dropdown-item">
+                                        created by <strong><a href="/u/profile/{{ .payload.ReporterUid }}">
+                                                {{- $user := getUser .payload.ReporterUid -}}
+                                                {{$user.Username}}#{{$user.UserDiscriminator}}</a></strong>
+                                    </div>
+                                    <hr class="dropdown-divider">
+                                    <div class="dropdown-item">
+                                        <strong>
+                                            <time datetime="{{.payload.DateEdit}}000"></time>
+                                        </strong>
+                                    </div>
+                                    <div class="dropdown-item">
+                                        Edited by <strong><a href="/u/profile/{{ .payload.EditedBy }}">
+                                                {{- $editor := getUser .payload.EditedBy -}}
+                                                {{$editor.Username}}#{{$editor.UserDiscriminator}}</a></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <span> - </span>
                         {{if .payload.SourceLink}}
                             <a target="_blank" href="{{.payload.SourceLink}}" rel="noopener">Source</a>
@@ -91,6 +127,7 @@
     let link = "{{.payload.SourceLink}}";
     let image = "{{.payload.ImageUrl}}";
     let time = new Date(parseInt("{{.payload.LeakTime}}"));
+    let title = "{{.payload.Title}}"
     const id = "{{.payload.ID}}"
 </script>
 <script defer src="/static/leakPostFunctions.js">

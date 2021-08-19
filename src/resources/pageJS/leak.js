@@ -122,7 +122,7 @@ function UpdateLeak() {
                 time: time.getTime(),
                 image_url: image,
                 source_url: link,
-                title: ""
+                title: title
             },
             success: function () {
                 submitButton.removeClass("is-loading")
