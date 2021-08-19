@@ -97,10 +97,12 @@ async function imageChange(field, previewImage) {
     }
 
     let done = false
+    let valid = false
 
     if (val !== "") {
         isValidImageUrl(val, function (result) {
             if (result) {
+                valid = true
                 field.removeClass("is-danger")
                 previewImage.attr("src", val)
                 container.removeClass("is-hidden")
@@ -116,7 +118,8 @@ async function imageChange(field, previewImage) {
     await new Promise(r => {
         let timeout = () => {
             if (done) {
-                r()
+                if (valid)
+                    r()
             } else {
                 setTimeout(timeout, 10)
             }

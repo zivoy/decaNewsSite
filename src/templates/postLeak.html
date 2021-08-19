@@ -5,7 +5,7 @@
 {{if .publishSuccess}}
     <div class="notification is-success">
         <p class="title">Success</p>
-        <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakId}}</a></p>
+        <p>your leak can now be found at <a href="{{.payload.leakUrl}}">{{.payload.leakTitle}}</a></p>
     </div>
 {{end}}
 {{if .errorPublishing}}
@@ -20,6 +20,14 @@
     <div class="column is-half">
         <div class="box is-info has-text-centered">
             <fieldset>
+                <div class="field">
+                    <label class="label">Leak Title</label>
+                    <div class="control">
+                        <input id="title" name="title" class="input" type="text"
+                               placeholder="Defaults to 'DecaLeak ##########'">
+                    </div>
+                </div>
+
                 <div class="field">
                     <label class="label">Leak Description</label>
                     <div class="control">
@@ -78,14 +86,42 @@
         </div>
     </div>
     <div id="preview" class="column is-invisible is-hidden-touch">
-        <div class="card">
+        <div class="level mb-2">
+            <div class="level-left">
+            </div>
+            <div class="level-right">
+                <div class="box level-item">
+                    <b id="leakTitle">
+                        DecaLeak ##########
+                    </b>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="overflow: visible">
             <div class="card-content">
                 <div class="content">
                     <p id="leakPreview">
                     </p>
                     <time id="timeToSet" datetime=""></time>
                     <span> - </span>
-                    <strong>{{.user.Username}}#{{ .user.UserDiscriminator }}</strong>
+                    <div class="dropdown is-hoverable is-up">
+                        <div class="dropdown-trigger">
+                            <a class="is-ghost" aria-haspopup="true" aria-controls="info-dropdown">
+                                <span><strong>leak info</strong></span>
+                            </a>
+                        </div>
+                        <div class="dropdown-menu" id="info-dropdown" role="menu">
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">
+                                    <strong>
+                                        <time datetime="{{now | unixEpoch}}000"></time>
+                                    </strong>
+                                    <br>
+                                    created by <strong><a>{{.user.Username}}#{{ .user.UserDiscriminator }}</a></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <span> - </span>
                     <a id="source" target="_blank" class="has-text-danger" rel="noopener">Source</a>
                 </div>
@@ -107,7 +143,15 @@
     let Link = "";
     let Leak = "";
     let Image = "";
-    let Title = ""
+    let Title = "";
+
+    function canLinkLess() {
+        //{{ if ge .user.AuthLevel $linkLess }}
+        return true;
+        //{{ else }}
+        return Link;
+        //{{ end }}
+    }
 
     //const postError = "true" === "{{.errorPublishing}}"
     //const postSuccess = "true" === "{{.publishSuccess}}"
@@ -135,6 +179,7 @@
             inputLink.val(Link);
             inputLeak.val(Leak);
             inputImage.val(Image);
+            inputTitle.val(Title);
 
             LeakTime = timeChange(inputTime, $("time#timeToSet"));
             Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);
@@ -142,8 +187,10 @@
                 return BBCodeParser.process(val.replaceAll("\n", "<br>"))
             });
             imageChange(inputImage, $("img#previewImage")).then(r => {
+                $("div.dropdown").removeClass("is-up")
                 Image = r
             });
+            title = titleChange(inputTitle, $("b#leakTitle"));
             formReady();
         });
 

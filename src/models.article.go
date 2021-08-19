@@ -308,7 +308,7 @@ func createArticle(c *gin.Context) {
 		}
 		render(c, gin.H{"status": "success",
 			"payload": map[string]interface{}{
-				"leakId":        a.ID,
+				"leakTitle":     a.Title,
 				"leakUrl":       leakLocation.String(), //c.Request.URL.Scheme, c.Request.URL.Host,
 				"leak":          a,
 				"allowed_links": allowedLinksForUserContext(c),

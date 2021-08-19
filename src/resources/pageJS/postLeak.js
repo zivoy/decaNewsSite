@@ -22,6 +22,7 @@ const submitButton = $("button#submit");
 const inputLeak = $("textarea#leak");
 const inputImage = $("input#image");
 const preview = $("div#preview");
+const inputTitle = $("input#title");
 
 LeakTime.setSeconds(0);
 LeakTime.setMilliseconds(0);
@@ -31,19 +32,16 @@ $(document).ready(function () {
     setTimeVal(inputTime, LeakTime);
 
     inputTime.change(() => {
-        preview.removeClass("is-invisible");
         LeakTime = timeChange(inputTime, $("time#timeToSet"));
         formReady();
     });
 
     inputLink.on("input", () => {
-        preview.removeClass("is-invisible");
         Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);
         formReady();
     });
 
     inputLeak.on("input", () => {
-        preview.removeClass("is-invisible");
         Leak = leakChange(inputLeak, $("p#leakPreview"),
             val => {
                 return BBCodeParser.process(val.replaceAll("\n", "<br>"))
@@ -52,29 +50,32 @@ $(document).ready(function () {
     })
 
     inputImage.on("input", () => {
-        preview.removeClass("is-invisible");
+        Image = "";
+        $("div.dropdown").addClass("is-up");
         imageChange(inputImage, $("img#previewImage")).then(r => {
             Image = r
+            $("div.dropdown").removeClass("is-up")
         });
         formReady();
     })
+
+    inputTitle.on("input", () => {
+        title = titleChange(inputTitle, $("b#leakTitle"));
+        formReady();
+    });
 });
 
 function formReady() {
+    preview.removeClass("is-invisible");
     stopLeave = true;
     submitButton.prop("disabled", true);
-    let linkValid =
-        //{{ if ge .user.AuthLevel $linkLess }}
-        true;
-    //{{else}}
-    Link;
-    //{{end}}
-    if (Leak && LeakTime && User && linkValid) {
+    if (Leak && LeakTime && User && canLinkLess()) {
         submitButton.prop("disabled", false);
     }
 }
 
 function post() {
+    stopLeave = false;
     let form = $('<form></form>');
 
     form.attr("method", "post");
@@ -86,7 +87,7 @@ function post() {
         time: LeakTime.getTime(),
         image_url: Image,
         source_url: Link,
-        title: ""
+        title: Title
     }, function (key, value) {
         let field = $('<input/>');
         field.attr("type", "hidden");
@@ -98,6 +99,5 @@ function post() {
 
     $(document.body).append(form);
     form.submit();
-    stopLeave = false;
 }
 
