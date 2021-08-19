@@ -105,6 +105,12 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cacheFS = CacheImageFs(pwd)
+
 	discordRedirect := confMap["REDIRECT"]
 	domainBase, err = url.Parse(discordRedirect)
 	if err != nil {
