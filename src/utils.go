@@ -12,6 +12,7 @@ import (
 )
 
 var tagRegex = regexp.MustCompile(`<.*?>`)
+var bbExclude = regexp.MustCompile(`<bbexclude>.*?</bbexclude>`)
 
 func clip(input string, maxLength int) string {
 	if len(input) > maxLength {
@@ -38,6 +39,7 @@ func unescape(s string) template.HTML {
 }
 
 func stripHtmlRegex(s string) string {
+	s = bbExclude.ReplaceAllString(s, "")
 	return tagRegex.ReplaceAllString(s, "")
 }
 
@@ -111,11 +113,16 @@ func initBBCode(compiler *bbcode.Compiler) {
 		source.Attrs["src"] = src
 		source.Attrs["type"] = "video/mp4"
 		videoFrame.AppendChild(source)
+
+		exclude := bbcode.NewHTMLTag("")
+		exclude.Name = "bbexclude"
+
 		warn := bbcode.NewHTMLTag("")
 		warn.Name = "strong"
 		warn.Attrs["class"] = "has-text-danger is-underlined"
 		warn.AppendChild(bbcode.NewHTMLTag("Your browser does not support the video tag."))
-		videoFrame.AppendChild(warn)
+		exclude.AppendChild(warn)
+		videoFrame.AppendChild(exclude)
 
 		out := bbcode.NewHTMLTag("")
 		out.Name = "figure"
