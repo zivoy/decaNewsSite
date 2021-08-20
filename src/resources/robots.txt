@@ -8,3 +8,4 @@ Disallow: /official
 
 Allow: /
 Allow: /u/profile/*
+Allow: /api/v1/image
