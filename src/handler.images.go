@@ -97,9 +97,11 @@ func getImage(url string, width, height int) (string, error) {
 			return "", err
 		}
 
+		var imgPath string
+
 		for _, f := range images {
 			if strings.Contains(f.Name(), originalImage) {
-				imgPath := filepath.Join(path, f.Name())
+				imgPath = filepath.Join(path, f.Name())
 
 				if sizeRequested == originalImage {
 					return imgPath, nil
@@ -121,17 +123,18 @@ func getImage(url string, width, height int) (string, error) {
 		} else if height == 0 {
 			X, Y = getSize(boundNumber(height, 0, Y), X, Y)
 		}
-		sizeRequested = fmt.Sprintf("%dx%d", X, Y)
 
+		// original dimensions requested, dont make a new image
+		if X == size.X && Y == size.Y {
+			return imgPath, nil
+		}
+
+		// look for if the image exists
+		sizeRequested = fmt.Sprintf("%dx%d", X, Y)
 		for _, f := range images {
 			if strings.Contains(f.Name(), sizeRequested) {
 				return filepath.Join(path, f.Name()), nil
 			}
-		}
-
-		// dont try to resize gifs
-		if format == "gif" {
-			return getImage(url, 0, 0)
 		}
 	}
 
