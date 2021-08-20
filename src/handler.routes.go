@@ -66,10 +66,18 @@ func noRouteFunc(c *gin.Context) {
 }
 
 func healthFunc(c *gin.Context) {
-	render(c, gin.H{"pageTitle": "Server is healthy",
-		"pageSubtitle": "Server is alive!",
-		"explanation":  "There are no errors",
-	}, "Server Health", "Server is alive!", "", c.Request.URL, "health.html")
+	if serverHealthy {
+		render(c, gin.H{"pageTitle": "Server is healthy",
+			"pageSubtitle": "Server is alive!",
+			"explanation":  "There are no errors",
+		}, "Server Health", "Server is alive!", "", c.Request.URL, "health.html")
+	} else {
+		render(c, gin.H{"pageTitle": "Server is unhealthy",
+			"pageSubtitle": "Server is dying",
+			"explanation":  "The Cache folder got too big",
+			"err":          true,
+		}, "Server Health", "Server is dead!", "", c.Request.URL, "health.html")
+	}
 }
 
 func readinessFunc(c *gin.Context) {

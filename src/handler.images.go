@@ -24,7 +24,7 @@ import (
 
 //const defaultTo = "resources/DecaFans-big.png"
 
-// todo delete this folder from time to time
+const imageDirMaxSize = 300 * (1 << (10 * 2)) // megabytes
 const imageDir = "cacheImages"
 const originalImage = "original"
 
@@ -147,6 +147,14 @@ func getImage(url string, width, height int) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// restart the server once the cache folder gets too big to clear it
+	cacheDirSize, _ := DirSize(imageDir)
+	if cacheDirSize > imageDirMaxSize {
+		log.Println("cache folder got too big")
+		serverHealthy = false
+	}
+
 	return imgPath, nil
 }
 
@@ -282,4 +290,18 @@ func decodeImage(f io.Reader) (img image.Image, format string, err error) {
 func getSize(target, sizeAdjust, setSize int) (adjustedValue int, setValue int) {
 	newSize := target * sizeAdjust / setSize
 	return newSize & -1, target
+}
+
+func DirSize(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
 }

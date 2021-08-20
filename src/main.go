@@ -41,6 +41,7 @@ var version string
 
 var ServerComms bool   // for turning off the heartbeat routine
 var HearRateAlive bool // to know if the server can reach the database
+var serverHealthy = true
 
 var authorities = map[int]string{
 	0: "Browser",
