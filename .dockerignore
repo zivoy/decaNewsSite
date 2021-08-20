@@ -3,6 +3,7 @@ pkg/
 .idea/
 src/conf/
 src/.env
+src/cacheImages
 docker.env
 
 .gitignore
