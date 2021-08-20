@@ -23,12 +23,14 @@ function timeChange(field, preview) {
     let time;
     try {
         time = new Date(field.val());
-        preview.attr("datetime", time.toISOString());
+        if (preview !== undefined)
+            preview.attr("datetime", time.toISOString());
         fixTime()
     } catch (err) {
         field.addClass("is-danger")
         time = null
-        preview.text("invalid date")
+        if (preview !== undefined)
+            preview.text("invalid date")
     }
     return time
 }
@@ -41,7 +43,8 @@ function titleChange(field, preview, def = "") {
     }
     if (val === "")
         prev = def
-    preview.html(prev)
+    if (preview !== undefined)
+        preview.html(prev)
     return val
 }
 
@@ -78,7 +81,8 @@ function leakChange(field, preview, processor) {
     if (val === "") {
         field.addClass("is-danger")
     }
-    preview.html(processor(val))
+    if (preview !== undefined)
+        preview.html(processor(val))
     return val
 }
 
@@ -106,10 +110,12 @@ async function imageChange(field, previewImage) {
             if (result) {
                 valid = true
                 field.removeClass("is-danger")
-                previewImage.attr("src", val)
+                if (previewImage !== undefined)
+                    previewImage.attr("src", val)
                 container.removeClass("is-hidden")
             } else {
-                previewImage.attr("src", "")
+                if (previewImage !== undefined)
+                    previewImage.attr("src", "")
                 container.addClass("is-hidden")
                 field.addClass("is-danger")
                 val = ""

@@ -146,6 +146,7 @@ func updateArticle(c *gin.Context) {
 	case 2:
 	case 3:
 	case 4:
+		log.Println("failed updating with code ", code)
 		abortWithMessage(c, 406)
 		return
 	}
