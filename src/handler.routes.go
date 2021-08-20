@@ -18,7 +18,29 @@ func formatUrl() gin.HandlerFunc {
 func pageLogo(c *gin.Context) string {
 	logo, _ := url.Parse(c.Request.URL.String())
 	logo.Path = "/static/DecaFans-big.png"
-	return logo.String()
+	return imagePath(c, parseUrlValues(urlValues{"url": logo.String()}))
+}
+
+type urlValues map[string]string
+
+func parseUrlValues(values map[string]string) url.Values {
+	r := url.Values{}
+	for k, v := range values {
+		r.Add(k, v)
+	}
+	return r
+}
+
+func imagePath(c *gin.Context, options ...url.Values) string {
+	images, _ := url.Parse(c.Request.URL.String())
+	images.Path = "/api/v1/image"
+	images.RawQuery = ""
+
+	if len(options) > 0 {
+		images.RawQuery = options[0].Encode()
+	}
+
+	return images.String()
 }
 
 func noRouteFunc(c *gin.Context) {

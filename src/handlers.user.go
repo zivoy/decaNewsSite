@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth/gothic"
-	"net/http"
 )
 
 //todo have reload also use refresh token
@@ -71,7 +72,7 @@ func userProfile(c *gin.Context) {
 		}},
 			title,
 			fmt.Sprintf("%s#%s - %s", user.Username, user.UserDiscriminator, authorityLevel(user.AuthLevel)),
-			user.AvatarUrl,
+			imagePath(c, parseUrlValues(urlValues{"url": user.AvatarUrl})),
 			c.Request.URL,
 			"profile.html")
 	} else {

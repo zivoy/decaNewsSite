@@ -57,8 +57,9 @@ func getArticle(c *gin.Context) {
 		// Call the HTML method of the Context to render a template
 		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)},
 			article.Title,
-			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "), article.ImageUrl, c.Request.URL,
-			"leak.html")
+			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "),
+			imagePath(c, parseUrlValues(urlValues{"id": article.ID})),
+			c.Request.URL, "leak.html")
 	} else {
 		// If the article is not found, abort with an error
 		abortWithMessage(c, http.StatusNotFound, err)

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -73,11 +74,12 @@ func apiV1ImageFunc(c *gin.Context) {
 	var path string
 
 	// url was provided
-	if url, ok := c.GetQuery("url"); ok {
-		path, err = getImage(url, width, height)
+	if imageUrl, ok := c.GetQuery("url"); ok {
+		imageUrl, _ = url.QueryUnescape(imageUrl)
+		path, err = getImage(imageUrl, width, height)
 		if err != nil {
 			log.Println(err)
-			c.JSON(http.StatusBadRequest, getApiError("'"+url+"' is invalid"))
+			c.JSON(http.StatusBadRequest, getApiError("'"+imageUrl+"' is invalid"))
 			return
 		}
 	}
