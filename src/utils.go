@@ -89,6 +89,38 @@ func initBBCode(compiler *bbcode.Compiler) {
 		node.Children = make([]*bbcode.BBCodeNode, 0)
 		return out, true
 	})
+
+	// video tag
+	compiler.SetTag("video", func(node *bbcode.BBCodeNode) (*bbcode.HTMLTag, bool) {
+		videoFrame := bbcode.NewHTMLTag("")
+		videoFrame.Name = "video"
+		//videoFrame.Attrs["style"] = "height:max(225px,100%); width:min(100%,400px);"
+		videoFrame.Attrs["controls"] = "true"
+		value := node.GetOpeningTag().Value
+		var src string
+		if value == "" {
+			text := bbcode.CompileText(node)
+			if len(text) > 0 {
+				src = strings.ReplaceAll(text, "javascript:", "")
+			}
+		} else {
+			src = strings.ReplaceAll(value, "javascript:", "")
+		}
+		source := bbcode.NewHTMLTag("")
+		source.Name = "source"
+		source.Attrs["src"] = src
+		source.Attrs["type"] = "video/mp4"
+		videoFrame.AppendChild(source)
+
+		out := bbcode.NewHTMLTag("")
+		out.Name = "figure"
+
+		out.Attrs["class"] = "image is-disable-16by9"
+		out.AppendChild(videoFrame)
+
+		node.Children = make([]*bbcode.BBCodeNode, 0)
+		return out, true
+	})
 }
 
 var _repeatedEnter = regexp.MustCompile(`\n\n+`)
