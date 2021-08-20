@@ -98,6 +98,13 @@ func apiV1ImageFunc(c *gin.Context) {
 		}
 	}
 
+	// gif
+	_, err = url.ParseRequestURI(path)
+	if err == nil {
+		c.Redirect(http.StatusTemporaryRedirect, path)
+		return
+	}
+
 	if path != "" {
 		c.FileFromFS(path, http.FS(cacheFS))
 		return

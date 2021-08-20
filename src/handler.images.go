@@ -44,7 +44,6 @@ func (c CacheImageFs) Open(name string) (fs.File, error) {
 var cacheFS CacheImageFs
 
 // put 0 in width or height for default / auto-scale
-// url can be a path
 func getImage(url string, width, height int) (string, error) {
 	name := getImageName(url)
 
@@ -65,13 +64,16 @@ func getImage(url string, width, height int) (string, error) {
 		}
 		// get new image
 		img, format, err = fetchImage(url)
-		if err != nil {
+		if err != nil || format == "gif" {
 			if err == image.ErrFormat {
 				log.Println("bad format", url)
 			}
 			errRem := os.Remove(path)
 			if errRem != nil {
 				return "", errRem
+			}
+			if format == "gif" {
+				return url, nil
 			}
 			return "", err
 		}
@@ -239,10 +241,20 @@ func loadImage(path string) (img image.Image, format string, err error) {
 }
 
 func decodeImage(f io.Reader) (img image.Image, format string, err error) {
-	img, format, err = image.Decode(f)
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(f)
 	if err != nil {
 		return nil, "", err
 	}
-	//https://stackoverflow.com/a/54210633 for gifs
+	contentType := http.DetectContentType(buf.Bytes())
+	if contentType == "image/gif" {
+		return nil, "gif", nil
+		//https://stackoverflow.com/a/54210633 for gifs
+	} else {
+		img, format, err = image.Decode(buf)
+		if err != nil {
+			return nil, "", err
+		}
+	}
 	return img, format, err
 }
