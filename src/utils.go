@@ -111,6 +111,11 @@ func initBBCode(compiler *bbcode.Compiler) {
 		source.Attrs["src"] = src
 		source.Attrs["type"] = "video/mp4"
 		videoFrame.AppendChild(source)
+		warn := bbcode.NewHTMLTag("")
+		warn.Name = "strong"
+		warn.Attrs["class"] = "has-text-danger is-underlined"
+		warn.AppendChild(bbcode.NewHTMLTag("Your browser does not support the video tag."))
+		videoFrame.AppendChild(warn)
 
 		out := bbcode.NewHTMLTag("")
 		out.Name = "figure"
