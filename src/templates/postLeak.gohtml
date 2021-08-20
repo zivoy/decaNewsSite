@@ -1,5 +1,5 @@
-<!--Embed the header.html template at this location-->
-{{ template "header.html" .}}
+<!--Embed the header.gohtml template at this location-->
+{{ template "header.gohtml" .}}
 {{$linkLess := .linkLessAuthLevel }}
 
 {{if .publishSuccess}}
@@ -203,5 +203,5 @@
 {{end}}
 
 
-<!--Embed the footer.html template at this location-->
-{{ template "footer.html" .}}
+<!--Embed the footer.gohtml template at this location-->
+{{ template "footer.gohtml" .}}

@@ -46,7 +46,7 @@ func adminBoard(c *gin.Context) {
 		"place to administrate all the things.",
 		"",
 		c.Request.URL,
-		"adminDashboard.html")
+		"adminDashboard.gohtml")
 
 }
 

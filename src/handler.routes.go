@@ -67,7 +67,7 @@ func noRouteFunc(c *gin.Context) {
 
 func healthFunc(c *gin.Context) {
 	title := "Server Health"
-	template := "health.html"
+	template := "health.gohtml"
 	if serverHealthy {
 		render(c, gin.H{"pageTitle": "Server is healthy",
 			"pageSubtitle": "Server is alive!",
@@ -84,7 +84,7 @@ func healthFunc(c *gin.Context) {
 
 func readinessFunc(c *gin.Context) {
 	title := "Server Readiness"
-	template := "health.html"
+	template := "health.gohtml"
 	if HearRateAlive {
 		render(c, gin.H{"pageTitle": "Server is ready",
 			"pageSubtitle": "Server ready to serve",
@@ -105,7 +105,7 @@ func officialPageFunc(c *gin.Context) {
 		"Official news from Megadodo about the DecaGear1 headset.",
 		"",
 		c.Request.URL,
-		"official.html")
+		"official.gohtml")
 }
 
 func aboutPageFunc(c *gin.Context) {
@@ -114,7 +114,7 @@ func aboutPageFunc(c *gin.Context) {
 		"DecaFans is a site maintained and run by fans of the DecaGear1 headset to share the latest news and leaks.",
 		"",
 		c.Request.URL,
-		"about.html")
+		"about.gohtml")
 }
 
 func adminRedirectFunc(c *gin.Context) {

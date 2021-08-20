@@ -31,7 +31,7 @@ func leakList(c *gin.Context) {
 		"List of the latest DecaLeaks.",
 		"",
 		c.Request.URL,
-		"leakList.html")
+		"leakList.gohtml")
 
 }
 
@@ -45,7 +45,7 @@ func showIndex(c *gin.Context) {
 		"DecaFans is a news page run and maintained by fans of the DecaGear1 headset to help getting all the latest information.",
 		"",
 		c.Request.URL,
-		"index.html")
+		"index.gohtml")
 
 }
 
@@ -59,7 +59,7 @@ func getArticle(c *gin.Context) {
 			article.Title,
 			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "),
 			imagePath(c, parseUrlValues(urlValues{"id": article.ID})),
-			c.Request.URL, "leak.html")
+			c.Request.URL, "leak.gohtml")
 	} else {
 		// If the article is not found, abort with an error
 		abortWithMessage(c, http.StatusNotFound, err)
@@ -74,7 +74,7 @@ func showArticleCreationPage(c *gin.Context) {
 		"Share a new DecaLeak",
 		"",
 		c.Request.URL,
-		"postLeak.html")
+		"postLeak.gohtml")
 }
 
 func archiveLeak(c *gin.Context) {

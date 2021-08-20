@@ -318,7 +318,7 @@ func createArticle(c *gin.Context) {
 			"Share a new DecaLeak",
 			"",
 			c.Request.URL,
-			"postLeak.html", http.StatusCreated)
+			"postLeak.gohtml", http.StatusCreated)
 	} else {
 		// error
 		if debug {
@@ -339,6 +339,6 @@ func createArticle(c *gin.Context) {
 			"Share a new DecaLeak",
 			"",
 			c.Request.URL,
-			"postLeak.html")
+			"postLeak.gohtml")
 	}
 }

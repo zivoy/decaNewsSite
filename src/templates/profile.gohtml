@@ -1,5 +1,5 @@
-<!--Embed the header.html template at this location-->
-{{ template "header.html" .}}
+<!--Embed the header.gohtml template at this location-->
+{{ template "header.gohtml" .}}
 {{$viewing:=.payload.user}}
 {{$viewer:=.user}}
 
@@ -100,4 +100,4 @@
 <script src="/static/convertTime.js"></script>
 <script src="/static/pageJS/profile.js"></script>
 
-{{ template "footer.html" .}}
+{{ template "footer.gohtml" .}}

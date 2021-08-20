@@ -74,7 +74,7 @@ func userProfile(c *gin.Context) {
 			fmt.Sprintf("%s#%s - %s", user.Username, user.UserDiscriminator, authorityLevel(user.AuthLevel)),
 			imagePath(c, parseUrlValues(urlValues{"url": user.AvatarUrl})),
 			c.Request.URL,
-			"profile.html")
+			"profile.gohtml")
 	} else {
 		// If the profile is not found, abort with an error
 		abortWithMessage(c, http.StatusNotFound)

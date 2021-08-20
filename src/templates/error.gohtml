@@ -1,0 +1,9 @@
+<!--Embed the header.gohtml template at this location-->
+{{ template "header.gohtml" .}}
+<div class="has-text-centered">
+    <p class="title has-text-danger">{{.errorTitle}}</p>
+    <p class="subtitle">{{.errorSubtitle}}</p>
+    <p>{{.explanation}}</p>
+</div>
+<!--Embed the footer.gohtml template at this location-->
+{{ template "footer.gohtml" .}}

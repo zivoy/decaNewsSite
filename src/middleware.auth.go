@@ -86,7 +86,7 @@ func canPost() gin.HandlerFunc {
 				"No posting privilege.",
 				"",
 				c.Request.URL,
-				"error.html", http.StatusOK)
+				"error.gohtml", http.StatusOK)
 			c.Abort()
 		}
 	}
@@ -110,7 +110,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 			"Page not found.",
 			"",
 			c.Request.URL,
-			"error.html", code)
+			"error.gohtml", code)
 	case http.StatusUnauthorized:
 		render(c, gin.H{
 			"payload":       map[string]string{"error": "Not signed in."},
@@ -125,7 +125,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 			"You are not signed in.",
 			"",
 			c.Request.URL,
-			"error.html", code)
+			"error.gohtml", code)
 	case http.StatusForbidden:
 		render(c, gin.H{
 			"payload":       map[string]string{"error": "insufficient permissions"},
@@ -137,7 +137,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 			"Insufficient privileges to access page.",
 			"",
 			c.Request.URL,
-			"error.html", code)
+			"error.gohtml", code)
 	case http.StatusBadRequest:
 		render(c, gin.H{
 			"payload":       map[string]string{"error": "page does not exist"},
@@ -149,7 +149,7 @@ func abortWithMessage(c *gin.Context, code int, erre ...error) {
 			"Url is invalid.",
 			"",
 			c.Request.URL,
-			"error.html", code)
+			"error.gohtml", code)
 	default:
 		if err != nil {
 			_ = c.AbortWithError(code, err)
