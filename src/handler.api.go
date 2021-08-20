@@ -54,7 +54,7 @@ func apiV1ImageFunc(c *gin.Context) {
 	}
 
 	if hOk || heightOk {
-		if wOk {
+		if hOk {
 			height64, err = strconv.ParseInt(h, 10, 32)
 			vErr = h
 		} else {
@@ -76,7 +76,7 @@ func apiV1ImageFunc(c *gin.Context) {
 	// url was provided
 	if imageUrl, ok := c.GetQuery("url"); ok {
 		imageUrl, _ = url.QueryUnescape(imageUrl)
-		path, err = getImage(imageUrl, width, height)
+		path, err = getImage(makeAbsUrl(c, imageUrl), width, height)
 		if err != nil {
 			log.Println(err)
 			c.JSON(http.StatusBadRequest, getApiError("'"+imageUrl+"' is invalid"))

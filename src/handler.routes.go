@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -13,6 +14,19 @@ func formatUrl() gin.HandlerFunc {
 		c.Request.URL.Host = domainBase.Host
 		c.Request.URL.Scheme = domainBase.Scheme
 	}
+}
+
+func makeAbsUrl(c *gin.Context, s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		log.Println(err)
+		return s
+	}
+	base, err := url.Parse(c.Request.URL.String())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return base.ResolveReference(u).String()
 }
 
 func pageLogo(c *gin.Context) string {
