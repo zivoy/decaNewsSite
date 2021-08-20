@@ -288,8 +288,8 @@ func decodeImage(f io.Reader) (img image.Image, format string, err error) {
 }
 
 func getSize(target, sizeAdjust, setSize int) (adjustedValue int, setValue int) {
-	newSize := target * sizeAdjust / setSize
-	return newSize & -1, target
+	newSize := float64(target) * float64(sizeAdjust) / float64(setSize)
+	return int(math.Round(newSize)) & -1, target
 }
 
 func DirSize(path string) (int64, error) {
