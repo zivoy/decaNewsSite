@@ -118,9 +118,9 @@ func getImage(url string, width, height int) (string, error) {
 		size := img.Bounds().Size()
 		X := size.X
 		Y := size.Y
-		if width == 0 {
+		if height == 0 {
 			Y, X = getSize(boundNumber(width, 0, X), Y, X)
-		} else if height == 0 {
+		} else if width == 0 {
 			X, Y = getSize(boundNumber(height, 0, Y), X, Y)
 		}
 
