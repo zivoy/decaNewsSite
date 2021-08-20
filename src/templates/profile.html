@@ -65,7 +65,7 @@
                         {{ if .ImageUrl}}
                             <figure class="media-left">
                                 <a class="image is-64x64" href="/leaks/leak/{{.ID}}">
-                                    <img src="/api/v1/image?id={{.ID}}&width=64">
+                                    <img src="/api/v1/image?id={{.ID}}&width=64" width="64" alt="Leak Image..." loading="lazy">
                                 </a>
                             </figure>
                         {{end}}
