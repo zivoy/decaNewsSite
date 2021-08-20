@@ -49,8 +49,8 @@ func getImage(url string, width, height int) (string, error) {
 
 	path := filepath.Join(imageDir, name)
 
-	sizeRequested := fmt.Sprintf("%dx%d", width, height)
-	if sizeRequested == "0x0" {
+	var sizeRequested string
+	if width == 0 && height == 0 {
 		sizeRequested = originalImage
 	}
 
@@ -96,22 +96,36 @@ func getImage(url string, width, height int) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		// check to see if size is already available
-		for _, f := range images {
-			if strings.Contains(f.Name(), sizeRequested) {
-				return filepath.Join(path, f.Name()), nil
-			}
-		}
 
-		// get original to rescale
 		for _, f := range images {
 			if strings.Contains(f.Name(), originalImage) {
 				imgPath := filepath.Join(path, f.Name())
+
+				if sizeRequested == originalImage {
+					return imgPath, nil
+				}
+
 				img, format, err = loadImage(imgPath)
 				if err != nil {
 					return "", err
 				}
 				break
+			}
+		}
+
+		size := img.Bounds().Size()
+		X := size.X
+		Y := size.Y
+		if width == 0 {
+			Y, X = getSize(boundNumber(width, 0, X), Y, X)
+		} else if height == 0 {
+			X, Y = getSize(boundNumber(height, 0, Y), X, Y)
+		}
+		sizeRequested = fmt.Sprintf("%dx%d", X, Y)
+
+		for _, f := range images {
+			if strings.Contains(f.Name(), sizeRequested) {
+				return filepath.Join(path, f.Name()), nil
 			}
 		}
 
@@ -121,8 +135,11 @@ func getImage(url string, width, height int) (string, error) {
 		}
 	}
 
-	imgPath := fmt.Sprintf("%s.%s", filepath.Join(path, sizeRequested), format)
 	newImg := resizeImage(img, width, height)
+
+	size := newImg.Bounds().Size()
+	sizeRequested = fmt.Sprintf("%dx%d", size.X, size.Y)
+	imgPath := fmt.Sprintf("%s.%s", filepath.Join(path, sizeRequested), format)
 	err := writeImage(newImg, imgPath, format)
 	if err != nil {
 		return "", err
@@ -157,11 +174,11 @@ func resizeImage(original image.Image, targetWidth, targetHeight int) (output im
 	w := boundNumber(targetWidth, 0, p.X)
 	h := boundNumber(targetHeight, 0, p.Y)
 
-	return resize.Resize(w, h, original, resize.Bilinear) // resize.NearestNeighbor
+	return resize.Resize(uint(w), uint(h), original, resize.Bilinear) // resize.NearestNeighbor
 }
 
-func boundNumber(number, min, max int) uint {
-	return uint(math.Min(math.Max(float64(number), float64(min)), float64(max)))
+func boundNumber(number, min, max int) int {
+	return int(math.Min(math.Max(float64(number), float64(min)), float64(max)))
 }
 
 func fetchImage(url string) (img image.Image, format string, err error) {
@@ -257,4 +274,9 @@ func decodeImage(f io.Reader) (img image.Image, format string, err error) {
 		}
 	}
 	return img, format, err
+}
+
+func getSize(target, sizeAdjust, setSize int) (adjustedValue int, setValue int) {
+	newSize := target * sizeAdjust / setSize
+	return newSize & -1, target
 }
