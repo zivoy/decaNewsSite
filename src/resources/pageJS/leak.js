@@ -104,6 +104,7 @@ function startEdit() {
                 },
                 closeDropdownOnItemSelect: false,
                 selectable: false,
+                tagClass: "",
             })
         });
 

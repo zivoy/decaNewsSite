@@ -37,6 +37,7 @@ BulmaTagsInput.attach(tagsInput[0], {
     },
     closeDropdownOnItemSelect: false,
     selectable: false,
+    tagClass: "",
 })
 
 $(document).ready(function () {
