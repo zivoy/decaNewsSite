@@ -24,31 +24,87 @@
                     </a>
                 {{end}}
             </div>
+            <span class="level-item" id="leakNumber">0 leaks</span>
         </div>
 
         <div class="level-right">
-            <div id="amountDropdown" class="dropdown level-item">
-                <div class="dropdown-trigger">
-                    <button id="dropButton" class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                        <span id="dropDownText">All leaks</span>
-                        <span class="icon is-small">
+            <div class="is-center">
+                <div id="filterItemsDropdown" class="dropdown level-item">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="filter-dropdown">
+                            <span>Filter</span>
+                            <span class="icon is-small">
                             <ion-icon class="ion-ionic" name="chevron-down-outline" aria-hidden="true"></ion-icon>
                         </span>
-                    </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                    <div class="dropdown-content">
-                        <div class="dropdown-item">
-                            Leaks per page
-                        </div>
-                        <hr class="dropdown-divider">
-                        <div id="leakAmounts">
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="filter-dropdown" role="menu">
+                        <p class="dropdown-item heading">Include</p>
 
+                        <div class="dropdown-content">
+                            <div class="field dropdown-item">
+                                <input class="is-checkradio" id="includeAnd" type="radio" name="includeRadio"
+                                       checked="checked">
+                                <label for="includeAnd">And</label>
+                                <input class="is-checkradio" id="includeOr" type="radio" name="includeRadio">
+                                <label for="includeOr">Or</label>
+                            </div>
+                            <div class="field dropdown-item">
+                                <div class="control">
+                                    <input class="input" type="text" id="includeTags" data-max-chars="20"
+                                           placeholder="Choose Tags">
+                                </div>
+                            </div>
+
+                            <hr class="dropdown-divider">
+                            <p class="dropdown-item heading">Exclude</p>
+
+                            <div class="field dropdown-item">
+                                <input class="is-checkradio" id="excludeAnd" type="radio" name="excludeRadio">
+                                <label for="excludeAnd">And</label>
+                                <input class="is-checkradio" id="excludeOr" type="radio" name="excludeRadio"
+                                       checked="checked">
+                                <label for="excludeOr">Or</label>
+                            </div>
+                            <div class="field dropdown-item">
+                                <div class="control">
+                                    <input class="input" type="text" id="excludeTags" data-max-chars="20"
+                                           placeholder="Choose Tags">
+                                </div>
+                            </div>
+
+                            <div class="field dropdown-item">
+                                <div class="control">
+                                    <button class="button is-link" type="button" onclick="clearFilters()">Clear</button>
+                                </div>
+                            </div>
+                            <!--todo search bar here-->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="amountDropdown" class="dropdown level-item">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span id="dropDownText">All leaks</span>
+                            <span class="icon is-small">
+                            <ion-icon class="ion-ionic" name="chevron-down-outline" aria-hidden="true"></ion-icon>
+                        </span>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div class="dropdown-content">
+                            <div class="dropdown-item">
+                                Leaks per page
+                            </div>
+                            <hr class="dropdown-divider">
+                            <div id="leakAmounts">
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!--todo search bar here-->
         </div>
     </div>
 
@@ -117,9 +173,11 @@
 
 <script>
     const articlesAmount = {{ .amount }}
-    let currPage = {{ .page }}
+        let
+    currPage = {{ .page }}
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/js/bulma-tagsinput.min.js"></script>
 <script src="/static/convertTime.js"></script>
 <script async src="/static/pageJS/leakList.js"></script>
 
