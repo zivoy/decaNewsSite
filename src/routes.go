@@ -66,10 +66,15 @@ func initializeRoutes() {
 
 			apiV1.GET("/image", apiV1ImageFunc)
 
-			leekApi := apiV1.Group("/leaks")
+			leakApi := apiV1.Group("/leaks")
 			{
-				leekApi.GET("/get", leaksApiGetFunc)
-				leekApi.GET("/amount", leaksApiAmountFunc)
+				leakApi.GET("/get", leaksApiGetFunc)
+				leakApi.GET("/amount", leaksApiAmountFunc)
+			}
+
+			tagApi := apiV1.Group("/tags")
+			{
+				tagApi.GET("/get", tagsApiGetFunc)
 			}
 			apiV1.POST("/archive/:uid", ensureLoggedIn(), archiveLeak)
 		}

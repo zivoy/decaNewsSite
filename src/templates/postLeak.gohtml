@@ -77,6 +77,14 @@
                     </div>
                 </div>
 
+                <div class="field">
+                    <label class="label">Tags</label>
+                    <div class="control">
+                        <input class="input" type="text" id="tags" data-max-chars="20" placeholder="Choose Tags">
+                    </div>
+                    <p class="help">Tags can be at most 20 characters long</p>
+                </div>
+
                 <div class="field is-grouped is-grouped-right">
                     <div class="control">
                         <button id="submit" class="button is-link" onclick="post()" disabled>Submit</button>
@@ -144,6 +152,7 @@
     let Leak = "";
     let Image = "";
     let Title = "";
+    let Tags = "";
 
     function canLinkLess() {
         //{{ if ge .user.AuthLevel $linkLess }}
@@ -159,6 +168,7 @@
 <script defer src="/static/leakPostFunctions.js">
     const allowedLinks = AllowedLinks({{.allowed_links}})
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/js/bulma-tagsinput.min.js"></script>
 <script src="/static/bbcode-config.js"></script>
 <script defer src="/static/bbcode-parser.js"></script>
 <script src="/static/pageJS/postLeak.js"></script>
@@ -172,6 +182,7 @@
             Image = "{{.payload.image_url}}"
             Link = "{{.payload.source_url}}"
             Title = "{{.payload.title}}"
+            Tags = "{{.payload.tags}}"
             if (isNaN(LeakTime.getTime())) {
                 LeakTime = new Date()
             }
@@ -180,6 +191,7 @@
             inputLeak.val(Leak);
             inputImage.val(Image);
             inputTitle.val(Title);
+            tagsInput[0].BulmaTagsInput().add(Tags);
 
             LeakTime = timeChange(inputTime, $("time#timeToSet"));
             Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);

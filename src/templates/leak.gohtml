@@ -138,6 +138,7 @@
     let image = "{{.payload.ImageUrl}}";
     let time = new Date(parseInt("{{.payload.LeakTime}}"));
     let title = "{{.payload.Title}}"
+    let tags = "{{.payload.Tags.String}}"
     const dTitle = "DecaLeak {{.payload.ID | hashString}}"
     const id = "{{.payload.ID}}"
 </script>

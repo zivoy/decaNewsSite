@@ -27,7 +27,7 @@ type article struct {
 	Title       string   `json:"title"`
 	DateCreate  int64    `json:"created_time"`
 	DateEdit    int64    `json:"edited_time,omitempty"`
-	Tags        []Tag    `json:"-"`
+	Tags        tagList  `json:"-"`
 	TagIds      []string `json:"tags,omitempty"`
 }
 
@@ -127,18 +127,18 @@ func getArticleByID(id string) (article, error) {
 
 			// has tags
 			var tagIds []string
-			var tags []Tag
-			if tagList, ok := articleData["tags"]; ok {
-				tagIdsI := tagList.([]interface{})
+			var tags tagList
+			if tagItems, ok := articleData["tags"]; ok {
+				tagIdsI := tagItems.([]interface{})
 				tagIds = make([]string, len(tagIdsI))
-				tags = make([]Tag, len(tagIdsI))
+				tags = make(tagList, len(tagIdsI))
 				for i, v := range tagIdsI {
 					tagIds[i] = v.(string)
 					tags[i] = getTagFromID(tagIds[i])
 				}
 			} else {
 				tagIds = make([]string, 0)
-				tags = make([]Tag, 0)
+				tags = make(tagList, 0)
 			}
 
 			return article{

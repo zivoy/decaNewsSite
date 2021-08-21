@@ -23,10 +23,25 @@ const inputLeak = $("textarea#leak");
 const inputImage = $("input#image");
 const preview = $("div#preview");
 const inputTitle = $("input#title");
+const tagsInput = $("input#tags");
 
 LeakTime.setSeconds(0);
 LeakTime.setMilliseconds(0);
 $("time#timeToSet").attr("datetime", LeakTime.toISOString());
+
+BulmaTagsInput.attach(tagsInput[0], {
+    source: async function () {
+        return $.get("/api/v1/tags/get").then(function (vals) {
+            let list = []
+            for (let i in vals) {
+                list.unshift(vals[i].name)
+            }
+            return list
+        })
+    },
+    closeDropdownOnItemSelect: false,
+    selectable: false,
+})
 
 $(document).ready(function () {
     setTimeVal(inputTime, LeakTime);
@@ -87,7 +102,8 @@ function post() {
         time: LeakTime.getTime(),
         image_url: Image,
         source_url: Link,
-        title: Title
+        title: Title,
+        tags: tagsInput.val()
     }, function (key, value) {
         let field = $('<input/>');
         field.attr("type", "hidden");

@@ -158,3 +158,9 @@ func leaksApiAmountFunc(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, map[string]int{"leaks": len(art)})
 }
+
+// tag api
+func tagsApiGetFunc(c *gin.Context) {
+	tags := getTagList()
+	c.JSON(http.StatusOK, tags)
+}

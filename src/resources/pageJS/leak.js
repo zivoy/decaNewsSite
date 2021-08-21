@@ -64,6 +64,16 @@ function startEdit() {
                         <input class="input" type="datetime-local" id="leakTime" name="leakTime" required>
                     </div>
                 </div>
+                
+                <div class="field">
+                    <label class="label">Tags</label>
+                    <div class="control">
+                        <input class="input" type="text" id="tags" data-max-chars="20" placeholder="Choose Tags" 
+                        value="${tags}">
+                    </div>
+                    <p class="help">Tags can be at most 20 characters long</p>
+                </div>
+
             </fieldset>
         `));
     $("p#bbcode").html("supports <a href='https://www.bbcode.org/reference.php' target='_blank' rel='noopener'>bbcode</a>")
@@ -82,6 +92,24 @@ function startEdit() {
     const linkInfo = $("p#linkInfo");
     const inputLeak = $("textarea#leak");
     const inputImage = $("input#image");
+    const tagsInput = $("input#tags");
+
+    $.getScript("https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/js/bulma-tagsinput.min.js",
+        function () {
+            BulmaTagsInput.attach(tagsInput[0], {
+                source: async function () {
+                    return $.get("/api/v1/tags/get").then(function (vals) {
+                        let list = []
+                        for (let i in vals) {
+                            list.unshift(vals[i].name)
+                        }
+                        return list
+                    })
+                },
+                closeDropdownOnItemSelect: false,
+                selectable: false,
+            })
+        });
 
     submitButton = $("button#saveEdit");
 
@@ -136,7 +164,8 @@ function UpdateLeak() {
                 time: time.getTime(),
                 image_url: image,
                 source_url: link,
-                title: title
+                title: title,
+                tags: $("input#tags").val()
             },
             success: function () {
                 submitButton.removeClass("is-loading")
