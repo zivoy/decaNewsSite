@@ -76,10 +76,10 @@ func main() {
 		serverPassword := os.Getenv("SERVER_PASSWORD")
 		filePassword := os.Getenv("FILE_PASSWORD")
 		if location == "" || serverPassword == "" || filePassword == "" {
-			log.Println(fmt.Sprintf("Missing credentials\n"+
+			log.Printf("Missing credentials\n"+
 				"\tURL:         %t\n"+
 				"\tServer pass: %t\n"+
-				"\tFile pass:   %t", location != "", serverPassword != "", filePassword != ""))
+				"\tFile pass:   %t", location != "", serverPassword != "", filePassword != "")
 			failedSimplePage()
 			return
 		}
