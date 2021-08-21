@@ -55,6 +55,11 @@ var articleListCache = Cache{
 	basePath: articleLocation,
 	id:       4,
 }
+var tagListCache = Cache{
+	list:     make(CacheList),
+	basePath: tagPath,
+	id:       5,
+}
 
 var cacheList = map[int]cacheInterface{
 	userCache.id:        &userCache,
@@ -62,6 +67,7 @@ var cacheList = map[int]cacheInterface{
 	articleCache.id:     &articleCache,
 	allowedLinkCache.id: &allowedLinkCache,
 	articleListCache.id: &articleListCache,
+	tagListCache.id:     &tagListCache,
 }
 
 const ServerCommunicationEndpoint = "SERVER-COMM"

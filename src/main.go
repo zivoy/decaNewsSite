@@ -143,7 +143,7 @@ func main() {
 	functions["unescape"] = unescape
 	functions["compileBB"] = compileBBCode
 	functions["hashString"] = hashTo32
-	functions["urlEncode"] = url.QueryEscape
+	functions["bulmaColorClass"] = getColorClassString
 
 	router.SetFuncMap(functions)
 

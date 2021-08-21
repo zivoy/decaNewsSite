@@ -16,17 +16,19 @@ import (
 )
 
 type article struct {
-	ID          string `json:"-"`
-	Description string `json:"description"`
-	Summary     string `json:"summary"`
-	LeakTime    int64  `json:"time"`
-	ImageUrl    string `json:"image_url"`
-	SourceLink  string `json:"source_url"`
-	ReporterUid string `json:"reporter_uid"`
-	EditedBy    string `json:"edited_by,omitempty"`
-	Title       string `json:"title"`
-	DateCreate  int64  `json:"created_time"`
-	DateEdit    int64  `json:"edited_time,omitempty"`
+	ID          string   `json:"-"`
+	Description string   `json:"description"`
+	Summary     string   `json:"summary"`
+	LeakTime    int64    `json:"time"`
+	ImageUrl    string   `json:"image_url"`
+	SourceLink  string   `json:"source_url"`
+	ReporterUid string   `json:"reporter_uid"`
+	EditedBy    string   `json:"edited_by,omitempty"`
+	Title       string   `json:"title"`
+	DateCreate  int64    `json:"created_time"`
+	DateEdit    int64    `json:"edited_time,omitempty"`
+	Tags        []Tag    `json:"-"`
+	TagIds      []string `json:"tags,omitempty"`
 }
 
 const (
@@ -51,6 +53,11 @@ func getAllArticles(low, high int) ([]article, error) {
 		articleList := make([]article, 0)
 		for k, v := range data {
 			v.ID = k
+
+			for _, tag := range v.TagIds {
+				v.Tags = append(v.Tags, getTagFromID(tag))
+			}
+
 			articleList = append(articleList, v)
 			articleCache.add(k, v)
 		}
@@ -81,6 +88,11 @@ func getAllUsersArticles(uid string) ([]article, error) {
 	articleList := make([]article, 0)
 	for k, v := range data {
 		v.ID = k
+
+		for _, tag := range v.TagIds {
+			v.Tags = append(v.Tags, getTagFromID(tag))
+		}
+
 		articleList = append(articleList, v)
 		articleCache.add(k, v)
 	}
@@ -113,6 +125,22 @@ func getArticleByID(id string) (article, error) {
 				editedWhen = 0
 			}
 
+			// has tags
+			var tagIds []string
+			var tags []Tag
+			if tagList, ok := articleData["tags"]; ok {
+				tagIdsI := tagList.([]interface{})
+				tagIds = make([]string, len(tagIdsI))
+				tags = make([]Tag, len(tagIdsI))
+				for i, v := range tagIdsI {
+					tagIds[i] = v.(string)
+					tags[i] = getTagFromID(tagIds[i])
+				}
+			} else {
+				tagIds = make([]string, 0)
+				tags = make([]Tag, 0)
+			}
+
 			return article{
 				ID:          id,
 				Description: articleData["description"].(string),
@@ -125,6 +153,8 @@ func getArticleByID(id string) (article, error) {
 				DateEdit:    editedWhen,
 				Title:       articleData["title"].(string),
 				DateCreate:  int64(articleData["created_time"].(float64)),
+				Tags:        tags,
+				TagIds:      tagIds,
 			}
 		})
 		return leak.(article), nil
@@ -168,8 +198,8 @@ func allowedLinksForUserContext(c *gin.Context) []string {
 	return r
 }
 
-func createNewLeak(title, description, rawTime, imageUrl, sourceUrl string, reporter user) (article, error) {
-	leak, code := leakSanitization(title, description, rawTime, imageUrl, sourceUrl,
+func createNewLeak(title, description, rawTime, imageUrl, sourceUrl, tags string, reporter user) (article, error) {
+	leak, code := leakSanitization(title, description, rawTime, imageUrl, sourceUrl, tags,
 		reporter, user{UID: ""}, time.Now().Unix(), 0)
 
 	switch code {
@@ -224,7 +254,7 @@ cases:
 	3 - no body
 	4 - invalid time
 */
-func leakSanitization(title, description, rawTime, imageUrl, sourceUrl string, reporter, editedBy user,
+func leakSanitization(title, description, rawTime, imageUrl, sourceUrl, tags string, reporter, editedBy user,
 	created, edited int64) (article, int) {
 	leakTime, err := strconv.ParseInt(rawTime, 10, 64)
 	if err != nil {
@@ -245,6 +275,12 @@ func leakSanitization(title, description, rawTime, imageUrl, sourceUrl string, r
 	title = strings.Trim(title, " ")
 	title = clip(title, 60)
 
+	tagList := getTagsFromString(tags)
+	tagIds := make([]string, len(tagList))
+	for i, v := range tagList {
+		tagIds[i] = v.id
+	}
+
 	leak := article{
 		Description: description,
 		Summary:     summery,
@@ -256,6 +292,8 @@ func leakSanitization(title, description, rawTime, imageUrl, sourceUrl string, r
 		Title:       title,
 		DateCreate:  created,
 		DateEdit:    edited,
+		Tags:        tagList,
+		TagIds:      tagIds,
 	}
 
 	checkPerms := reporter
@@ -297,10 +335,11 @@ func createArticle(c *gin.Context) {
 	sourceUrl := c.PostForm("source_url")
 	//reporter := getUser(c.PostForm("reporter_uid"))
 	title := c.PostForm("title")
+	tags := c.PostForm("tags")
 	reporterUser, _ := c.Get("user")
 	reporter := reporterUser.(user)
 
-	if a, err := createNewLeak(title, description, leakTime, imageUrl, sourceUrl, reporter); err == nil {
+	if a, err := createNewLeak(title, description, leakTime, imageUrl, sourceUrl, tags, reporter); err == nil {
 		// success
 		leakLocation := url.URL{
 			Scheme: domainBase.Scheme,
@@ -332,6 +371,7 @@ func createArticle(c *gin.Context) {
 				"source_url":    sourceUrl,
 				"reporter_uid":  reporter.UID,
 				"title":         title,
+				"tags":          tags,
 				"allowed_links": allowedLinksForUserContext(c),
 				"error":         err,
 			}, "errorPublishing": true, "linkLessAuthLevel": linkLessAuthLevel},

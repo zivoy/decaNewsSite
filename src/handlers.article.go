@@ -118,6 +118,7 @@ func updateArticle(c *gin.Context) {
 	imageUrl := c.PostForm("image_url")
 	sourceUrl := c.PostForm("source_url")
 	title := c.PostForm("title")
+	tags := c.PostForm("tags")
 
 	updaterUser, _ := c.Get("user")
 	updater := updaterUser.(user)
@@ -134,11 +135,11 @@ func updateArticle(c *gin.Context) {
 
 	// nothing was changed
 	if !(leak.Description != description || leak.ImageUrl != imageUrl || strconv.Itoa(int(leak.LeakTime)) != leakTime ||
-		leak.SourceLink != sourceUrl || leak.Title != title) {
+		leak.SourceLink != sourceUrl || leak.Title != title || !compareTagList(getTagsFromString(tags), leak.Tags)) {
 		return
 	}
 
-	newLeak, code := leakSanitization(title, description, leakTime, imageUrl, sourceUrl,
+	newLeak, code := leakSanitization(title, description, leakTime, imageUrl, sourceUrl, tags,
 		getUser(leak.ReporterUid), updater, leak.DateCreate, time.Now().Unix())
 	newLeak.ID = leak.ID
 	switch code {
