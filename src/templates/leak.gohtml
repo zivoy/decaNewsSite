@@ -92,8 +92,8 @@
                         {{end}}
 
                         {{if .payload.Tags}}
-                            <br>
-                            <span><strong>Tags</strong>:</span>
+                            {{/*<br>*/}}
+                            {{/*<span><strong>Tags</strong>:</span>*/}}
                             <div class="tags mt-2">
                                 {{ range .payload.Tags }}
                                     <span class="tag {{.Color | bulmaColorClass}}">{{.Name}}</span>

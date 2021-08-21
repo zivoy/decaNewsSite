@@ -76,6 +76,13 @@
                                     <br>
                                     {{.Summary | replace "\n" "<br>" | unescape}}
                                 </a>
+                                {{if .Tags}}
+                                    <div class="tags mt-1 mb-0">
+                                        {{ range .Tags }}
+                                            <span class="tag {{.Color | bulmaColorClass}}">{{.Name}}</span>
+                                        {{end}}
+                                    </div>
+                                {{end}}
                             </div>
                         </div>
 

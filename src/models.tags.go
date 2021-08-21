@@ -42,7 +42,7 @@ func getTagsFromString(s string) []Tag {
 	tagsPut := map[string]bool{}
 
 	for i, v := range list {
-		id := strings.ToLower(v)
+		id := strings.Trim(strings.ToLower(v), " ")
 		if _, ok := tagsPut[id]; ok {
 			continue
 		}
@@ -51,7 +51,7 @@ func getTagsFromString(s string) []Tag {
 			tagList[i] = tag
 		} else {
 			tagList[i] = Tag{
-				Name:  v,
+				Name:  strings.Trim(v, " "),
 				Color: Info | Lighter,
 				id:    id,
 			}
