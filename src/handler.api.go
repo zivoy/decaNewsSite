@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -160,7 +161,8 @@ func leaksApiAmountFunc(c *gin.Context) {
 }
 
 // tag api
+
 func tagsApiGetFunc(c *gin.Context) {
-	tags := getTagList()
-	c.JSON(http.StatusOK, tags)
+	tags := getTagList().String()
+	c.JSON(http.StatusOK, strings.Split(tags, ","))
 }
