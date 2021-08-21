@@ -99,13 +99,7 @@ func newTag(a Tag) {
 }
 
 func compareTagList(a, b tagList) bool {
-	aIds := make([]string, len(a))
-	bIds := make([]string, len(b))
-	sort.Strings(aIds)
-	sort.Strings(bIds)
-	listA := strings.Join(aIds, ",")
-	listB := strings.Join(bIds, ",")
-	return listA == listB
+	return a.String() == b.String()
 }
 
 func getTagFromID(id string) Tag {
