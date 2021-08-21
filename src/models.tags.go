@@ -40,6 +40,9 @@ func getTagList() tagList {
 	tagMap := getAvailableTags()
 	var tags = make(tagList, 0)
 	for _, v := range tagMap {
+		if v.id == "" {
+			continue
+		}
 		tags = append(tags, v)
 	}
 	return tags
