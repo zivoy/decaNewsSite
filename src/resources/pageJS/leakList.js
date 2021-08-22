@@ -347,9 +347,9 @@ function filterLeaks() {
                 // and
                 if (includeTags.length !== 0) {
                     include = tags.length !== 0
-                    for (let i in tags) {
-                        let tag = tags[i]
-                        if (!includeTags.includes(tag)) {
+                    for (let i in includeTags) {
+                        let tag = includeTags[i]
+                        if (!tags.includes(tag)) {
                             include = false
                             break
                         }
