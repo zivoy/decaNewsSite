@@ -97,11 +97,7 @@ function startEdit() {
     $.getScript("https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/js/bulma-tagsinput.min.js",
         function () {
             BulmaTagsInput.attach(tagsInput[0], {
-                source: async function () {
-                    return $.get("/api/v1/tags/get").then(function (list) {
-                        return list
-                    })
-                },
+                source: getTagList,
                 closeDropdownOnItemSelect: false,
                 selectable: false,
                 tagClass: "",

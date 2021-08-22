@@ -128,11 +128,7 @@ let includeItems = $("#includeTags");
 let excludeItems = $("#excludeTags");
 
 BulmaTagsInput.attach(includeItems[0], {
-    source: async function () {
-        return $.get("/api/v1/tags/get").then(function (list) {
-            return list
-        })
-    },
+    source: getTagList,
     closeDropdownOnItemSelect: true,
     selectable: false,
     tagClass: "",
@@ -140,11 +136,7 @@ BulmaTagsInput.attach(includeItems[0], {
 })
 
 BulmaTagsInput.attach(excludeItems[0], {
-    source: async function () {
-        return $.get("/api/v1/tags/get").then(function (list) {
-            return list
-        })
-    },
+    source: getTagList,
     closeDropdownOnItemSelect: true,
     selectable: false,
     tagClass: "",
