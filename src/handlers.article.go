@@ -55,11 +55,17 @@ func getArticle(c *gin.Context) {
 	// Check if the article exists
 	if article, err := getArticleByID(articleID); err == nil {
 		// Call the HTML method of the Context to render a template
+
+		// don't show image if there is none
+		var image string
+		if article.ImageUrl != "" {
+			image = imagePath(c, parseUrlValues(urlValues{"id": article.ID}))
+		}
+
 		render(c, gin.H{"payload": article, "allowed_links": allowedLinksForUserContext(c)},
 			article.Title,
 			strings.Trim(strings.ReplaceAll(article.Summary, "\n", " "), " "),
-			imagePath(c, parseUrlValues(urlValues{"id": article.ID})),
-			c.Request.URL, "leak.gohtml")
+			image, c.Request.URL, "leak.gohtml")
 	} else {
 		// If the article is not found, abort with an error
 		abortWithMessage(c, http.StatusNotFound, err)
