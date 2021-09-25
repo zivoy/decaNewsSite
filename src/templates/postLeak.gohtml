@@ -146,6 +146,8 @@
     </div>
 </div>
 <script>
+    const allowedLinks = AllowedLinks({{.payload.allowed_links}})
+
     const User = "{{.user.UID}}";
     let LeakTime = new Date();
     let Link = "";
@@ -165,9 +167,7 @@
     //const postError = "true" === "{{.errorPublishing}}"
     //const postSuccess = "true" === "{{.publishSuccess}}"
 </script>
-<script defer src="/static/leakPostFunctions.js">
-    const allowedLinks = AllowedLinks({{.payload.allowed_links}})
-</script>
+<script defer src="/static/leakPostFunctions.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/js/bulma-tagsinput.min.js"></script>
 <script src="/static/bbcode-config.js"></script>
 <script src="/static/generalFunctions.js"></script>
