@@ -30,7 +30,7 @@ LeakTime.setMilliseconds(0);
 $("time#timeToSet").attr("datetime", LeakTime.toISOString());
 
 BulmaTagsInput.attach(tagsInput[0], {
-    source: getTagList(),
+    source: getTagList,
     closeDropdownOnItemSelect: false,
     selectable: false,
     tagClass: "",
