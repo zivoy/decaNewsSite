@@ -91,6 +91,15 @@ async function imageChange(field, previewImage) {
     let val = field.val();
 
     function isValidImageUrl(url, callback) {
+        if (val === "") {
+            callback(true);
+            return;
+        }
+        if (!url.includes("://")) {
+            callback(false);
+            return;
+        }
+
         $('<img>', {
             src: url,
             load: function () {
@@ -105,24 +114,25 @@ async function imageChange(field, previewImage) {
     let done = false
     let valid = false
 
-    if (val !== "") {
-        isValidImageUrl(val, function (result) {
-            if (result) {
-                valid = true
-                field.removeClass("is-danger")
-                if (previewImage !== undefined)
-                    previewImage.attr("src", val)
+    isValidImageUrl(val, function (result) {
+        container.addClass("is-hidden")
+
+        if (result) {
+            valid = true
+            field.removeClass("is-danger")
+            if (previewImage !== undefined)
+                previewImage.attr("src", val)
+            if (val !== "") {
                 container.removeClass("is-hidden")
-            } else {
-                if (previewImage !== undefined)
-                    previewImage.attr("src", "")
-                container.addClass("is-hidden")
-                field.addClass("is-danger")
-                val = ""
             }
-            done = true
-        });
-    }
+        } else {
+            if (previewImage !== undefined)
+                previewImage.attr("src", "")
+            container.addClass("is-hidden")
+            val = ""
+        }
+        done = true
+    });
     await new Promise(r => {
         let timeout = () => {
             if (done) {

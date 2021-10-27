@@ -24,6 +24,7 @@ const inputImage = $("input#image");
 const preview = $("div#preview");
 const inputTitle = $("input#title");
 const tagsInput = $("input#tags");
+const tagList = $("div#tagsList")
 
 LeakTime.setSeconds(0);
 LeakTime.setMilliseconds(0);
@@ -35,6 +36,8 @@ BulmaTagsInput.attach(tagsInput[0], {
     selectable: false,
     tagClass: "",
 })
+
+const tagSelector = tagsInput[0].BulmaTagsInput()
 
 $(document).ready(function () {
     setTimeVal(inputTime, LeakTime);
@@ -71,6 +74,26 @@ $(document).ready(function () {
         Title = titleChange(inputTitle, $("b#leakTitle"), "DecaLeak ##########");
         formReady();
     });
+
+    function tagUpdate() {
+        tagList.empty()
+        let tags = tagSelector.items
+        if (tags.length > 0){
+            tagList.removeClass("is-hidden");
+        } else {
+            tagList.addClass("is-hidden");
+        }
+        for (let i in tags){
+            let tag = tags[i]
+            $("<span>", {
+                class: "tag " + "TODOColor",
+            }).append(tag).appendTo(tagList)
+        }
+        formReady();
+    }
+
+    tagSelector.on("after.add", tagUpdate)
+    tagSelector.on("after.remove", tagUpdate)
 });
 
 function formReady() {

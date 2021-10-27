@@ -5,3 +5,4 @@ src/conf/
 src/.env
 docker.env
 src/cacheImages/
+node_modules/

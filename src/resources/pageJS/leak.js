@@ -22,6 +22,12 @@ let submitButton;
 let editing = false;
 
 function startEdit() {
+    $("<link/>", {
+        rel: "stylesheet",
+        type: "text/css",
+        href: "/static/css/poster.css"
+    }).appendTo("head");
+
     $("#leakBody").html($(`
             <fieldset>
                 <div class="field">
@@ -103,6 +109,11 @@ function startEdit() {
                 tagClass: "",
             })
         });
+
+    $.getScript("https://cdn.jsdelivr.net/npm/bulma-calendar/dist/js/bulma-calendar.min.js",
+        function () {
+        });
+
 
     submitButton = $("button#saveEdit");
 

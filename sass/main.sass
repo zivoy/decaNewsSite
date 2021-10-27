@@ -1,0 +1,93 @@
+@charset "utf-8"
+
+// Import Bulma core
+//@import "../node_modules/bulma/bulma.sass"
+
+//@import "../node_modules/bulma/sass/utilities/_all"
+@import "../node_modules/bulma/sass/utilities/controls"
+@import "../node_modules/bulma/sass/utilities/extends"
+
+//@import "../node_modules/bulma/sass/base/_all"
+@import "../node_modules/bulma/sass/base/generic"
+@import "../node_modules/bulma/sass/base/minireset"
+
+//@import "../node_modules/bulma/sass/elements/_all"
+@import "../node_modules/bulma/sass/elements/box"
+@import "../node_modules/bulma/sass/elements/button"
+@import "../node_modules/bulma/sass/elements/container"
+@import "../node_modules/bulma/sass/elements/content"
+@import "../node_modules/bulma/sass/elements/icon"
+@import "../node_modules/bulma/sass/elements/image"
+@import "../node_modules/bulma/sass/elements/notification"
+@import "../node_modules/bulma/sass/elements/table"
+@import "../node_modules/bulma/sass/elements/tag"
+@import "../node_modules/bulma/sass/elements/title"
+@import "../node_modules/bulma/sass/elements/other"
+
+//@import "../node_modules/bulma/sass/form/_all"
+@import "../node_modules/bulma/sass/form/shared"
+@import "../node_modules/bulma/sass/form/input-textarea"
+@import "../node_modules/bulma/sass/form/checkbox-radio"
+
+//@import "../node_modules/bulma/sass/components/_all"
+@import "../node_modules/bulma/sass/components/card"
+@import "../node_modules/bulma/sass/components/dropdown"
+@import "../node_modules/bulma/sass/components/level"
+@import "../node_modules/bulma/sass/components/media"
+@import "../node_modules/bulma/sass/components/modal"
+@import "../node_modules/bulma/sass/components/navbar"
+@import "../node_modules/bulma/sass/components/pagination"
+
+//@import "../node_modules/bulma/sass/grid/_all"
+@import "../node_modules/bulma/sass/grid/columns"
+
+//@import "../node_modules/bulma/sass/helpers/_all"
+@import "../node_modules/bulma/sass/helpers/visibility"
+@import "../node_modules/bulma/sass/helpers/spacing"
+@import "../node_modules/bulma/sass/helpers/color"
+@import "../node_modules/bulma/sass/helpers/typography"
+
+//@import "../node_modules/bulma/sass/layout/_all"
+@import "../node_modules/bulma/sass/layout/hero"
+@import "../node_modules/bulma/sass/layout/section"
+
+
+
+// Import components
+//@import "../node_modules/bulma-prefers-dark/bulma-prefers-dark.sass"
+@import "../node_modules/bulma-prefers-dark/sass/utilities/_all"
++prefers-scheme(dark)
+  @import "../node_modules/bulma-prefers-dark/sass/base/_all"
+
+  @import "../node_modules/bulma-prefers-dark/sass/elements/box"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/button"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/content"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/notification"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/table"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/tag"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/title"
+  @import "../node_modules/bulma-prefers-dark/sass/elements/other"
+
+  @import "../node_modules/bulma-prefers-dark/sass/components/card"
+  @import "../node_modules/bulma-prefers-dark/sass/components/dropdown"
+  @import "../node_modules/bulma-prefers-dark/sass/components/media"
+  @import "../node_modules/bulma-prefers-dark/sass/components/modal"
+  @import "../node_modules/bulma-prefers-dark/sass/components/navbar"
+  @import "../node_modules/bulma-prefers-dark/sass/components/pagination"
+
+  @import "../node_modules/bulma-prefers-dark/sass/layout/hero"
+
+@import "../node_modules/bulma-checkradio/src/sass/index.sass"
+@import "../node_modules/@creativebulma/bulma-tagsinput/src/sass/index"
+
+// custom styling
+.icon
+  vertical-align: middle
+  display: inline-table
+
+.userImage
+  margin-right: .3em
+
+img.no-img
+  object-fit: cover
+  object-position: 50% 50%

@@ -3,6 +3,7 @@ pkg/
 .idea/
 src/conf/
 src/.env
+src/resources/css
 src/cacheImages
 docker.env
 

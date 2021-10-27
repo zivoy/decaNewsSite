@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@creativebulma/bulma-tagsinput": "^1.0.3",
+    "@creativebulma/bulma-tooltip": "^1.2.0",
+    "bulma": "^0.9.3",
+    "bulma-calendar": "^6.1.14",
+    "bulma-checkradio": "^2.1.2",
+    "bulma-prefers-dark": "^0.1.0-beta.1",
+    "sass": "^1.43.4"
+  }
+}

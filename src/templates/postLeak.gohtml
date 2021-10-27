@@ -16,6 +16,16 @@
     </div>
 {{end}}
 
+<script id="temp">
+    $("<link/>", {
+        rel: "stylesheet",
+        type: "text/css",
+        href: "/static/css/poster.css"
+    }).appendTo("head");
+    // $('head').append('<link rel="stylesheet" type="text/css" href="/static/css/poster.css">');
+</script>
+{{/*<link rel="stylesheet" type="text/css" href="/static/css/poster.css">*/}}
+
 <div class="columns is-centered">
     <div class="column is-half">
         <div class="box is-info has-text-centered">
@@ -132,6 +142,9 @@
                     </div>
                     <span> - </span>
                     <a id="source" target="_blank" class="has-text-danger" rel="noopener">Source</a>
+
+                    <div class="tags mt-2 is-hidden" id="tagsList">
+                    </div>
                 </div>
             </div>
 
@@ -145,6 +158,8 @@
         </div>
     </div>
 </div>
+
+<script src="/static/leakPostFunctions.js"></script>
 <script>
     const allowedLinks = AllowedLinks({{.payload.allowed_links}})
 
@@ -167,12 +182,11 @@
     //const postError = "true" === "{{.errorPublishing}}"
     //const postSuccess = "true" === "{{.publishSuccess}}"
 </script>
-<script defer src="/static/leakPostFunctions.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/js/bulma-tagsinput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bulma-calendar/dist/js/bulma-calendar.min.js"></script>
 <script src="/static/bbcode-config.js"></script>
-<script src="/static/generalFunctions.js"></script>
 <script defer src="/static/bbcode-parser.js"></script>
-<script src="/static/pageJS/postLeak.js"></script>
+<script defer src="/static/pageJS/postLeak.js"></script>
 <script src="/static/convertTime.js"></script>
 
 {{if .errorPublishing}}

@@ -34,27 +34,15 @@
     <meta property="twitter:image" content="{{$image}}">
     <meta property="twitter:url" content="{{ .url }}">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://unpkg.com/bulma-prefers-dark@0.1.0-beta.0/css/bulma-prefers-dark.css"/>
-    <!--    https://unpkg.com/bulma-prefers-dark-->
+    <link rel="stylesheet" href="/static/css/main.css">
 
     <script src="https://code.jquery.com/jquery-2.2.4.js"
             integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
-    <script defer src="/static/menuToggle.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.min.css">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bulma-checkradio@1.1.1/dist/css/bulma-checkradio.min.css">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/css/bulma-tagsinput.min.css">
-    <link rel="stylesheet" href="/static/default.css">
-    <script src="/static/default.js"></script>
-
-    <script async src="/static/noImg.js"></script>
-    <script>
+          href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput/dist/css/bulma-tagsinput.min.css"/>
+    <script async src="/static/default.js">
         last = sessionStorage.getItem("currentPage");
         curr = window.location.pathname
         sessionStorage.setItem("currentPage", curr);
