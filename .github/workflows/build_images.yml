@@ -61,7 +61,7 @@ jobs:
           file: ./Dockerfile
           build-args:
             VERSION=${{ github.sha }}
-          platforms: linux/amd64,linux/arm32
+          platforms: linux/amd64,linux/arm/v7
           push: true
           tags: ${{ steps.prep.outputs.tags }}
 
