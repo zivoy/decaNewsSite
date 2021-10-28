@@ -6,3 +6,4 @@ src/.env
 docker.env
 src/cacheImages/
 node_modules/
+src/resources/css

@@ -15,7 +15,6 @@ parserTags["youtube"] = {
     }
 }
 
-const inputTime = $("input#leakTime");
 const inputLink = $("input#link");
 const linkInfo = $("p#linkInfo");
 const submitButton = $("button#submit");
@@ -38,14 +37,22 @@ BulmaTagsInput.attach(tagsInput[0], {
 })
 
 const tagSelector = tagsInput[0].BulmaTagsInput()
+let calendar
 
 $(document).ready(function () {
-    setTimeVal(inputTime, LeakTime);
+    calendar = bulmaCalendar.attach('[type="datetime-local"]', calenderOptions(LeakTime))[0];
 
-    inputTime.change(() => {
-        LeakTime = timeChange(inputTime, $("time#timeToSet"));
+    calendar.on('select', () => {
+        calendar.value()
+        LeakTime = timeChange(calendar, $("time#timeToSet"));
         formReady();
+        // calendar.refresh()
     });
+    // calendar.on('hide', (e,s) => {
+    //     calendar.save()
+    // });
+
+    LeakTime = timeChange(calendar);
 
     inputLink.on("input", () => {
         Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);
@@ -78,12 +85,12 @@ $(document).ready(function () {
     function tagUpdate() {
         tagList.empty()
         let tags = tagSelector.items
-        if (tags.length > 0){
+        if (tags.length > 0) {
             tagList.removeClass("is-hidden");
         } else {
             tagList.addClass("is-hidden");
         }
-        for (let i in tags){
+        for (let i in tags) {
             let tag = tags[i]
             $("<span>", {
                 class: "tag " + "TODOColor",

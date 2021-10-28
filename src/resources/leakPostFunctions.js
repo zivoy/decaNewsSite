@@ -11,23 +11,34 @@ window.addEventListener("beforeunload", function (e) {
     }
 });
 
-function setTimeVal(field, date) {
-    let now = new Date(date);
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    field.val(now.toISOString().slice(0, 16));
-    field.attr("max", now.toISOString().slice(0, 16));
+function setTimeVal(field, now) {
+    field.value(`${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}`)
+}
+
+function calenderOptions(leakTime) {
+    return {
+        color: "info",
+        showHeader: false,
+        showFooter: false,
+        displayMode: "inline",//"dialog",
+        // enableYearSwitch: false,
+        startDate: leakTime,
+        startTime: leakTime,
+        maxDate: new Date(),
+        dateFormat: 'yyyy/MM/dd',
+        displayYearsCount: 5,
+        minuteSteps: 1,
+    };
 }
 
 function timeChange(field, preview) {
-    field.removeClass("is-danger");
     let time;
     try {
-        time = new Date(field.val());
+        time = new Date(field.value());
         if (preview !== undefined)
             preview.attr("datetime", time.toISOString());
         fixTime()
     } catch (err) {
-        field.addClass("is-danger")
         time = null
         if (preview !== undefined)
             preview.text("invalid date")

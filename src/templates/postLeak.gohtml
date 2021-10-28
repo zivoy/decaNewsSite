@@ -83,7 +83,9 @@
                 <div class="field">
                     <label class="label">Time</label>
                     <div class="control">
-                        <input class="input" type="datetime-local" id="leakTime" name="leakTime" required>
+                        <div class="level-item">
+                            <input class="input" type="datetime-local" id="leakTime" name="leakTime" required>
+                        </div>
                     </div>
                 </div>
 
@@ -186,8 +188,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bulma-calendar/dist/js/bulma-calendar.min.js"></script>
 <script src="/static/bbcode-config.js"></script>
 <script defer src="/static/bbcode-parser.js"></script>
-<script defer src="/static/pageJS/postLeak.js"></script>
 <script src="/static/convertTime.js"></script>
+<script src="/static/pageJS/postLeak.js"></script>
 
 {{if .errorPublishing}}
     <script>
@@ -201,14 +203,14 @@
             if (isNaN(LeakTime.getTime())) {
                 LeakTime = new Date()
             }
-            setTimeVal(inputTime, LeakTime);
+            setTimeVal(calendar, LeakTime);
             inputLink.val(Link);
             inputLeak.val(Leak);
             inputImage.val(Image);
             inputTitle.val(Title);
             tagsInput[0].BulmaTagsInput().add(Tags);
 
-            LeakTime = timeChange(inputTime, $("time#timeToSet"));
+            LeakTime = timeChange(calendar, $("time#timeToSet"));
             Link = linkChange(inputLink, linkInfo, $("a#source"), allowedLinks);
             Leak = leakChange(inputLeak, $("p#leakPreview"), val => {
                 return BBCodeParser.process(val.replaceAll("\n", "<br>"))
@@ -222,9 +224,7 @@
         });
 
         console.log("returned from error");
-        let err = `
-            {{.payload.error}}
-        `
+        let err = `{{.payload.error.Error}}`
         console.error(err)
     </script>
 {{end}}

@@ -83,7 +83,6 @@ function startEdit() {
             </fieldset>
         `));
     $("p#bbcode").html("supports <a href='https://www.bbcode.org/reference.php' target='_blank' rel='noopener'>bbcode</a>")
-    setTimeVal($("#leakTime"), time)
     $("#leakImage").remove();
     $("#controlButtons").html(`
             <button class="button is-warning" id="cancelEdit" onclick="location.reload();">Cancel</button>
@@ -93,7 +92,6 @@ function startEdit() {
     editing = true;
 
     const inputTitle = $("input#title");
-    const inputTime = $("input#leakTime");
     const inputLink = $("input#link");
     const linkInfo = $("p#linkInfo");
     const inputLeak = $("textarea#leak");
@@ -112,6 +110,14 @@ function startEdit() {
 
     $.getScript("https://cdn.jsdelivr.net/npm/bulma-calendar/dist/js/bulma-calendar.min.js",
         function () {
+            let calendar = bulmaCalendar.attach('[type="datetime-local"]', calenderOptions(time))[0];
+            setTimeVal(calendar, time)
+
+            calendar.on('select', () => {
+                calendar.value()
+                time = timeChange(calendar, $("time#timeToSet"));
+                formReady();
+            });
         });
 
 
@@ -119,11 +125,6 @@ function startEdit() {
 
     inputTitle.on("input", () => {
         title = titleChange(inputTitle, $("b#leakTitle"), dTitle);
-        formReady();
-    });
-
-    inputTime.change(() => {
-        time = timeChange(inputTime);
         formReady();
     });
 
