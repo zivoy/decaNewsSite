@@ -34,6 +34,13 @@
     <meta property="twitter:image" content="{{$image}}">
     <meta property="twitter:url" content="{{ .url }}">
 
+    <link rel="alternate" type="application/json+oembed"
+          href="https://decafans.com/api/v1/oembed?url={{ .url | urlquery }}&format=json"
+          title="{{ .title }}"/>
+    <link rel="alternate" type="text/xml+oembed"
+          href="https://decafans.com/api/v1/oembed?url={{ .url | urlquery }}&format=xml"
+          title="{{ .title }}"/>
+
     <link rel="stylesheet" href="/static/css/main.css">
 
     <script src="https://code.jquery.com/jquery-2.2.4.js"

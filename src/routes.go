@@ -65,6 +65,7 @@ func initializeRoutes() {
 			apiV1.GET("/", apiV1RootFunc)
 
 			apiV1.GET("/image", apiV1ImageFunc)
+			apiV1.GET("/oembed", oembedEndpoint)
 
 			leakApi := apiV1.Group("/leaks")
 			{
