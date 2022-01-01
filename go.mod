@@ -25,6 +25,6 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/ugorji/go v1.2.4 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
-	google.golang.org/api v0.56.0
+	google.golang.org/api v0.63.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
