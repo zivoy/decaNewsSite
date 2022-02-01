@@ -18,7 +18,7 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/markbates/goth v1.68.0
+	github.com/markbates/goth v1.69.0
 	github.com/mitchellh/copystructure v1.1.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
