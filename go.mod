@@ -18,13 +18,12 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/markbates/goth v1.68.0
+	github.com/markbates/goth v1.71.1
 	github.com/mitchellh/copystructure v1.1.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/ugorji/go v1.2.4 // indirect
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	google.golang.org/api v0.56.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
